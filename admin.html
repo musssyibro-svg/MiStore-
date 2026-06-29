@@ -1,11 +1,2113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>MiStore Admin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Orders">
+<meta name="theme-color" content="#0E7C66">
+<title>Order Tracker</title>
+<style>
+  :root{
+    --paper:#FBFAF7;
+    --surface:#FFFFFF;
+    --ink:#1A1D21;
+    --muted:#6B7280;
+    --faint:#9AA1AC;
+    --line:#ECE9E2;
+    --line-strong:#DBD7CE;
+    --go:#0E7C66;        /* in transit / primary action */
+    --go-soft:#E3F1ED;
+    --due:#C77700;       /* due today */
+    --due-soft:#FBEFD9;
+    --late:#C0392B;      /* overdue */
+    --late-soft:#FBE6E3;
+    --done:#0E7C66;
+    --shadow:0 1px 2px rgba(26,29,33,.05),0 8px 24px rgba(26,29,33,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:16px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:120px;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+
+  /* ---------- Top bar ---------- */
+  header{
+    position:sticky;top:0;z-index:30;
+    background:rgba(251,250,247,.86);
+    backdrop-filter:saturate(160%) blur(12px);
+    -webkit-backdrop-filter:saturate(160%) blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + 14px) 18px 12px;
+  }
+  .brandrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .brand{font-weight:800;letter-spacing:-.02em;font-size:20px;display:flex;align-items:center;gap:8px;}
+  .brand .pin{font-size:18px;}
+  .clock{font-size:12px;color:var(--muted);}
+  .sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .sub b{color:var(--late);font-weight:700;}
+  .sub b.ok{color:var(--go);}
+
+  .searchwrap{margin-top:12px;position:relative;display:none;}
+  .searchwrap.show{display:block;}
+  .search{
+    width:100%;border:1px solid var(--line-strong);background:var(--surface);
+    border-radius:12px;padding:11px 14px 11px 38px;font-size:15px;color:var(--ink);outline:none;
+  }
+  .search:focus{border-color:var(--go);box-shadow:0 0 0 3px var(--go-soft);}
+  .searchwrap .mag{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:15px;}
+
+  /* ---------- Banner ---------- */
+  .banner{
+    margin:12px 18px 0;background:var(--due-soft);border:1px solid #EAD9B0;
+    color:#7A5200;border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.4;
+    display:none;
+  }
+  .banner.show{display:block;}
+  .banner b{font-weight:700;}
+  .banner.err{background:var(--late-soft);border-color:#F0C7C1;color:#8A2A20;}
+
+  /* ---------- Sections ---------- */
+  main{padding:6px 18px 0;}
+  .section{margin-top:22px;}
+  .sechead{
+    display:flex;align-items:center;gap:8px;margin:0 2px 10px;
+    font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+  }
+  .sechead .count{
+    font-family:ui-monospace,monospace;background:var(--line);color:var(--muted);
+    border-radius:999px;padding:1px 8px;font-size:11px;letter-spacing:0;
+  }
+  .sechead.alert{color:var(--late);}
+  .sechead.alert .count{background:var(--late-soft);color:var(--late);}
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:14px;margin-bottom:12px;position:relative;overflow:hidden;
+  }
+  .card.late{border-color:#F0C7C1;}
+  .card.due{border-color:#EBD6A8;}
+  .card .urg{
+    position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent;
+  }
+  .card.late .urg{background:var(--late);}
+  .card.due  .urg{background:var(--due);}
+  .card.done .urg{background:var(--done);}
+
+  .cardtop{display:flex;gap:12px;}
+  .thumb{
+    width:58px;height:58px;border-radius:12px;flex:0 0 auto;object-fit:cover;
+    background:var(--line);display:flex;align-items:center;justify-content:center;
+    color:var(--faint);font-size:22px;border:1px solid var(--line);
+  }
+  .thumbwrap{position:relative;flex:0 0 auto;}
+  .thumbn{position:absolute;right:-5px;bottom:-5px;background:var(--ink);color:#fff;font-size:10px;font-weight:800;
+    min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;
+    border:2px solid var(--surface);line-height:1;}
+  .galrow{display:flex;gap:8px;overflow-x:auto;margin:-2px 0 16px;padding:2px 0;-webkit-overflow-scrolling:touch;}
+  .galthumb{width:66px;height:66px;border-radius:11px;object-fit:cover;flex:0 0 auto;cursor:pointer;border:1px solid var(--line);}
+  .photostrip{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px;}
+  .pscell{position:relative;width:66px;height:66px;}
+  .pscell img{width:66px;height:66px;border-radius:11px;object-fit:cover;border:1px solid var(--line);display:block;}
+  .pscell .psload{width:66px;height:66px;border-radius:11px;background:var(--line);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:20px;}
+  .psdel{position:absolute;top:-7px;right:-7px;width:21px;height:21px;border-radius:50%;background:var(--late);color:#fff;border:2px solid var(--surface);
+    font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:1000;padding:18px;}
+  .lightbox.show{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain;}
+  /* ---------- batch (customer order with several phones) ---------- */
+  .batch{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+  .batch.attn{border-left:4px solid var(--late);}
+  .batchhead{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .batchhead:active{background:var(--paper);}
+  .bcaret{font-size:13px;color:var(--muted);width:14px;flex:0 0 auto;}
+  .bh-main{min-width:0;flex:1;}
+  .bname{font-weight:700;font-size:16px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bname .bcount{font-weight:500;color:var(--muted);font-size:13px;}
+  .bchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .batchbody{border-top:1px solid var(--line);}
+  .prow{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .prow:last-child{border-bottom:none;}
+  .prow:active{background:var(--paper);}
+  .prow-thumb{width:42px;height:42px;border-radius:9px;object-fit:cover;flex:0 0 auto;border:1px solid var(--line);}
+  .prow-thumb.ph{background:var(--line);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:18px;}
+  .prow-main{min-width:0;flex:1;}
+  .prow-name{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .prow-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;}
+  .prow-trk{font-size:11px;color:var(--faint);}
+  .prow-go{color:var(--faint);font-size:20px;flex:0 0 auto;}
+  .save.ghost{background:transparent;color:var(--go);border:1.5px solid var(--line);margin-top:10px;}
+  .save.ghost:active{background:var(--paper);}
+  .qtybadge{display:inline-block;background:var(--ink);color:#fff;font-size:12px;font-weight:700;border-radius:7px;padding:1px 7px;vertical-align:middle;margin-left:4px;letter-spacing:0;}
+  /* items & returns inside an order */
+  .itemsec{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;}
+  .itemhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-weight:700;font-size:15px;}
+  .itemhead .count{display:inline-block;background:var(--line);color:var(--muted);border-radius:8px;padding:0 7px;font-size:12px;font-weight:700;margin-left:4px;}
+  .itembody{border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .itembody .prow:last-child{border-bottom:none;}
+  .itemempty{font-size:12.5px;color:var(--faint);line-height:1.5;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .prow-note{font-size:12.5px;color:var(--muted);margin-top:4px;font-style:italic;}
+  .ihist{font-size:11.5px;color:var(--muted);margin-top:7px;}
+  .ci{min-width:0;flex:1;}
+  .cname{font-weight:700;font-size:16px;letter-spacing:-.01em;line-height:1.25;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cmeta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:4px;font-size:12.5px;color:var(--muted);}
+  .cmeta .amt{color:var(--ink);font-weight:600;}
+  .trk{display:inline-flex;align-items:center;gap:5px;}
+  .trk .code{color:var(--ink);}
+  .copy{border:none;background:var(--line);color:var(--muted);border-radius:6px;
+    font-size:10.5px;padding:1px 6px;cursor:pointer;font-weight:600;}
+  .copy:active{background:var(--line-strong);}
+
+  /* ---------- Route rail ---------- */
+  .rail{display:flex;align-items:flex-start;margin:14px 2px 2px;}
+  .stop{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;}
+  .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);
+    background:var(--surface);z-index:2;transition:transform .25s;}
+  .stop.done .dot{background:var(--done);border-color:var(--done);}
+  .stop.now .dot{border-color:var(--go);background:var(--surface);transform:scale(1.15);}
+  .card.due  .stop.now .dot{border-color:var(--due);}
+  .card.late .stop.now .dot{border-color:var(--late);}
+  .stop.now.pulse .dot{animation:pulse 1.8s ease-out infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(199,119,0,.45);}70%{box-shadow:0 0 0 9px rgba(199,119,0,0);}100%{box-shadow:0 0 0 0 rgba(199,119,0,0);}}
+  .seg{position:absolute;top:6px;left:50%;width:100%;height:2px;background:var(--line-strong);z-index:1;}
+  .stop.done .seg{background:var(--done);}
+  .stop:last-child .seg{display:none;}
+  .slab{font-size:9.5px;margin-top:6px;color:var(--faint);text-align:center;letter-spacing:.01em;
+    line-height:1.15;max-width:54px;}
+  .stop.now .slab{color:var(--ink);font-weight:700;}
+  .stop.done .slab{color:var(--muted);}
+
+  /* ---------- Status + action ---------- */
+  .statusrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+  .chip{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;letter-spacing:.01em;
+    display:inline-flex;align-items:center;gap:5px;}
+  .chip.late{background:var(--late-soft);color:var(--late);}
+  .chip.due{background:var(--due-soft);color:var(--due);}
+  .chip.go{background:var(--go-soft);color:var(--go);}
+  .nextline{font-size:12.5px;color:var(--muted);margin-top:7px;}
+  .nextline b{color:var(--ink);font-weight:600;}
+
+  .act{
+    width:100%;margin-top:12px;border:none;border-radius:12px;padding:13px;
+    font-size:15px;font-weight:700;color:#fff;background:var(--go);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.01em;
+    transition:transform .08s,filter .15s;
+  }
+  .act:active{transform:scale(.985);filter:brightness(.96);}
+  .act.due{background:var(--due);}
+  .act.late{background:var(--late);}
+
+  .cardfoot{display:flex;gap:14px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line);}
+  .link{background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;
+    cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:5px;}
+  .link:active{color:var(--ink);}
+  .link.cal{color:var(--go);}
+
+  /* completed */
+  .card.done{opacity:.92;}
+  .card.done .cname{color:var(--muted);}
+  .donetag{font-size:11.5px;font-weight:700;color:var(--done);display:inline-flex;align-items:center;gap:5px;}
+
+  /* ---------- Empty ---------- */
+  .empty{text-align:center;padding:54px 24px;color:var(--muted);}
+  .empty .big{font-size:38px;margin-bottom:10px;}
+  .empty h2{font-size:18px;color:var(--ink);margin:0 0 6px;font-weight:700;}
+  .empty p{font-size:14px;margin:0 auto;max-width:300px;}
+
+  /* ---------- Floating add ---------- */
+  .fab{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:40;
+    background:var(--ink);color:#fff;border:none;border-radius:999px;
+    padding:15px 26px;font-size:16px;font-weight:700;letter-spacing:-.01em;
+    box-shadow:0 8px 28px rgba(26,29,33,.28);cursor:pointer;
+    display:flex;align-items:center;gap:9px;
+  }
+  .fab:active{transform:translateX(-50%) scale(.97);}
+
+  /* ---------- Sheet ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(26,29,33,.4);z-index:50;opacity:0;
+    pointer-events:none;transition:opacity .25s;backdrop-filter:blur(1px);}
+  .scrim.show{opacity:1;pointer-events:auto;}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--surface);
+    border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(26,29,33,.22);
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+    max-height:92vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 20px);
+  }
+  .sheet.show{transform:translateY(0);}
+  .grab{width:38px;height:4px;background:var(--line-strong);border-radius:99px;margin:10px auto 4px;}
+  .shead{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 14px;
+    border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2;}
+  .shead h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em;}
+  .xbtn{border:none;background:var(--line);color:var(--muted);width:30px;height:30px;border-radius:50%;
+    font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .sbody{padding:16px 20px 0;}
+  .field{margin-bottom:15px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.01em;}
+  .field input[type=text],.field input[type=number],.field input[type=date]{
+    width:100%;border:1px solid var(--line-strong);border-radius:11px;padding:12px 13px;
+    font-size:16px;color:var(--ink);background:var(--surface);outline:none;font-family:inherit;
+  }
+  .field input:focus{border-color:var(--go);box-shadow:0 0 0 3px var(--go-soft);}
+  .row2{display:flex;gap:10px;}
+  .row2 .field{flex:1;}
+  .amtgrp{display:flex;border:1px solid var(--line-strong);border-radius:11px;overflow:hidden;}
+  .amtgrp:focus-within{border-color:var(--go);box-shadow:0 0 0 3px var(--go-soft);}
+  .amtgrp input{border:none!important;box-shadow:none!important;border-radius:0!important;flex:1;}
+  .amtgrp select{border:none;background:var(--line);font-size:15px;padding:0 10px;color:var(--ink);
+    font-weight:700;outline:none;cursor:pointer;}
+  .photopick{
+    display:flex;align-items:center;gap:12px;border:1px dashed var(--line-strong);
+    border-radius:11px;padding:12px;cursor:pointer;color:var(--muted);font-size:14px;
+  }
+  .photopick img{width:46px;height:46px;border-radius:9px;object-fit:cover;}
+  .photopick .ph{width:46px;height:46px;border-radius:9px;background:var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--faint);}
+  .hint{font-size:11.5px;color:var(--faint);margin-top:5px;line-height:1.35;}
+  .save{width:100%;margin-top:6px;border:none;border-radius:13px;padding:15px;background:var(--go);
+    color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.01em;}
+  .save:active{filter:brightness(.96);}
+  .save:disabled{opacity:.45;}
+
+  /* detail route (vertical) */
+  .vroute{margin:4px 0 8px;}
+  .vstop{display:flex;gap:12px;padding:2px 0;position:relative;cursor:pointer;}
+  .vstop .col{display:flex;flex-direction:column;align-items:center;width:18px;flex:0 0 auto;}
+  .vdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);background:var(--surface);margin-top:4px;z-index:2;}
+  .vstop.done .vdot{background:var(--done);border-color:var(--done);}
+  .vstop.now .vdot{border-color:var(--go);}
+  .vbar{width:2px;flex:1;background:var(--line-strong);margin:2px 0;min-height:18px;}
+  .vstop.done .vbar{background:var(--done);}
+  .vstop:last-child .vbar{display:none;}
+  .vtext{padding-bottom:12px;flex:1;min-width:0;}
+  .vtitle{font-size:14.5px;font-weight:600;}
+  .vstop.done .vtitle{color:var(--muted);}
+  .vsub{font-size:12px;color:var(--faint);margin-top:1px;}
+  .vsub .reopen{color:var(--go);font-weight:600;}
+  .vstop.now .vtitle{font-weight:700;}
+
+  .dangerline{display:flex;gap:14px;justify-content:center;margin-top:8px;padding-top:14px;border-top:1px solid var(--line);}
+  .dbtn{background:none;border:none;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);}
+  .dbtn.del{color:var(--late);}
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 96px);
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;
+    z-index:80;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:var(--shadow);
+    max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .tools{display:flex;gap:10px;margin:20px 2px 4px;}
+  .toolbtn{flex:1;background:var(--surface);border:1px solid var(--line-strong);border-radius:11px;
+    padding:11px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;}
+  .toolbtn:active{background:var(--line);}
+  .iconbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;gap:6px;padding:12px 18px 0;}
+  .tab{flex:1;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
+    border-radius:11px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.01em;
+    display:flex;align-items:center;justify-content:center;gap:7px;}
+  .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .tabbadge{min-width:18px;height:18px;border-radius:9px;background:var(--late);color:#fff;font-size:11px;
+    display:none;align-items:center;justify-content:center;padding:0 5px;font-family:ui-monospace,monospace;}
+  .tabbadge.show{display:inline-flex;}
+  .tab.active .tabbadge{background:#fff;color:var(--ink);}
+
+  /* ---------- Payment chips ---------- */
+  .chip.pay-paid{background:var(--go-soft);color:var(--go);}
+  .chip.pay-bal{background:var(--due-soft);color:var(--due);}
+  .chip.pay-unpaid{background:var(--late-soft);color:var(--late);}
+
+  /* ---------- Outstanding banner ---------- */
+  .owed{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--due);
+    border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;margin:18px 2px 2px;
+    display:flex;align-items:center;gap:13px;}
+  .owed .ic{font-size:24px;}
+  .owed .t{font-size:12px;color:var(--muted);}
+  .owed .v{font-size:18px;font-weight:800;letter-spacing:-.01em;font-family:ui-monospace,monospace;color:var(--ink);margin-top:1px;}
+
+  /* ---------- Payment block (detail) ---------- */
+  .payblock{border:1px solid var(--line);border-radius:14px;padding:14px;margin:6px 0;background:var(--paper);}
+  .payhead{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:11px;}
+  .payrows{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;font-size:14px;}
+  .payrows .k{color:var(--muted);}
+  .payrows .v{font-weight:700;font-family:ui-monospace,monospace;}
+  .baltot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:10px;border-top:1px solid var(--line);}
+  .baltot .lbl{font-size:13px;color:var(--muted);font-weight:600;}
+  .baltot .amt{font-size:20px;font-weight:800;font-family:ui-monospace,monospace;}
+  .baltot .amt.paid{color:var(--go);}
+  .baltot .amt.owe{color:var(--late);}
+  .paybtns{display:flex;gap:10px;margin-top:13px;}
+  .paybtns button{flex:1;border-radius:11px;padding:11px;font-size:13.5px;font-weight:700;cursor:pointer;
+    border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);}
+  .paybtns button.prim{background:var(--go);color:#fff;border-color:var(--go);}
+  .paybtns button:active{filter:brightness(.96);}
+  .nopay{font-size:13.5px;color:var(--muted);margin:2px 0;}
+
+  .checkrow{display:flex;align-items:center;gap:11px;font-size:14px;color:var(--ink);margin:2px 0 16px;cursor:pointer;line-height:1.3;}
+  .checkrow input{width:22px;height:22px;flex:0 0 auto;accent-color:var(--go);}
+
+  /* ---------- Login screen ---------- */
+  .login-screen{position:fixed;inset:0;background:var(--paper);z-index:200;
+    display:none;align-items:center;justify-content:center;padding:24px;overflow-y:auto;}
+  .login-screen.show{display:flex;}
+  .login-card{width:100%;max-width:380px;padding:32px 24px 24px;background:var(--surface);
+    border:1px solid var(--line);border-radius:24px;box-shadow:0 12px 40px rgba(26,29,33,.14);}
+  .login-logo{font-size:46px;text-align:center;margin-bottom:10px;}
+  .login-title{text-align:center;font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;}
+  .login-sub{text-align:center;font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.4;}
+  .login-err{color:var(--late);font-size:13px;text-align:center;margin-top:10px;min-height:18px;}
+  .login-ok{color:var(--go);font-size:13px;text-align:center;margin-top:10px;}
+
+  /* ---------- Compact view ---------- */
+  .card.compact{padding:11px 12px;margin-bottom:8px;}
+  .card.compact .cardtop{align-items:center;}
+  .card.compact .thumb{width:42px;height:42px;font-size:18px;border-radius:9px;}
+  .card.compact .cname{font-size:15px;}
+  .card.compact .cmeta{margin-top:3px;}
+  .cstage{font-size:12px;color:var(--muted);font-weight:600;}
+
+  /* ---------- Who owes list ---------- */
+  .owedlist{margin:8px 2px 0;display:flex;flex-direction:column;gap:1px;
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+  .owedrow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .owedrow:last-child{border-bottom:none;}
+  .owedrow:active{background:var(--paper);}
+  .owedrow .on{font-weight:600;font-size:14px;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .owedrow .oa{font-family:ui-monospace,monospace;font-weight:700;font-size:14px;color:var(--late);white-space:nowrap;}
+  .owedrow .ot{font-size:11px;color:var(--faint);font-weight:500;font-family:-apple-system,system-ui,sans-serif;}
+
+  /* ---------- Insights stat cards ---------- */
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .statcard{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:13px;}
+  .statcard .sl{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.3;}
+  .statcard .sv{font-size:19px;font-weight:800;font-family:ui-monospace,monospace;margin-top:5px;letter-spacing:-.01em;word-break:break-word;}
+  .statcard.owe .sv{color:var(--late);}
+  .statcard.pos .sv{color:var(--go);}
+  .statcard.neg .sv{color:var(--late);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;}
+  }
+</style>
 </head>
-<body style="background:black;color:white;font-family:Arial;text-align:center;padding:40px;">
-<h1>MiStore Admin Panel</h1>
-<p>This is your private admin page.</p>
-<p>Orders and stock management will be added here.</p>
+<body>
+
+<header>
+  <div class="brandrow">
+    <div class="brand"><span class="pin">📦</span>Order Tracker</div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button class="iconbtn" id="insightsBtn" aria-label="Insights" title="Insights">📊</button>
+      <button class="iconbtn" id="compactToggle" aria-label="Toggle compact view" title="Compact view">⊟</button>
+      <button class="iconbtn" id="searchToggle" aria-label="Search">🔍</button>
+      <span class="clock" id="clock"></span>
+    </div>
+  </div>
+  <div class="sub" id="subline">Loading…</div>
+  <div class="searchwrap" id="searchWrap">
+    <span class="mag">🔍</span>
+    <input class="search" id="searchInput" placeholder="Search phone, tracking, or customer" />
+  </div>
+</header>
+
+<div class="banner" id="cloudBanner"></div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="active">On the way <span class="tabbadge" id="activeBadge"></span></button>
+  <button class="tab" data-tab="history">History</button>
+</div>
+
+<main id="app"></main>
+
+<button class="fab" id="addFab">＋ Add order</button>
+
+<!-- ===== Login screen ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">📦</div>
+    <h1 class="login-title">Order Tracker</h1>
+    <p class="login-sub" id="loginMsg">Sign in to access your orders.</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="lEmail" placeholder="you@example.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="lPass" placeholder="Password" autocomplete="current-password" />
+    </div>
+    <button class="save" id="lSubmit">Sign in</button>
+    <button class="link" id="lToggle" style="margin:14px auto 0;display:flex;justify-content:center;">No account? Create one</button>
+    <div class="login-err" id="lHint"></div>
+  </div>
+</div>
+
+<!-- ===== Scrim + sheets ===== -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="formSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="formTitle">New order</h2><button class="xbtn" id="formClose">✕</button></div>
+  <div class="sbody">
+    <div class="field">
+      <label>Phone</label>
+      <input type="text" id="fName" placeholder="e.g. iPhone 12 Pro Max" autocomplete="off" />
+    </div>
+    <div class="field" id="qtyField">
+      <label>How many units? <span style="font-weight:500;color:var(--faint)">(phones in this one order)</span></label>
+      <input type="number" id="fQty" value="1" min="1" max="500" inputmode="numeric" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Product cost <span style="font-weight:500;color:var(--faint)">(private — hidden on home)</span></label>
+        <div class="amtgrp">
+          <input type="number" id="fAmount" placeholder="0" inputmode="decimal" />
+          <select id="fCurrency">
+            <option value="¥">¥ CNY</option>
+            <option value="₦">₦ NGN</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Date bought</label>
+        <input type="date" id="fBuyDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Tracking code <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+      <input type="text" id="fTracking" placeholder="e.g. GX123456789" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>Customer <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+      <input type="text" id="fCustomer" placeholder="Name · city, e.g. Musa · Kaduna" autocomplete="off" />
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Customer price <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+        <div class="amtgrp">
+          <input type="number" id="fPrice" placeholder="0" inputmode="decimal" />
+          <select id="fPayCurrency">
+            <option value="₦">₦</option>
+            <option value="¥">¥</option>
+            <option value="$">$</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Paid so far</label>
+        <input type="number" id="fPaid" placeholder="0" inputmode="decimal" />
+      </div>
+    </div>
+    <p class="hint" id="balHint" style="margin:-8px 0 14px;"></p>
+    <div class="row2">
+      <div class="field">
+        <label>Customer shipping <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+        <input type="number" id="fShipPrice" placeholder="0" inputmode="decimal" />
+      </div>
+      <div class="field">
+        <label>I pay logistics <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+        <input type="number" id="fLogiFee" placeholder="0" inputmode="decimal" />
+      </div>
+    </div>
+    <p class="hint" style="margin:-8px 0 12px;">Shipping uses the same currency as the customer price. You'll tick these as paid later.</p>
+    <label class="checkrow"><input type="checkbox" id="fShipIncluded" /> <span>Shipping already included in customer price</span></label>
+    <label class="checkrow"><input type="checkbox" id="fSkipHome" /> <span>Goods skip my place — ship straight to logistics</span></label>
+    <div class="field">
+      <label>Photo <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+      <label class="photopick" for="fPhoto" id="photoLabel">
+        <span class="ph" id="photoPh">📷</span>
+        <span id="photoText">Take a photo or choose from library</span>
+      </label>
+      <div class="photostrip" id="photoStrip"></div>
+      <input type="file" id="fPhoto" accept="image/*" multiple style="display:none" />
+    </div>
+    <p class="hint" id="schedHint"></p>
+    <button class="save" id="saveBtn">Save order</button>
+    <p class="hint" style="text-align:center;margin:12px 0 6px;">Timeline starts automatically. You'll just confirm each step.</p>
+  </div>
+</div>
+
+<!-- ===== Detail sheet ===== -->
+<div class="sheet" id="detailSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="detailTitle">Order</h2><button class="xbtn" id="detailClose">✕</button></div>
+  <div class="sbody" id="detailBody"></div>
+</div>
+
+<!-- ===== Item editor sheet ===== -->
+<div class="sheet" id="itemSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="itemTitle">Returned phone</h2><button class="xbtn" id="itemClose">✕</button></div>
+  <div class="sbody">
+    <div class="field">
+      <label>Which phone? <span style="font-weight:500;color:var(--faint)">(label, IMEI, or “Phone 3”)</span></label>
+      <input type="text" id="iLabel" placeholder="e.g. iPhone 13 Pro — screen issue" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="iStatus">
+        <option value="returned">↩ Returned to seller</option>
+        <option value="fixing">🔧 Being fixed</option>
+        <option value="back">📦 Sent back to me</option>
+        <option value="resent">🚚 Re-sent to logistics</option>
+        <option value="moved">➡ Moved to another order</option>
+        <option value="delivered">✓ Delivered</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>What's the issue / note? <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+      <textarea id="iNote" rows="2" placeholder="e.g. Screen flickering, seller replacing it" style="resize:none"></textarea>
+    </div>
+    <div class="field">
+      <label>New tracking number <span style="font-weight:500;color:var(--faint)">(when re-sent — old one is archived)</span></label>
+      <input type="text" id="iTracking" placeholder="e.g. LOG5582…" autocomplete="off" />
+      <div id="iHist" class="ihist"></div>
+    </div>
+    <div class="field">
+      <label>Returned-goods photos <span style="font-weight:500;color:var(--faint)">(optional)</span></label>
+      <label class="photopick" for="iPhoto" id="iPhotoLabel">
+        <span class="ph" id="iPhotoPh">📷</span>
+        <span id="iPhotoText">Add photos of the returned phone</span>
+      </label>
+      <div class="photostrip" id="iPhotoStrip"></div>
+      <input type="file" id="iPhoto" accept="image/*" multiple style="display:none" />
+    </div>
+    <button class="save" id="iSave">Save item</button>
+    <button class="dbtn del" id="iDelete" style="margin:10px auto 0;display:none;">🗑 Remove this item</button>
+  </div>
+</div>
+
+<!-- ===== Insights sheet ===== -->
+<div class="sheet" id="insightsSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>📊 Insights</h2><button class="xbtn" id="insightsClose">✕</button></div>
+  <div class="sbody" id="insightsBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s);"></script>
+<script>
+/* ============================================================
+   Order Tracker — single file · Supabase backend (cloud sync)
+   Route: Supplier → My place → China logistics → Lagos → Kano → Customer
+   ============================================================ */
+
+/* ===========  PASTE YOUR SUPABASE DETAILS HERE  =========== */
+const SUPABASE_URL      = 'https://pisfsnmwwotxxuouogqz.supabase.co';   // e.g. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';      // Settings -> API -> anon public key
+const PHOTO_BUCKET      = 'order-photos';
+/* ========================================================= */
+
+// stage metadata keyed by stage key. offset = days from the PREVIOUS stage in the route.
+const NODE_META = {
+  bought:{ label:'Bought',           slab:'Bought',     offset:0, verb:null,                         due:null },
+  home:  { label:'At my place',      slab:'My place',   offset:2, verb:'Collected at my place',      due:'Collect at my place' },
+  logi:  { label:'Received at logistics',  slab:'Logistics', offset:2, verb:'Received at logistics',  due:'Confirm logistics received it' },
+  lagos: { label:'Arrived in Lagos', slab:'Lagos',      offset:2, verb:'Arrived in Lagos',           due:'Confirm Lagos arrival' },
+  kano:  { label:'Arrived in Kano',  slab:'Kano',       offset:1, verb:'Arrived in Kano',            due:'Confirm Kano arrival' },
+  sent:  { label:'Sent to customer', slab:'Customer',   offset:0, verb:'Sent to customer',           due:'Send to customer' },
+};
+const ROUTE_FULL = ['bought','home','logi','lagos','kano','sent'];
+const ROUTE_SKIP = ['bought','logi','lagos','kano','sent'];   // goods skip my place, straight to logistics
+function routeKeys(o){ return (o && o.skipHome) ? ROUTE_SKIP : ROUTE_FULL; }
+function nmeta(node){ return NODE_META[node.key] || {label:node.key, slab:node.key, due:node.key, verb:node.key, offset:0}; }
+const REMIND_HOUR = 8;
+
+/* ---------- configurable route durations (user-settable) ---------- */
+let durations = {home:2, logi:2, lagos:2, kano:1};
+try{ const d=localStorage.getItem('po_dur'); if(d){ const p=JSON.parse(d)||{}; ['home','logi','lagos','kano'].forEach(k=>{ if(p[k]!=null){ const v=Number(p[k]); if(!isNaN(v)) durations[k]=Math.max(0,Math.min(60,v)); } }); } }catch(e){}
+function saveDurations(){ try{ localStorage.setItem('po_dur', JSON.stringify(durations)); }catch(e){} }
+function applyDurationsToAll(){
+  const changed=[];
+  orders.forEach(o=>{
+    if(currentIndex(o)<0) return;                 // completed orders keep their real dates
+    const before = o.nodes.map(n=>n.expected).join('|');
+    recompute(o.nodes);                           // preserves actuals, only shifts pending expecteds
+    if(o.nodes.map(n=>n.expected).join('|')!==before) changed.push(o);
+  });
+  render();
+  if(changed.length && db){                       // one batched write, not N parallel ones
+    const rows = changed.map(o=>Object.assign(toRow(o), {id:o.id}));
+    db.from('orders').upsert(rows, {onConflict:'id'}).then(({error})=>{ if(error) toast('⚠ Some new dates didn’t save: '+error.message); });
+  }
+  return changed.length;
+}
+function stageDays(key){ return durations[key]!=null ? durations[key] : (NODE_META[key]||{offset:0}).offset; }
+
+/* ---------- current authenticated user ---------- */
+let currentUser = null;
+
+/* ---------- XSS: only allow https URLs for user-supplied images ---------- */
+function safeUrl(url){
+  if(typeof url!=='string') return '';
+  const u=url.trim();
+  if(!u) return '';
+  if(/[\u0000-\u001f]/.test(u)) return '';                       // control chars
+  if(/^(javascript|data|vbscript|file|blob):/i.test(u)) return ''; // dangerous schemes
+  try{ const p=new URL(u); if(p.protocol==='https:') return p.href; }catch(e){}
+  return '';
+}
+function isValidYMD(s){ return typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(pd(s).getTime()); }
+
+/* ---------- date helpers ---------- */
+const DAY = 86400000;
+function today(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function pd(s){ const [y,m,d]=s.split('-').map(Number); const x=new Date(y,m-1,d); x.setHours(0,0,0,0); return x; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; }
+function diffDays(a,b){ return Math.round((b-a)/DAY); }
+function nice(d){ return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
+
+/* ---------- Supabase data layer ---------- */
+let db = null;
+let orders = [];
+let cloudReady = false;
+const banner = document.getElementById('cloudBanner');
+
+function setBanner(html, kind){
+  if(!html){ banner.className='banner'; banner.innerHTML=''; return; }
+  banner.className = 'banner show ' + (kind||'');
+  banner.innerHTML = html;
+}
+function configError(){
+  if(SUPABASE_URL.indexOf('PASTE_')>-1 || SUPABASE_ANON_KEY.indexOf('PASTE_')>-1) return 'setup';
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.(co|in|net)\/?$/i.test(SUPABASE_URL.trim())) return 'Your SUPABASE_URL looks wrong — it should be like https://yourproject.supabase.co';
+  const key = (SUPABASE_ANON_KEY||'').trim();
+  // SECURITY: a secret/service key must never ship in the browser
+  if(/^sb_secret_/i.test(key) || /service_role/i.test(key)) return 'That looks like a SECRET / service_role key — never put it in front-end code. Use the publishable (anon) key instead.';
+  const isPublishable = /^sb_publishable_[A-Za-z0-9_-]{16,}$/.test(key);     // modern Supabase key
+  const isLegacyJwt   = /^eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(key); // legacy anon JWT
+  if(!isPublishable && !isLegacyJwt) return 'Your Supabase key doesn’t match a known format. It should start with "sb_publishable_…" or be a long JWT ("eyJ…"). Re-copy it from Settings → API.';
+  return null;
+}
+function initSupabase(){ db = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim()); }
+function numOrNull(v){ if(v===null||v===undefined||v==='') return null; const n=Number(v); return isNaN(n)?null:n; }
+
+/* map between DB row (snake_case) and app object (camelCase) */
+function fromRow(r){
+  const photos = (Array.isArray(r.photos)&&r.photos.length) ? r.photos.filter(p=>typeof p==='string') : (r.photo?[r.photo]:[]);
+  return {
+    id:r.id, name:r.name, amount:r.amount, currency:r.currency,
+    tracking:r.tracking, customer:r.customer, photo:photos[0]||null, photos:photos,
+    createdAt:r.created_at,
+    nodes:(Array.isArray(r.nodes)&&r.nodes.length)?r.nodes:makeNodes(ymd(today()), !!r.skip_home),
+    price:r.price, paid:r.paid, payCurrency:r.pay_currency||'₦',
+    shipPrice:r.ship_price, shipPaid:!!r.ship_paid,
+    logiFee:r.logi_fee, logiPaid:!!r.logi_paid,
+    skipHome:!!r.skip_home,
+    shipIncluded:!!r.ship_included,
+    quantity:(r.quantity&&Number(r.quantity)>0)?Number(r.quantity):1,
+    items:Array.isArray(r.items)?r.items.map(normItem):[],
+    hold:r.hold||null
+  };
+}
+function toRow(o){
+  const photos = (Array.isArray(o.photos)&&o.photos.length)?o.photos:(o.photo?[o.photo]:[]);
+  const row = {
+    name:o.name||null, amount:numOrNull(o.amount), currency:o.currency||null,
+    tracking:o.tracking||null, customer:o.customer||null,
+    photo:photos[0]||null, photos:photos.length?photos:null,
+    nodes:o.nodes||null, price:numOrNull(o.price), paid:numOrNull(o.paid),
+    pay_currency:o.payCurrency||'₦',
+    ship_price:numOrNull(o.shipPrice), ship_paid:!!o.shipPaid,
+    logi_fee:numOrNull(o.logiFee), logi_paid:!!o.logiPaid,
+    skip_home:!!o.skipHome,
+    ship_included:!!o.shipIncluded,
+    quantity:(o.quantity&&Number(o.quantity)>0)?Math.round(Number(o.quantity)):1,
+    items:(Array.isArray(o.items)&&o.items.length)?o.items.map(cleanItem):null,
+    hold:o.hold||null
+  };
+  if(currentUser) row.user_id = currentUser.id;
+  return row;
+}
+
+let loading=false, reloadPending=false;
+async function loadCloud(){
+  if(!db || !currentUser) return;
+  if(loading){ reloadPending=true; return; }   // coalesce overlapping loads
+  loading=true;
+  setBanner('Loading your orders…','');
+  try{
+    const { data, error } = await db.from('orders').select('*')
+      .eq('user_id', currentUser.id).order('created_at',{ascending:false});
+    if(error){
+      setBanner('⚠ Could not load from Supabase: '+esc(error.message)+'<br>Check the table, columns, and Row Level Security policies.','err');
+      return;
+    }
+    orders = (data||[]).map(fromRow);
+    cloudReady = true; setBanner('');
+    render();
+    resolvePhotos();
+  } finally {
+    loading=false;
+    if(reloadPending){ reloadPending=false; loadCloud(); }
+  }
+}
+function validateRow(row){
+  if(!row || !row.name || typeof row.name!=='string') throw new Error('Order needs a name');
+  if(!Array.isArray(row.nodes) || !row.nodes.length) throw new Error('Order has no route');
+  for(const n of row.nodes){
+    if(!n || !NODE_META[n.key]) throw new Error('Order has an invalid route stage');
+    if(n.actual!=null && !isValidYMD(n.actual)) throw new Error('Order has an invalid date');
+    if(n.expected!=null && !isValidYMD(n.expected)) throw new Error('Order has an invalid date');
+  }
+  ['amount','price','paid','ship_price','logi_fee'].forEach(k=>{ if(row[k]!=null && (typeof row[k]!=='number'||isNaN(row[k]))) row[k]=null; });
+  if(row.photos!=null){ if(!Array.isArray(row.photos)){ row.photos=null; } else { row.photos=row.photos.filter(p=>typeof p==='string').slice(0,6); if(!row.photos.length) row.photos=null; } }
+  return row;
+}
+async function dbInsert(o){
+  const row = validateRow(toRow(o));
+  if(!row.user_id){                                    // fallback: pull id straight from the live session
+    try{ const { data:{ user } } = await db.auth.getUser(); if(user) row.user_id = user.id; }catch(e){}
+  }
+  if(!row.user_id){ throw new Error('Not signed in — please sign out and back in'); }
+  const { data, error } = await db.from('orders').insert(row).select().single();
+  if(error) throw error;
+  return fromRow(data);
+}
+async function dbUpdate(o){
+  const row = validateRow(toRow(o));
+  const { error } = await db.from('orders').update(row).eq('id', o.id);
+  if(error) throw error;
+}
+async function dbDelete(id){
+  const { error } = await db.from('orders').delete().eq('id', id);
+  if(error) throw error;
+}
+/* fire-and-forget update for quick actions (optimistic UI) */
+function syncOrder(o){ if(db) dbUpdate(o).catch(err=>toast('⚠ Sync failed: '+(err.message||err))); }
+
+/* optimistic change with automatic rollback if the server write fails.
+   A per-order revision guard stops a stale failed request from clobbering a newer change. */
+let _revCounter=0;
+const _orderRev=new Map();
+function optimistic(o, mutate, refreshDetail){
+  const snap = JSON.parse(JSON.stringify(o));   // deep snapshot of prior state
+  const rev = ++_revCounter; _orderRev.set(o.id, rev);
+  mutate();
+  render();
+  if(refreshDetail) openDetail(o.id);
+  dbUpdate(o).catch(()=>{
+    if(_orderRev.get(o.id)!==rev) return;        // a newer change superseded this one — don't revert
+    Object.assign(o, snap);                       // revert to snapshot, same object reference
+    render();
+    if(refreshDetail) openDetail(o.id);
+    toast('⚠ Sync failed — change undone');
+  });
+}
+
+async function uploadPhoto(dataUrl){
+  if(!currentUser) throw new Error('Not signed in');
+  const blob = await (await fetch(dataUrl)).blob();
+  if(blob.size > 8*1024*1024) throw new Error('Image too large');
+  const path = currentUser.id + '/' + Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.jpg';
+  const up = await db.storage.from(PHOTO_BUCKET).upload(path, blob, {contentType:'image/jpeg', upsert:false});
+  if(up.error) throw up.error;
+  return path;   // store the storage PATH; we mint short-lived signed URLs on demand (bucket can be private)
+}
+
+/* ---------- private photos: resolve stored paths to short-lived signed URLs ---------- */
+function extractPath(p){
+  if(!p || typeof p!=='string') return null;
+  if(p.indexOf('/storage/v1/object/')>-1){           // legacy public URL -> pull the path back out
+    const m=p.match(/\/order-photos\/([^?]+)/);
+    return m?decodeURIComponent(m[1]):null;
+  }
+  if(/^https?:\/\//i.test(p)) return null;            // unknown external URL, can't sign
+  return p;                                           // already a storage path
+}
+function allPaths(o){
+  const arr = (Array.isArray(o.photos)&&o.photos.length) ? o.photos : (o.photo?[o.photo]:[]);
+  return arr.map(extractPath).filter(Boolean);
+}
+async function resolvePhotos(){
+  if(!db || !currentUser) return;
+  const now=Date.now();
+  const targets=[];                                   // order photos AND item photos
+  orders.forEach(o=>{
+    targets.push({obj:o, order:true, paths:allPaths(o)});
+    if(Array.isArray(o.items)) o.items.forEach(it=>{
+      targets.push({obj:it, order:false, paths:(Array.isArray(it.photos)?it.photos:[]).map(extractPath).filter(Boolean)});
+    });
+  });
+  const need=[];                                      // {t, path, idx, total}
+  targets.forEach(t=>{
+    if(!t.paths.length){ if(t.order){t.obj._photoUrls=[];t.obj._photoUrl='';} else {t.obj._urls=[];t.obj._url='';} return; }
+    const cur = t.order? t.obj._photoUrls : t.obj._urls;
+    const exp = t.order? t.obj._photoExpires : t.obj._exp;
+    const fresh = Array.isArray(cur) && cur.length===t.paths.length && now < (exp||0);
+    if(fresh) return;
+    t.paths.forEach((p,idx)=>need.push({t,path:p,idx,total:t.paths.length}));
+  });
+  if(!need.length) return;
+  try{
+    const { data, error } = await db.storage.from(PHOTO_BUCKET).createSignedUrls(need.map(n=>n.path), 3600);
+    if(error) return;
+    const map=new Map();
+    need.forEach((n,i)=>{
+      if(!map.has(n.t)) map.set(n.t, new Array(n.total).fill(null));
+      const d=data&&data[i];
+      if(d && d.signedUrl) map.get(n.t)[n.idx]=d.signedUrl;
+    });
+    let any=false;
+    map.forEach((urls,t)=>{
+      if(t.order){ t.obj._photoUrls=urls; t.obj._photoUrl=urls.find(u=>!!u)||''; t.obj._photoExpires=now+55*60*1000; }
+      else { t.obj._urls=urls; t.obj._url=urls.find(u=>!!u)||''; t.obj._exp=now+55*60*1000; }
+      any=true;
+    });
+    if(any){ render(); if(openDetailId && detailSheet.classList.contains('show')) openDetail(openDetailId); }
+  }catch(e){}
+}
+
+/* ---------- model ---------- */
+function makeNodes(buyDate, skipHome){
+  const keys = skipHome ? ROUTE_SKIP : ROUTE_FULL;
+  const nodes = keys.map(k=>({ key:k, expected:null, actual:null }));
+  nodes[0].actual = buyDate;
+  recompute(nodes);
+  return nodes;
+}
+function recompute(nodes){
+  for(let i=1;i<nodes.length;i++){
+    const prev = nodes[i-1];
+    const base = prev.actual ? pd(prev.actual) : pd(prev.expected);
+    nodes[i].expected = ymd(addDays(base, stageDays(nodes[i].key)));
+  }
+}
+function currentIndex(o){
+  for(let i=0;i<o.nodes.length;i++){ if(!o.nodes[i].actual) return i; }
+  return -1; // complete
+}
+
+/* payment status: 'paid' | 'partial' | 'unpaid' | 'none' */
+function payInfo(o){
+  const hasPrice = o.price!=null && o.price!=='' && Number(o.price)>0;
+  const price = hasPrice?Number(o.price):0;
+  const paid  = (o.paid!=null && o.paid!=='')?Number(o.paid):0;
+  const bal   = Math.max(0, price - paid);
+  const cur   = o.payCurrency||'₦';
+  let status='none';
+  if(hasPrice){ status = paid>=price ? 'paid' : (paid>0 ? 'partial' : 'unpaid'); }
+  return {hasPrice, price, paid, bal, cur, status};
+}
+
+/* shipping: customer charge (varies) + my logistics fee (paid after Lagos) */
+function shipInfo(o){
+  const cur = o.payCurrency||'₦';
+  const charge = (o.shipPrice!=null && o.shipPrice!=='')?Number(o.shipPrice):0;
+  const fee    = (o.logiFee!=null   && o.logiFee!=='')  ?Number(o.logiFee):0;
+  const lagosNode = (o.nodes||[]).find(n=>n.key==='lagos');
+  const reachedLagos = !!(lagosNode && lagosNode.actual);
+  return { cur, charge, hasShip:charge>0, shipPaid:!!o.shipPaid,
+           fee, hasFee:fee>0, logiPaid:!!o.logiPaid, reachedLagos };
+}
+
+/* ---------- exchange rate + profit ---------- */
+let rate=null;
+try{ const r=localStorage.getItem('po_rate'); rate=(r&&Number(r)>0)?Number(r):null; }catch(e){}
+function setRate(v){ rate=(v&&Number(v)>0)?Number(v):null; try{ localStorage.setItem('po_rate', rate?String(rate):''); }catch(e){} }
+function convToPay(amount, fromCur, payCur){
+  if(amount==null||amount==='') return 0;
+  const a=Number(amount); if(isNaN(a)) return 0;
+  if(fromCur===payCur) return a;
+  if(fromCur==='¥' && payCur==='₦') return rate?a*rate:null;
+  if(fromCur==='₦' && payCur==='¥') return rate?a/rate:null;
+  return null; // unsupported currency pair
+}
+function profitInfo(o){
+  const p=payInfo(o), s=shipInfo(o);
+  const cur=p.cur;
+  const hasRevenue = p.hasPrice || s.hasShip;
+  const hasCost = o.amount!=null && o.amount!=='';
+  const revenue = (p.hasPrice?p.price:0) + ((s.hasShip && !o.shipIncluded)?s.charge:0);
+  const buy = convToPay(o.amount, o.currency||'¥', cur);
+  if(hasCost && buy===null) return {cur, hasRevenue, hasCost, revenue, profit:null, needRate:true, computable:false};
+  const cost = (buy||0) + (s.hasFee?s.fee:0);
+  return {cur, hasRevenue, hasCost, revenue, cost, profit:revenue-cost, needRate:false, computable:hasRevenue&&hasCost};
+}
+function deliveredOrders(){ return orders.filter(o=>!o.hold && currentIndex(o)<0); }
+
+/* urgency of an order's current step: 'late' | 'due' | 'go' | 'done' */
+function urgency(o){
+  const ci = currentIndex(o);
+  if(ci<0) return 'done';
+  const exp = pd(o.nodes[ci].expected);
+  const d = diffDays(today(), exp);
+  if(d<0) return 'late';
+  if(d===0) return 'due';
+  return 'go';
+}
+function rank(o){ // for sorting attention: most overdue first
+  const ci=currentIndex(o); if(ci<0) return 1e9;
+  return diffDays(today(), pd(o.nodes[ci].expected));
+}
+
+/* ---------- ids ---------- */
+function uuid(){
+  if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3|0x8)).toString(16);});
+}
+/* an "item" = one phone inside an order that you track individually (usually a returned/problem unit) */
+const ITEM_STATUS = {
+  returned:{label:'Returned to seller', cls:'late', ico:'↩'},
+  fixing:  {label:'Being fixed',        cls:'due',  ico:'🔧'},
+  resent:  {label:'Re-sent to logistics',cls:'go',  ico:'🚚'},
+  back:    {label:'Sent back to me',     cls:'go',   ico:'📦'},
+  moved:   {label:'Moved to another order',cls:'go', ico:'➡'},
+  delivered:{label:'Delivered',          cls:'pay-paid', ico:'✓'}
+};
+function normItem(it){
+  it=it||{};
+  return { id:it.id||uuid(), label:(it.label||'').toString(), status:ITEM_STATUS[it.status]?it.status:'returned',
+    note:(it.note||'').toString(), photos:Array.isArray(it.photos)?it.photos.filter(p=>typeof p==='string'):[],
+    tracking:(it.tracking||'').toString(), history:Array.isArray(it.history)?it.history:[] };
+}
+function cleanItem(it){
+  return { id:it.id, label:it.label||'', status:it.status||'returned', note:it.note||'',
+    photos:Array.isArray(it.photos)?it.photos:[], tracking:it.tracking||'',
+    history:Array.isArray(it.history)?it.history:[] };
+}
+
+/* ---------- rendering ---------- */
+const app = document.getElementById('app');
+let search = '';
+let tab = 'active';
+
+function matches(o){
+  if(!search) return true;
+  const hay = ((o.name||'')+' '+(o.tracking||'')+' '+(o.customer||'')).toLowerCase();
+  return search.toLowerCase().split(/\s+/).filter(Boolean).every(tok=>hay.includes(tok));
+}
+
+/* total customers still owe (phone balance + unpaid shipping), grouped by currency */
+function outstandingText(){
+  const byCur={};
+  orders.forEach(o=>{
+    const p=payInfo(o), s=shipInfo(o);
+    let owe=0;
+    if(p.status==='partial'||p.status==='unpaid') owe+=p.bal;
+    if(s.hasShip && !s.shipPaid) owe+=s.charge;
+    if(owe>0){ byCur[p.cur]=(byCur[p.cur]||0)+owe; }
+  });
+  const parts=Object.entries(byCur).filter(([,v])=>v>0).map(([c,v])=>c+v.toLocaleString());
+  return parts.join('  +  ');
+}
+
+/* per-customer breakdown of who owes what */
+function owedList(){
+  const rows=[];
+  orders.forEach(o=>{
+    const p=payInfo(o), s=shipInfo(o);
+    let owe=0; const parts=[];
+    if(p.status==='partial'||p.status==='unpaid'){ owe+=p.bal; parts.push('phone'); }
+    if(s.hasShip && !s.shipPaid){ owe+=s.charge; parts.push('shipping'); }
+    if(owe>0){ rows.push({ id:o.id, name:o.customer||o.name||'Unnamed', cur:p.cur,
+      amount:owe, note:parts.join(' + '), delivered:currentIndex(o)<0 }); }
+  });
+  rows.sort((a,b)=>b.amount-a.amount);
+  return rows;
+}
+
+/* ---------- compact view preference ---------- */
+let compact=false;
+try{ compact = localStorage.getItem('po_compact')==='1'; }catch(e){}
+function updateCompactBtn(){
+  const b=document.getElementById('compactToggle');
+  if(b){ b.textContent = compact?'≣':'⊟'; b.title = compact?'Full view':'Compact view'; }
+}
+function setCompact(v){ compact=v; try{ localStorage.setItem('po_compact', v?'1':'0'); }catch(e){} updateCompactBtn(); render(); }
+
+/* ---------- returns / hold helpers ---------- */
+function returnToSeller(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const note=prompt('Returning to seller — note? (e.g. screen fault, wrong model). Leave blank to skip:');
+  if(note===null) return;
+  optimistic(o, ()=>{ o.hold={ type:'returned', note:note.trim(), since:ymd(today()) }; }, true);
+  toast('Marked as returned to seller');
+}
+function resumeAt(id, key){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  optimistic(o, ()=>{
+    o.hold=null;
+    if(key==='logi' && routeKeys(o).indexOf('home')>=0){
+      o.skipHome=true;
+      o.nodes=makeNodes(o.nodes[0].actual, true);   // straight-to-logistics route
+    }
+    let idx=o.nodes.findIndex(n=>n.key===key);
+    if(idx<0) idx=1;
+    for(let i=0;i<idx;i++){ if(!o.nodes[i].actual) o.nodes[i].actual=ymd(today()); }
+    for(let i=idx;i<o.nodes.length;i++){ o.nodes[i].actual=null; }
+    recompute(o.nodes);
+  });
+  const idx2=o.nodes.findIndex(n=>n.key===key);
+  toast('Resumed — now expecting '+nmeta(o.nodes[idx2>=0?idx2:1]).label);
+}
+function resumeButtons(o, idPrefix){
+  const hasHome = routeKeys(o).indexOf('home')>=0;
+  return `<div style="margin-top:10px">
+    ${hasHome?`<button class="act" data-resume="${o.id}:home">↩ Came back to my place</button>`:''}
+    <button class="act" style="background:var(--muted);margin-top:8px" data-resume="${o.id}:logi">→ Re-sent to logistics</button>
+  </div>`;
+}
+function heldCard(o){
+  const note  = o.hold&&o.hold.note ? esc(o.hold.note) : '';
+  const since = o.hold&&o.hold.since ? nice(pd(o.hold.since)) : '';
+  const purl = o._photoUrl && safeUrl(o._photoUrl);
+  const pcount = Array.isArray(o.photos)?o.photos.length:(o.photo?1:0);
+  const photo = purl ? `<div class="thumbwrap"><img class="thumb" src="${purl}" alt="">${pcount>1?`<span class="thumbn">${pcount}</span>`:''}</div>` : `<div class="thumb">📱</div>`;
+  return `<div class="card late" data-open="${o.id}">
+    <span class="urg"></span>
+    <div class="cardtop">${photo}
+      <div class="ci">
+        <div class="cname">${esc(o.name||'Order')}${o.quantity>1?` <span class="qtybadge">×${o.quantity}</span>`:''}</div>
+        <div class="cmeta"><span class="chip late">↩ Returned to seller</span>${since?`<span>since ${since}</span>`:''}</div>
+        ${note?`<div class="nextline" style="margin-top:6px">“${note}”</div>`:''}
+      </div>
+    </div>
+    ${resumeButtons(o)}
+    <div class="cardfoot"><button class="link" data-open="${o.id}">Details</button></div>
+  </div>`;
+}
+
+function render(){
+  updateSub();
+  updateBadge();
+
+  if(orders.length===0){
+    app.innerHTML = `<div class="empty"><div class="big">📦</div>
+      <h2>No orders yet</h2>
+      <p>Add your first phone to start tracking it from China all the way to your customer.</p></div>`;
+    return;
+  }
+
+  let html='';
+
+  if(search){
+    // unified search across EVERYTHING (active, delivered, returned)
+    const results = orders.filter(matches);
+    if(results.length){
+      html += `<section class="section"><div class="sechead">Search results <span class="count">${results.length}</span></div>`;
+      html += results.map(o=> o.hold ? heldCard(o) : card(o)).join('') + `</section>`;
+    } else {
+      html += `<div class="empty"><div class="big">🔍</div><h2>No matches</h2><p>Nothing matches “${esc(search)}”.</p></div>`;
+    }
+  } else if(tab==='active'){
+    const held     = orders.filter(o=>o.hold);
+    const active   = orders.filter(o=>!o.hold && currentIndex(o)>=0);
+    const attention= active.filter(o=>['late','due'].includes(urgency(o))).sort((a,b)=>rank(b)-rank(a));
+    const transit  = active.filter(o=>urgency(o)==='go').sort((a,b)=>rank(b)-rank(a));
+
+    if(held.length){
+      html += `<section class="section"><div class="sechead alert">Returns &amp; issues <span class="count">${held.length}</span></div>`;
+      html += held.map(heldCard).join('') + `</section>`;
+    }
+    if(attention.length){
+      html += `<section class="section"><div class="sechead alert">Needs your attention <span class="count">${attention.length}</span></div>`;
+      html += attention.map(card).join('') + `</section>`;
+    }
+    if(transit.length){
+      html += `<section class="section"><div class="sechead">On the way <span class="count">${transit.length}</span></div>`;
+      html += transit.map(card).join('') + `</section>`;
+    }
+    if(!held.length && !attention.length && !transit.length){
+      const anyDone = orders.some(o=>!o.hold && currentIndex(o)<0);
+      html += `<div class="empty"><div class="big">✅</div><h2>Nothing in transit</h2>
+        <p>All caught up. ${anyDone?'Delivered orders are in History.':'Add an order to start tracking.'}</p></div>`;
+    }
+  } else {
+    // HISTORY
+    const done = orders.filter(o=>!o.hold && currentIndex(o)<0)
+      .sort((a,b)=> pd(b.nodes[b.nodes.length-1].actual) - pd(a.nodes[a.nodes.length-1].actual));
+    const owed = outstandingText();
+    if(owed){
+      html += `<div class="owed"><span class="ic">💰</span><div><div class="t">Customers still owe you</div><div class="v">${owed}</div></div></div>`;
+      const rows = owedList();
+      if(rows.length){
+        html += `<div class="owedlist">` + rows.map(r=>
+          `<div class="owedrow" data-open="${r.id}">
+             <span class="on">${esc(r.name)}${r.delivered?'':' <span class="ot">· in transit</span>'}</span>
+             <span class="oa">${r.cur}${r.amount.toLocaleString()} <span class="ot">${r.note}</span></span>
+           </div>`).join('') + `</div>`;
+      }
+    }
+    if(done.length){
+      html += `<section class="section"><div class="sechead">Delivered <span class="count">${done.length}</span></div>`;
+      html += done.map(card).join('') + `</section>`;
+    } else {
+      html += `<div class="empty"><div class="big">🗂️</div><h2>No delivered orders yet</h2>
+        <p>Orders show here once you mark them sent to the customer.</p></div>`;
+    }
+  }
+
+  // tools
+  html += `<div class="tools">
+      <button class="toolbtn" data-action="backup">⬇︎ Back up</button>
+      <button class="toolbtn" data-action="restore">⬆︎ Restore</button>
+    </div>`;
+  app.innerHTML = html;
+}
+
+/* one delegated click handler for the whole list — attached once, no per-render churn */
+app.addEventListener('click', e=>{
+  const t = e.target.closest('[data-confirm],[data-cal],[data-copy],[data-resume],[data-action],[data-open]');
+  if(!t) return;
+  if(t.dataset.confirm!=null){ e.stopPropagation(); confirmStep(t.dataset.confirm); }
+  else if(t.dataset.cal!=null){ e.stopPropagation(); exportICS(t.dataset.cal); }
+  else if(t.dataset.copy!=null){ e.stopPropagation(); copyText(decodeURIComponent(t.dataset.copy)); }
+  else if(t.dataset.resume!=null){ e.stopPropagation(); const [id,key]=t.dataset.resume.split(':'); resumeAt(id,key); }
+  else if(t.dataset.action==='backup'){ e.stopPropagation(); backup(); }
+  else if(t.dataset.action==='restore'){ e.stopPropagation(); document.getElementById('restoreInput').click(); }
+  else if(t.dataset.open!=null){ openDetail(t.dataset.open); }
+});
+
+function updateBadge(){
+  const need = orders.filter(o=>!o.hold && currentIndex(o)>=0 && ['late','due'].includes(urgency(o))).length;
+  const held = orders.filter(o=>o.hold).length;
+  const total = need+held;
+  const b=document.getElementById('activeBadge');
+  if(total>0){ b.textContent=total; b.classList.add('show'); } else { b.classList.remove('show'); }
+}
+
+function card(o){
+  const ci = currentIndex(o);
+  const u = urgency(o);
+  const lastDone = ci<0 ? o.nodes.length : ci;
+  const railHtml = o.nodes.map((nd,i)=>{
+    const cls = i<lastDone ? 'done' : (i===ci?'now':'');
+    const pulse = (i===ci && (u==='due'||u==='late'))?'pulse':'';
+    return `<div class="stop ${cls} ${pulse}"><span class="seg"></span><span class="dot"></span><span class="slab">${nmeta(nd).slab}</span></div>`;
+  }).join('');
+
+  let statusBlock='';
+  if(ci<0){
+    const sentDate = o.nodes[o.nodes.length-1].actual;
+    statusBlock = `<div class="statusrow"><span class="donetag">✓ Delivered to customer</span>
+      <span class="nextline" style="margin:0">${nice(pd(sentDate))}</span></div>`;
+  } else {
+    const node = nmeta(o.nodes[ci]);
+    const exp = pd(o.nodes[ci].expected);
+    const d = diffDays(today(), exp);
+    let chip, actCls, when;
+    if(d<0){ chip=`<span class="chip late">⚠ Overdue ${-d}d</span>`; actCls='late'; when=`was due ${nice(exp)}`; }
+    else if(d===0){ chip=`<span class="chip due">● Due today</span>`; actCls='due'; when=`today, ${nice(exp)}`; }
+    else { chip=`<span class="chip go">→ On the way</span>`; actCls=''; when=`expected ${nice(exp)}${d===1?' (tomorrow)':' ('+d+' days)'}`; }
+    statusBlock = `<div class="statusrow">${chip}</div>
+      <div class="nextline">Next: <b>${node.due}</b> · ${when}</div>
+      <button class="act ${actCls}" data-confirm="${o.id}">✓ ${node.verb}</button>`;
+  }
+
+  const purl = o._photoUrl ? safeUrl(o._photoUrl) : '';
+  const pcount = Array.isArray(o.photos)?o.photos.length:(o.photo?1:0);
+  const photo = purl
+    ? `<div class="thumbwrap"><img class="thumb" src="${purl}" alt="">${pcount>1?`<span class="thumbn">${pcount}</span>`:''}</div>`
+    : `<div class="thumb">📱</div>`;
+  const trk = o.tracking
+    ? `<span class="trk mono"><span class="code">${esc(o.tracking)}</span><button class="copy" data-copy="${encodeURIComponent(o.tracking)}">copy</button></span>` : '';
+  const cust = o.customer ? `<span>👤 ${esc(o.customer)}</span>` : '';
+  const pInfo = payInfo(o);
+  let payChip='';
+  if(pInfo.status==='paid')    payChip=`<span class="chip pay-paid">✓ Paid</span>`;
+  else if(pInfo.status==='partial') payChip=`<span class="chip pay-bal">Balance ${pInfo.cur}${pInfo.bal.toLocaleString()}</span>`;
+  else if(pInfo.status==='unpaid')  payChip=`<span class="chip pay-unpaid">Unpaid ${pInfo.cur}${pInfo.price.toLocaleString()}</span>`;
+  const sInfo = shipInfo(o);
+  let shipChip='';
+  if(sInfo.hasShip && !sInfo.shipPaid) shipChip=`<span class="chip pay-unpaid">🚚 Ship ${sInfo.cur}${sInfo.charge.toLocaleString()}</span>`;
+  let logiChip='';
+  if(ci>=0 && sInfo.hasFee && sInfo.reachedLagos && !sInfo.logiPaid) logiChip=`<span class="chip due">🚚 Pay logistics ${sInfo.cur}${sInfo.fee.toLocaleString()}</span>`;
+
+  if(compact){
+    let cChip, cStage='';
+    if(ci<0){ cChip=`<span class="chip pay-paid">✓ Delivered</span>`; }
+    else {
+      const exp=pd(o.nodes[ci].expected); const d=diffDays(today(),exp);
+      if(d<0) cChip=`<span class="chip late">⚠ ${-d}d late</span>`;
+      else if(d===0) cChip=`<span class="chip due">● Due today</span>`;
+      else cChip=`<span class="chip go">→ ${d}d</span>`;
+      cStage=`<span class="cstage">${nmeta(o.nodes[ci]).slab}</span>`;
+    }
+    return `<div class="card compact ${u}" data-open="${o.id}">
+      <span class="urg"></span>
+      <div class="cardtop">
+        ${photo}
+        <div class="ci">
+          <div class="cname">${esc(o.name||'Order')}${o.quantity>1?` <span class="qtybadge">×${o.quantity}</span>`:''}</div>
+          <div class="cmeta">${cChip}${cStage}${cust}${payChip}${shipChip}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const calBtn = ci>=0 ? `<button class="link cal" data-cal="${o.id}">🔔 Add reminders to iPhone</button>` : '';
+
+  return `<div class="card ${u}" data-open="${o.id}">
+    <span class="urg"></span>
+    <div class="cardtop">
+      ${photo}
+      <div class="ci">
+        <div class="cname">${esc(o.name||'Order')}${o.quantity>1?` <span class="qtybadge">×${o.quantity}</span>`:''}</div>
+        <div class="cmeta">${trk}${cust}${payChip}${shipChip}${logiChip}</div>
+      </div>
+    </div>
+    <div class="rail">${railHtml}</div>
+    ${statusBlock}
+    <div class="cardfoot">
+      <button class="link" data-open="${o.id}">Details</button>
+      ${calBtn}
+    </div>
+  </div>`;
+}
+
+function fmtNum(n){ const x=Number(n); return isNaN(x)?esc(String(n)):x.toLocaleString(); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
+
+/* ---------- sub line ---------- */
+function updateSub(){
+  const active = orders.filter(o=>!o.hold && currentIndex(o)>=0);
+  const need = active.filter(o=>['late','due'].includes(urgency(o))).length;
+  const held = orders.filter(o=>o.hold).length;
+  const el = document.getElementById('subline');
+  if(orders.length===0){ el.innerHTML='Track every order to your customer — never lose one again.'; return; }
+  if(need>0 || held>0){
+    const bits=[];
+    if(need>0) bits.push(`<b>${need}</b> need${need>1?'':'s'} action`);
+    if(held>0) bits.push(`<b>${held}</b> returned`);
+    el.innerHTML = bits.join(' · ') + ` · ${active.length} on the way`;
+  }
+  else if(active.length){ el.innerHTML=`<b class="ok">All caught up</b> · ${active.length} on the way`; }
+  else { el.innerHTML=`<b class="ok">All caught up</b> · nothing in transit`; }
+}
+
+/* ---------- clock ---------- */
+function tickClock(){
+  document.getElementById('clock').textContent =
+    new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+}
+
+/* ============================================================
+   Actions
+   ============================================================ */
+function confirmStep(id){
+  const o = orders.find(x=>x.id===id); if(!o) return;
+  const ci = currentIndex(o); if(ci<0) return;
+  optimistic(o, ()=>{ o.nodes[ci].actual = ymd(today()); recompute(o.nodes); });
+  const nextI = currentIndex(o);
+  if(nextI<0){ toast('🎉 '+(o.name||'Order')+' delivered!'); }
+  else { toast('✓ Done. Next: '+nmeta(o.nodes[nextI]).due+' by '+nice(pd(o.nodes[nextI].expected))); }
+}
+
+function copyText(t){
+  if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>toast('Copied tracking code')).catch(()=>toast(t)); }
+  else { toast(t); }
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ============================================================
+   Add / Edit sheet
+   ============================================================ */
+const scrim=document.getElementById('scrim');
+const formSheet=document.getElementById('formSheet');
+const detailSheet=document.getElementById('detailSheet');
+let openDetailId=null;
+const insightsSheet=document.getElementById('insightsSheet');
+const itemSheet=document.getElementById('itemSheet');
+let itemCtx=null, pendingItemPhotos=[];
+let editingId=null, pendingPhotos=[];
+
+function openForm(o){
+  editingId = o?o.id:null;
+  pendingPhotos = (o && Array.isArray(o.photos) && o.photos.length)
+    ? o.photos.map((p,i)=>({kind:'path', value:p, url:(o._photoUrls&&o._photoUrls[i])||''}))
+    : [];
+  document.getElementById('formTitle').textContent = o?'Edit order':'New order';
+  document.getElementById('fName').value = o?o.name||'':'';
+  document.getElementById('fAmount').value = o&&o.amount!=null?o.amount:'';
+  document.getElementById('fCurrency').value = o?o.currency||'¥':'¥';
+  document.getElementById('fTracking').value = o?o.tracking||'':'';
+  document.getElementById('fCustomer').value = o?o.customer||'':'';
+  document.getElementById('fPrice').value = o&&o.price!=null?o.price:'';
+  document.getElementById('fPaid').value = o&&o.paid!=null?o.paid:'';
+  document.getElementById('fPayCurrency').value = o?o.payCurrency||'₦':'₦';
+  document.getElementById('fShipPrice').value = o&&o.shipPrice!=null?o.shipPrice:'';
+  document.getElementById('fLogiFee').value = o&&o.logiFee!=null?o.logiFee:'';
+  document.getElementById('fSkipHome').checked = !!(o&&o.skipHome);
+  document.getElementById('fShipIncluded').checked = !!(o&&o.shipIncluded);
+  document.getElementById('fBuyDate').value = o?o.nodes[0].actual:ymd(today());
+  document.getElementById('fQty').value = (o&&o.quantity)?o.quantity:1;
+  document.getElementById('saveBtn').textContent = o?'Save changes':'Save order';
+  renderPhotoStrip();
+  if(o && Array.isArray(o.photos) && o.photos.some((p,i)=>!(o._photoUrls&&o._photoUrls[i]))){   // sign any unresolved thumbs, then refresh strip
+    resolvePhotos().then(()=>{ if(editingId===o.id && formSheet.classList.contains('show')){ pendingPhotos.forEach((it,i)=>{ if(it.kind==='path') it.url=(o._photoUrls&&o._photoUrls[i])||it.url; }); renderPhotoStrip(); } });
+  }
+  updateSchedHint();
+  updateBalHint();
+  showSheet(formSheet);
+  setTimeout(()=>document.getElementById('fName').focus(),300);
+}
+function renderPhotoStrip(){
+  const strip=document.getElementById('photoStrip');
+  const txt=document.getElementById('photoText'), ph=document.getElementById('photoPh');
+  strip.innerHTML = pendingPhotos.map((it,i)=>{
+    const src = it.url ? (it.kind==='data' ? it.url : safeUrl(it.url)) : '';
+    const inner = src ? `<img src="${src}" alt="">` : `<div class="psload">📷</div>`;
+    return `<div class="pscell">${inner}<button type="button" class="psdel" data-psdel="${i}" aria-label="Remove">×</button></div>`;
+  }).join('');
+  txt.textContent = pendingPhotos.length ? 'Add another photo' : 'Take a photo or choose from library';
+  ph.style.display = pendingPhotos.length ? 'none' : 'flex';
+}
+function updateSchedHint(){
+  const v=document.getElementById('fBuyDate').value; if(!v){document.getElementById('schedHint').textContent='';return;}
+  const skip=document.getElementById('fSkipHome').checked;
+  const keys = skip?ROUTE_SKIP:ROUTE_FULL;
+  let cursor=pd(v); const parts=[];
+  for(let i=1;i<keys.length;i++){
+    cursor=addDays(cursor, stageDays(keys[i]));
+    if(keys[i]!=='sent') parts.push(`${NODE_META[keys[i]].slab} <b>${nice(cursor)}</b>`);
+  }
+  document.getElementById('schedHint').innerHTML = 'Estimated: '+parts.join(', ')+'. Dates adjust as you confirm each step.';
+}
+document.getElementById('fBuyDate').addEventListener('change',updateSchedHint);
+document.getElementById('fSkipHome').addEventListener('change',updateSchedHint);
+
+function updateBalHint(){
+  const el=document.getElementById('balHint');
+  const price=parseFloat(document.getElementById('fPrice').value);
+  const paid=parseFloat(document.getElementById('fPaid').value)||0;
+  const cur=document.getElementById('fPayCurrency').value;
+  if(isNaN(price)||price<=0){ el.textContent=''; return; }
+  const bal=Math.max(0, price-paid);
+  if(bal<=0){ el.innerHTML=`<span style="color:var(--go);font-weight:700;">✓ Fully paid</span>`; }
+  else { el.innerHTML=`Balance remaining: <b style="color:var(--due);">${cur}${bal.toLocaleString()}</b>`; }
+}
+['fPrice','fPaid'].forEach(id=>document.getElementById(id).addEventListener('input',updateBalHint));
+document.getElementById('fPayCurrency').addEventListener('change',updateBalHint);
+
+document.getElementById('fPhoto').addEventListener('change',e=>{
+  const files=Array.from(e.target.files||[]); 
+  e.target.value='';                                  // allow re-picking the same file later
+  if(!files.length) return;
+  const slots=Math.max(0, 6 - pendingPhotos.length);
+  if(slots<=0){ toast('Up to 6 photos per order'); return; }
+  const toAdd=files.slice(0, slots);
+  if(files.length>slots) toast('Added '+slots+' — max 6 photos per order');
+  document.getElementById('photoText').textContent='Processing…';
+  let pending=toAdd.length;
+  toAdd.forEach(f=>downscale(f, dataUrl=>{ if(dataUrl) pendingPhotos.push({kind:'data', value:dataUrl, url:dataUrl}); if(--pending===0) renderPhotoStrip(); }));
+});
+document.getElementById('photoStrip').addEventListener('click',e=>{
+  const b=e.target.closest('[data-psdel]'); if(!b) return;
+  const i=Number(b.dataset.psdel); if(i>=0 && i<pendingPhotos.length){ pendingPhotos.splice(i,1); renderPhotoStrip(); }
+});
+function downscale(file, cb){
+  const r=new FileReader();
+  r.onload=ev=>{ const img=new Image();
+    img.onload=()=>{ const max=720; let w=img.width,h=img.height;
+      if(w>h&&w>max){h=Math.round(h*max/w);w=max;} else if(h>=w&&h>max){w=Math.round(w*max/h);h=max;}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      try{ cb(c.toDataURL('image/jpeg',0.6)); }catch(err){ cb(null); }
+    };
+    img.onerror=()=>{toast('Could not read that image');cb(null);};
+    img.src=ev.target.result;
+  };
+  r.onerror=()=>{toast('Could not read that file');cb(null);};
+  r.readAsDataURL(file);
+}
+
+async function doSave(){
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('Add the phone name first'); document.getElementById('fName').focus(); return; }
+  const amount=document.getElementById('fAmount').value.trim();
+  const currency=document.getElementById('fCurrency').value;
+  const tracking=document.getElementById('fTracking').value.trim();
+  const customer=document.getElementById('fCustomer').value.trim();
+  const buyDate=document.getElementById('fBuyDate').value || ymd(today());
+  const price=document.getElementById('fPrice').value.trim();
+  const paid=document.getElementById('fPaid').value.trim();
+  const payCurrency=document.getElementById('fPayCurrency').value;
+  const shipPrice=document.getElementById('fShipPrice').value.trim();
+  const logiFee=document.getElementById('fLogiFee').value.trim();
+  const skipHome=document.getElementById('fSkipHome').checked;
+  const shipIncluded=document.getElementById('fShipIncluded').checked;
+  let qty=parseInt(document.getElementById('fQty').value,10); if(isNaN(qty)||qty<1) qty=1; if(qty>500) qty=500;
+  if(!db){ toast('Supabase isn’t configured yet'); return; }
+
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; btn.textContent = editingId?'Saving…':'Adding…';
+  try{
+    const photoVals=[];
+    for(const it of pendingPhotos){
+      if(it.kind==='data'){ btn.textContent='Uploading photos…'; photoVals.push(await uploadPhoto(it.value)); }
+      else photoVals.push(it.value);
+    }
+
+    if(editingId){
+      const o=orders.find(x=>x.id===editingId);
+      o.name=name; o.amount=amount===''?null:amount; o.currency=currency;
+      o.tracking=tracking; o.customer=customer; o.quantity=qty;
+      o.photos=photoVals; o.photo=photoVals[0]||null;
+      o._photoUrls=null; o._photoUrl=''; o._photoExpires=0;          // force re-sign on next resolve
+      o.price=price===''?null:price; o.paid=paid===''?null:paid; o.payCurrency=payCurrency;
+      o.shipPrice=shipPrice===''?null:shipPrice; o.logiFee=logiFee===''?null:logiFee;
+      o.shipIncluded=shipIncluded;
+      const routeChanged = (!!skipHome)!==(!!o.skipHome);
+      o.skipHome=skipHome;
+      if(routeChanged){ o.nodes=makeNodes(buyDate, skipHome); }          // resets progress
+      else if(o.nodes[0].actual!==buyDate){ o.nodes[0].actual=buyDate; recompute(o.nodes); }
+      await dbUpdate(o);
+      toast(routeChanged?'Order updated (route reset)':'Order updated');
+    } else {
+      const draft={ name, amount:amount===''?null:amount, currency, tracking, customer, quantity:qty,
+        photos:photoVals, price:price===''?null:price, paid:paid===''?null:paid, payCurrency,
+        shipPrice:shipPrice===''?null:shipPrice, shipPaid:false,
+        logiFee:logiFee===''?null:logiFee, logiPaid:false, skipHome, shipIncluded, items:[],
+        nodes:makeNodes(buyDate, skipHome) };
+      const saved=await dbInsert(draft);
+      orders.unshift(saved);
+      toast(qty>1?('Order added — '+qty+' units, tracking started'):'Order added — tracking started');
+    }
+    render(); hideSheets(); resolvePhotos();
+  } catch(err){
+    toast('⚠ Save failed: '+(err.message||err));
+  } finally {
+    btn.disabled=false; btn.textContent = editingId?'Save changes':'Save order';
+  }
+}
+document.getElementById('saveBtn').onclick=()=>doSave();
+
+/* ============================================================
+   Detail sheet
+   ============================================================ */
+function paymentBlock(o){
+  const p=payInfo(o);
+  const s=shipInfo(o);
+  let phoneHtml;
+  if(!p.hasPrice){
+    phoneHtml = `<p class="nopay">No customer price set.</p>
+      <div class="paybtns"><button id="pSet">Add price</button></div>`;
+  } else {
+    const balCls = p.bal<=0?'paid':'owe';
+    const balVal = p.bal<=0?'✓ Fully paid':p.cur+p.bal.toLocaleString();
+    const phoneBtns = p.bal>0
+      ? `<div class="paybtns"><button id="pRecord">＋ Record payment</button><button class="prim" id="pFull">Mark fully paid</button></div>`
+      : `<div class="paybtns"><button id="pEditPay">Edit payment</button></div>`;
+    phoneHtml = `
+      <div class="payrows"><span class="k">Phone price</span><span class="v">${p.cur}${p.price.toLocaleString()}</span></div>
+      <div class="payrows"><span class="k">Paid so far</span><span class="v">${p.cur}${p.paid.toLocaleString()}</span></div>
+      <div class="baltot"><span class="lbl">${p.bal<=0?'Status':'Balance owed'}</span><span class="amt ${balCls}">${balVal}</span></div>
+      ${phoneBtns}`;
+  }
+
+  let shipRows='';
+  if(s.hasShip){
+    shipRows += `<div class="payrows"><span class="k">Customer shipping</span><span class="v">${s.cur}${s.charge.toLocaleString()}</span></div>
+      <div class="paybtns"><button class="${s.shipPaid?'':'prim'}" id="shipToggle">${s.shipPaid?'✓ Customer paid shipping — undo':'Customer paid shipping'}</button></div>`;
+  }
+  if(s.hasFee){
+    shipRows += `<div class="payrows"><span class="k">I pay logistics${s.reachedLagos?'':' <span style="color:var(--faint)">(after Lagos)</span>'}</span><span class="v">${s.cur}${s.fee.toLocaleString()}</span></div>
+      <div class="paybtns"><button class="${s.logiPaid?'':'prim'}" id="logiToggle">${s.logiPaid?'✓ I paid logistics — undo':'I paid logistics'}</button></div>`;
+  }
+  const shipHtml = `<div class="payhead" style="margin-top:16px">Shipping</div>` +
+    (shipRows || `<p class="nopay">No shipping set. Add it with Edit.</p>`);
+
+  return `<div class="payblock"><div class="payhead">Payment</div>${phoneHtml}${shipHtml}</div>`;
+}
+function recordPayment(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const p=payInfo(o);
+  const amt=prompt('Payment received ('+p.cur+'). Balance is '+p.cur+p.bal.toLocaleString()+':');
+  if(amt==null) return;
+  const n=parseFloat(amt);
+  if(isNaN(n)||n<=0){ toast('Enter a valid amount'); return; }
+  optimistic(o, ()=>{ o.paid=(Number(o.paid)||0)+n; }, true);
+  const np=payInfo(o);
+  toast(np.bal<=0?'✓ Fully paid':'Recorded. Balance '+np.cur+np.bal.toLocaleString());
+}
+
+function profitLine(o){
+  const pr=profitInfo(o);
+  if(!pr.hasRevenue && !pr.hasCost) return '';
+  if(pr.needRate){
+    return `<div class="payblock"><div class="payhead">Profit</div>
+      <p class="nopay">Set the ¥→₦ rate in 📊 Insights to see profit.</p></div>`;
+  }
+  if(!pr.hasRevenue || !pr.hasCost){
+    return `<div class="payblock"><div class="payhead">Profit</div>
+      <p class="nopay">${!pr.hasCost?'Add the buying cost':'Add the customer price'} to see profit.</p></div>`;
+  }
+  const cls = pr.profit>=0?'paid':'owe';
+  const sign = pr.profit<0?'-':'';
+  return `<div class="payblock"><div class="payhead">Profit (estimate)</div>
+    <div class="payrows"><span class="k">Revenue (${o.shipIncluded?'price, shipping included':'price + shipping'})</span><span class="v">${pr.cur}${Math.round(pr.revenue).toLocaleString()}</span></div>
+    <div class="payrows"><span class="k">Cost (phone + logistics)</span><span class="v">${pr.cur}${Math.round(pr.cost).toLocaleString()}</span></div>
+    <div class="baltot"><span class="lbl">Profit</span><span class="amt ${cls}">${sign}${pr.cur}${Math.abs(Math.round(pr.profit)).toLocaleString()}</span></div></div>`;
+}
+
+function openInsights(){
+  const body=document.getElementById('insightsBody');
+  const delivered=deliveredOrders();
+  const now=new Date(); const mk=now.getFullYear()+'-'+(now.getMonth()+1);
+  let sales=0, profitMonth=0, profitAll=0, profitCount=0, monthCount=0;
+  delivered.forEach(o=>{
+    const pr=profitInfo(o);
+    sales += pr.revenue||0;
+    if(pr.computable && pr.profit!=null){
+      profitAll+=pr.profit; profitCount++;
+      const sent=o.nodes[o.nodes.length-1].actual;
+      if(sent){ const d=pd(sent); if(d.getFullYear()+'-'+(d.getMonth()+1)===mk){ profitMonth+=pr.profit; monthCount++; } }
+    }
+  });
+  const owed=outstandingText();
+  const counts={};
+  orders.forEach(o=>{ const n=(o.customer||'').trim(); if(n){ counts[n]=(counts[n]||0)+1; } });
+  const repeats=Object.entries(counts).filter(([,c])=>c>1).sort((a,b)=>b[1]-a[1]);
+  const cur='₦';
+  const pm = rate?`${profitMonth<0?'-':''}${cur}${Math.abs(Math.round(profitMonth)).toLocaleString()}`:'—';
+  const pa = rate?`${profitAll<0?'-':''}${cur}${Math.abs(Math.round(profitAll)).toLocaleString()}`:'—';
+
+  body.innerHTML = `
+    <div class="field" style="margin-bottom:16px">
+      <label>Exchange rate — ₦ per ¥1 (needed for profit)</label>
+      <input type="number" id="rateInput" placeholder="e.g. 205" value="${rate||''}" inputmode="decimal" />
+      <p class="hint">Phone cost is in ¥, sales are in ₦. Set this once so profit can be worked out. (Saved on this device.)</p>
+    </div>
+    <div class="statgrid">
+      <div class="statcard"><div class="sl">Total sales · delivered (${delivered.length})</div><div class="sv">${cur}${Math.round(sales).toLocaleString()}</div></div>
+      <div class="statcard owe"><div class="sl">Outstanding debt</div><div class="sv">${owed||cur+'0'}</div></div>
+      <div class="statcard ${profitMonth>=0?'pos':'neg'}"><div class="sl">Profit this month${monthCount?` · ${monthCount}`:''}</div><div class="sv">${pm}</div></div>
+      <div class="statcard ${profitAll>=0?'pos':'neg'}"><div class="sl">Profit all-time${profitCount?` · ${profitCount}`:''}</div><div class="sv">${pa}</div></div>
+    </div>
+    ${!rate?`<p class="hint" style="text-align:center;margin-top:12px">Enter the exchange rate above to unlock profit figures.</p>`:''}
+    <div class="payhead" style="margin-top:22px">Repeat customers</div>
+    ${repeats.length
+      ? `<div class="owedlist">`+repeats.map(([n,c])=>`<div class="owedrow" style="cursor:default"><span class="on">${esc(n)}</span><span class="oa" style="color:var(--ink)">${c} orders</span></div>`).join('')+`</div>`
+      : `<p class="nopay">No repeat customers yet.</p>`}
+    <p class="hint" style="margin-top:16px">Profit = (customer price + shipping charged) − (phone cost + logistics fee). Only orders with both a price and a cost are counted.</p>
+
+    <div class="payhead" style="margin-top:22px">Route durations</div>
+    <div class="row2">
+      <div class="field"><label>Buy → my place (days)</label><input class="dur-input" type="number" data-key="home" value="${durations.home!=null?durations.home:2}" min="0" max="30" /></div>
+      <div class="field"><label>My place → logistics</label><input class="dur-input" type="number" data-key="logi" value="${durations.logi!=null?durations.logi:2}" min="0" max="30" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Logistics → Lagos (days)</label><input class="dur-input" type="number" data-key="lagos" value="${durations.lagos!=null?durations.lagos:2}" min="0" max="30" /></div>
+      <div class="field"><label>Lagos → Kano (days)</label><input class="dur-input" type="number" data-key="kano" value="${durations.kano!=null?durations.kano:1}" min="0" max="30" /></div>
+    </div>
+    <p class="hint">Changes apply to the next confirmed stage onward. Already-confirmed steps keep their real dates.</p>
+
+    <div class="dangerline" style="margin-top:22px">
+      <button class="dbtn del" id="iSignOut">Sign out (${currentUser?esc(currentUser.email):''})</button>
+    </div>
+  `;
+  showSheet(insightsSheet);
+  const ri=document.getElementById('rateInput');
+  if(ri) ri.addEventListener('change',()=>{ setRate(ri.value); render(); openInsights(); });
+  body.querySelectorAll('.dur-input').forEach(inp=>inp.addEventListener('change',()=>{
+    const v=Math.max(0,Math.min(60,Number(inp.value)||0)); durations[inp.dataset.key]=v; saveDurations();
+    const n=applyDurationsToAll();
+    toast(n>0?('Updated · '+n+' order'+(n>1?'s':'')+' rescheduled'):'Duration saved');
+  }));
+  const so=document.getElementById('iSignOut'); if(so) so.onclick=()=>signOut();
+}
+
+function itemsBlock(o){
+  const items = Array.isArray(o.items)?o.items:[];
+  const rows = items.map(it=>{
+    const st=ITEM_STATUS[it.status]||ITEM_STATUS.returned;
+    const purl = it._url ? safeUrl(it._url) : '';
+    const cnt = (Array.isArray(it.photos)&&it.photos.length>1)?`<span class="thumbn">${it.photos.length}</span>`:'';
+    const thumb = purl ? `<div class="thumbwrap" style="flex:0 0 auto;"><img class="prow-thumb" src="${purl}" alt="">${cnt}</div>` : `<div class="prow-thumb ph">${st.ico}</div>`;
+    const trk = it.tracking?`<span class="prow-trk mono">${esc(it.tracking)}</span>`:'';
+    const note = it.note?`<div class="prow-note">“${esc(it.note)}”</div>`:'';
+    return `<div class="prow" data-item="${it.id}">
+      ${thumb}
+      <div class="prow-main">
+        <div class="prow-name">${esc(it.label||'Phone')}</div>
+        <div class="prow-meta"><span class="chip ${st.cls}">${st.ico} ${st.label}</span>${trk}</div>
+        ${note}
+      </div>
+      <span class="prow-go">›</span>
+    </div>`;
+  }).join('');
+  return `<div class="itemsec">
+    <div class="itemhead"><span>Items &amp; returns${items.length?` <span class="count">${items.length}</span>`:''}</span>
+      <button class="link" id="addItemBtn" style="font-size:13px;">＋ Add returned phone</button></div>
+    ${items.length?`<div class="itembody">${rows}</div>`:`<div class="itemempty">Add a phone here when one is returned, damaged, or re-sent with a new tracking number — with its own photos and notes.</div>`}
+  </div>`;
+}
+
+function openDetail(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  openDetailId=id;
+  const ci=currentIndex(o);
+  document.getElementById('detailTitle').textContent=o.name||'Order';
+  const body=document.getElementById('detailBody');
+
+  const meta=[];
+  if(o.amount!=null&&o.amount!=='') meta.push(`<b>${o.currency||''}${fmtNum(o.amount)}</b>`);
+  if(o.tracking) meta.push(`<span class="mono">${esc(o.tracking)}</span>`);
+  if(o.customer) meta.push(esc(o.customer));
+
+  const vroute = o.nodes.map((nd,i)=>{
+    const done = nd.actual;
+    const isNow = i===ci;
+    const cls = done?'done':(isNow?'now':'');
+    let sub;
+    if(done){
+      sub = `Done ${nice(pd(nd.actual))}` + (i>0?` · <span class="reopen" data-reopen="${o.id}:${i}">reopen</span>`:'');
+    } else {
+      sub = `Expected ${nice(pd(nd.expected))}`;
+    }
+    return `<div class="vstop ${cls}"><div class="col"><span class="vdot"></span><span class="vbar"></span></div>
+      <div class="vtext"><div class="vtitle">${nmeta(nd).label}</div><div class="vsub">${sub}</div></div></div>`;
+  }).join('');
+
+  const _urls = (Array.isArray(o._photoUrls)?o._photoUrls:[]).filter(Boolean);
+  const headThumb = _urls.length
+    ? `<div class="thumbwrap" style="flex:0 0 auto;"><img data-light="${encodeURIComponent(_urls[0])}" src="${safeUrl(_urls[0])}" style="width:84px;height:84px;border-radius:14px;object-fit:cover;cursor:pointer;">${_urls.length>1?`<span class="thumbn">${_urls.length}</span>`:''}</div>`
+    : `<div style="width:84px;height:84px;border-radius:14px;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--faint);flex:0 0 auto;">📱</div>`;
+  body.innerHTML = `
+    <div style="display:flex;gap:14px;margin-bottom:16px;">
+      ${headThumb}
+      <div style="min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;font-size:13.5px;color:var(--muted);">
+        ${meta.map(m=>`<div>${m}</div>`).join('')||'<div>No extra details</div>'}
+        <div style="font-size:12px;color:var(--faint);">Bought ${nice(pd(o.nodes[0].actual))}</div>
+      </div>
+    </div>
+    ${_urls.length>1?`<div class="galrow">${_urls.map(u=>`<img class="galthumb" data-light="${encodeURIComponent(u)}" src="${safeUrl(u)}" alt="">`).join('')}</div>`:''}
+    ${paymentBlock(o)}
+    ${profitLine(o)}
+    <div class="vroute">${vroute}</div>
+    ${o.hold
+      ? `<div style="margin-top:6px;font-size:13px;color:var(--late);font-weight:600">↩ Returned to seller${o.hold.since?' on '+nice(pd(o.hold.since)):''}.</div>${resumeButtons(o)}`
+      : (ci>=0
+          ? `<button class="act" id="dConfirm">✓ ${nmeta(o.nodes[ci]).verb}</button>
+             <button class="link cal" id="dCal" style="margin:12px auto 0;display:flex;">🔔 Add reminders to iPhone Calendar</button>
+             <button class="link" id="dReturn" style="margin:14px auto 0;display:flex;color:var(--late)">↩ Return to seller (failed inspection)</button>`
+          : '')}
+    ${itemsBlock(o)}
+    <div class="dangerline">
+      <button class="dbtn" id="dEdit">✎ Edit details</button>
+      <button class="dbtn del" id="dDelete">🗑 Delete order</button>
+    </div>`;
+
+  showSheet(detailSheet);
+
+  const dc=document.getElementById('dConfirm'); if(dc) dc.onclick=()=>{ confirmStep(o.id); hideSheets(); };
+  const dcal=document.getElementById('dCal'); if(dcal) dcal.onclick=()=>exportICS(o.id);
+  const dret=document.getElementById('dReturn'); if(dret) dret.onclick=()=>returnToSeller(o.id);
+  const aib=document.getElementById('addItemBtn'); if(aib) aib.onclick=()=>{ const oid=o.id; hideSheets(); setTimeout(()=>openItemEditor(oid,null),260); };
+  body.querySelectorAll('[data-item]').forEach(el=>el.onclick=()=>{ const oid=o.id, iid=el.dataset.item; hideSheets(); setTimeout(()=>openItemEditor(oid,iid),260); });
+  body.querySelectorAll('[data-resume]').forEach(b=>b.onclick=()=>{ const [id,key]=b.dataset.resume.split(':'); resumeAt(id,key); hideSheets(); });
+  const sT=document.getElementById('shipToggle'); if(sT) sT.onclick=()=>{ const v=!o.shipPaid; optimistic(o, ()=>{ o.shipPaid=v; }, true); toast(v?'✓ Customer shipping marked paid':'Shipping set unpaid'); };
+  const lT=document.getElementById('logiToggle'); if(lT) lT.onclick=()=>{ const v=!o.logiPaid; optimistic(o, ()=>{ o.logiPaid=v; }, true); toast(v?'✓ Logistics marked paid':'Logistics set unpaid'); };
+  document.getElementById('dEdit').onclick=()=>{ hideSheets(); setTimeout(()=>openForm(o),260); };
+  document.getElementById('dDelete').onclick=()=>{
+    if(confirm('Delete "'+(o.name||'this order')+'"? This cannot be undone.')){
+      const id=o.id;
+      orders=orders.filter(x=>x.id!==id); render(); hideSheets(); toast('Order deleted');
+      dbDelete(id).catch(err=>{ toast('⚠ Delete failed on server: '+(err.message||err)); loadCloud(); });
+    }
+  };
+  const pRec=document.getElementById('pRecord'); if(pRec) pRec.onclick=()=>recordPayment(o.id);
+  const pFull=document.getElementById('pFull'); if(pFull) pFull.onclick=()=>{ optimistic(o, ()=>{ o.paid=payInfo(o).price; }, true); toast('✓ Marked fully paid'); };
+  const pSet=document.getElementById('pSet'); if(pSet) pSet.onclick=()=>{ hideSheets(); setTimeout(()=>{ openForm(o); setTimeout(()=>{const f=document.getElementById('fPrice'); if(f) f.focus();},360); },260); };
+  const pEditPay=document.getElementById('pEditPay'); if(pEditPay) pEditPay.onclick=()=>{ hideSheets(); setTimeout(()=>openForm(o),260); };
+  body.querySelectorAll('[data-reopen]').forEach(el=>el.onclick=()=>{
+    const [oid,idx]=el.dataset.reopen.split(':'); const ord=orders.find(x=>x.id===oid);
+    if(!ord) return;
+    const k=Number(idx);
+    optimistic(ord, ()=>{ for(let i=k;i<ord.nodes.length;i++) ord.nodes[i].actual=null; recompute(ord.nodes); }, true);
+    toast('Reopened — step set back to pending');
+  });
+}
+
+/* ============================================================
+   iPhone Calendar reminders (.ics)
+   ============================================================ */
+function pad(n){ return String(n).padStart(2,'0'); }
+function icsEsc(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n'); }
+function dtLocal(dateStr,hour){ const d=pd(dateStr); return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(hour)+'0000'; }
+function dtStamp(){ const d=new Date(); return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+pad(d.getUTCSeconds())+'Z'; }
+
+function exportICS(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const pending = o.nodes.map((nd,i)=>({nd,i})).filter(x=>x.i>0 && !x.nd.actual);
+  if(!pending.length){ toast('No upcoming steps to remind'); return; }
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Order Tracker//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n';
+  pending.forEach(({nd,i})=>{
+    const m=nmeta(nd);
+    const start=dtLocal(nd.expected, REMIND_HOUR);
+    const endD=pd(nd.expected); const end=endD.getFullYear()+pad(endD.getMonth()+1)+pad(endD.getDate())+'T'+pad(REMIND_HOUR)+'3000';
+    const detailBits=[];
+    if(o.tracking) detailBits.push('Tracking: '+o.tracking);
+    if(o.amount!=null&&o.amount!=='') detailBits.push('Amount: '+(o.currency||'')+o.amount);
+    if(o.customer) detailBits.push('Customer: '+o.customer);
+    detailBits.push('(Estimated date — adjust in Order Tracker as you confirm steps.)');
+    ics+='BEGIN:VEVENT\r\n';
+    ics+='UID:'+o.id+'-'+nd.key+'@ordertracker\r\n';
+    ics+='DTSTAMP:'+dtStamp()+'\r\n';
+    ics+='DTSTART:'+start+'\r\n';
+    ics+='DTEND:'+end+'\r\n';
+    ics+='SUMMARY:'+icsEsc('📦 '+(o.name||'Order')+' — '+m.due)+'\r\n';
+    ics+='DESCRIPTION:'+icsEsc(detailBits.join('\n'))+'\r\n';
+    ics+='BEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:PT0M\r\nDESCRIPTION:'+icsEsc(m.due)+'\r\nEND:VALARM\r\n';
+    ics+='END:VEVENT\r\n';
+  });
+  ics+='END:VCALENDAR\r\n';
+  downloadFile((o.name||'order').replace(/[^\w]+/g,'_')+'_reminders.ics', ics, 'text/calendar');
+  toast('Opening reminders — tap "Add All" to your calendar');
+}
+
+/* ============================================================
+   Backup / Restore (JSON)
+   ============================================================ */
+function backup(){
+  const clean = orders.map(o=>{ const c=Object.assign({},o); delete c._photoUrl; delete c._photoUrls; delete c._photoExpires; if(Array.isArray(c.items)) c.items=c.items.map(cleanItem); return c; });
+  const data=JSON.stringify({app:'order-tracker',version:2,owner:currentUser?currentUser.id:null,exported:new Date().toISOString(),orders:clean},null,2);
+  downloadFile('order_tracker_backup_'+ymd(today())+'.json', data, 'application/json');
+  toast('Backup downloaded');
+}
+function downloadFile(name, content, type){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+// hidden restore input
+const restoreInput=document.createElement('input');
+restoreInput.type='file'; restoreInput.accept='.json,application/json'; restoreInput.id='restoreInput';
+restoreInput.style.display='none'; document.body.appendChild(restoreInput);
+restoreInput.addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  if(f.size > 5*1024*1024){ toast('Backup file too large (max 5 MB)'); restoreInput.value=''; return; }
+  const r=new FileReader();
+  r.onload=async ev=>{ try{
+      if(!db || !currentUser){ toast('Sign in first'); return; }
+      const obj=JSON.parse(ev.target.result);
+      const incoming=Array.isArray(obj)?obj:(obj&&obj.orders);
+      if(!Array.isArray(incoming)) throw new Error('Not a valid backup file');
+      if(incoming.length>5000) throw new Error('Too many orders in file (max 5000)');
+      // Only reuse row IDs when restoring YOUR OWN export. A foreign/unknown backup gets fresh IDs,
+      // so it can never overwrite an existing row (in addition to RLS already blocking cross-user writes).
+      const sameOwner = !!(obj && obj.owner && obj.owner===currentUser.id);
+      const verb = sameOwner ? 'Restore' : 'Import as new orders';
+      if(!confirm(verb+' '+incoming.length+' order(s) into your account?'+(sameOwner?' Matching IDs are updated, not duplicated.':' New copies will be created.'))) return;
+      // strict validation + sanitisation; toRow() whitelists fields so junk/__proto__ keys never reach the DB
+      const rows = incoming.map((o,idx)=>{
+        if(!o || typeof o!=='object') throw new Error('Row '+(idx+1)+' is not an object');
+        const row = validateRow(toRow(o));         // toRow stamps YOUR user_id (can't impersonate)
+        if(sameOwner && o.id && typeof o.id==='string' && /^[0-9a-f-]{36}$/i.test(o.id)) row.id=o.id;  // keep ids only for own backup
+        return row;
+      });
+      const { error } = await db.from('orders').upsert(rows, { onConflict:'id', ignoreDuplicates:false });
+      if(error) throw error;
+      toast('Imported '+rows.length+' order(s)');
+      loadCloud();
+    }catch(err){ toast('Restore failed: '+(err&&err.message?err.message:'invalid file')); }
+  };
+  r.readAsText(f); restoreInput.value='';
+});
+
+/* ============================================================
+   Sheet plumbing
+   ============================================================ */
+function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; }
+function hideSheets(){ openDetailId=null; itemCtx=null; scrim.classList.remove('show'); formSheet.classList.remove('show'); detailSheet.classList.remove('show'); insightsSheet.classList.remove('show'); itemSheet.classList.remove('show'); document.body.style.overflow=''; }
+scrim.onclick=hideSheets;
+document.getElementById('formClose').onclick=hideSheets;
+document.getElementById('detailClose').onclick=hideSheets;
+document.getElementById('insightsClose').onclick=hideSheets;
+document.getElementById('addFab').onclick=()=>openForm(null);
+
+/* ---------- item editor (a phone inside an order: returns, re-sends, notes, photos) ---------- */
+function renderItemHist(it){
+  const el=document.getElementById('iHist');
+  const h=(it&&Array.isArray(it.history))?it.history:[];
+  el.innerHTML = h.length ? ('Old tracking: '+h.map(x=>`<span class="mono">${esc(x.tracking)}</span>${x.date?` <span style="color:var(--faint)">(${nice(pd(x.date))})</span>`:''}`).join(' · ')) : '';
+}
+function renderItemStrip(){
+  const strip=document.getElementById('iPhotoStrip');
+  const txt=document.getElementById('iPhotoText'), ph=document.getElementById('iPhotoPh');
+  strip.innerHTML = pendingItemPhotos.map((x,i)=>{
+    const src = x.url ? (x.kind==='data'?x.url:safeUrl(x.url)) : '';
+    const inner = src ? `<img src="${src}" alt="">` : `<div class="psload">📷</div>`;
+    return `<div class="pscell">${inner}<button type="button" class="psdel" data-ipsdel="${i}" aria-label="Remove">×</button></div>`;
+  }).join('');
+  txt.textContent = pendingItemPhotos.length ? 'Add more photos' : 'Add photos of the returned phone';
+  ph.style.display = pendingItemPhotos.length ? 'none' : 'flex';
+}
+function openItemEditor(orderId, itemId){
+  const o=orders.find(x=>x.id===orderId); if(!o) return;
+  itemCtx={orderId, itemId};
+  const it = itemId ? (o.items||[]).find(x=>x.id===itemId) : null;
+  document.getElementById('itemTitle').textContent = it ? 'Edit item' : 'Add returned phone';
+  document.getElementById('iLabel').value = it?it.label||'':'';
+  document.getElementById('iStatus').value = it?it.status||'returned':'returned';
+  document.getElementById('iNote').value = it?it.note||'':'';
+  document.getElementById('iTracking').value = it?it.tracking||'':'';
+  document.getElementById('iDelete').style.display = it?'flex':'none';
+  document.getElementById('iSave').textContent = it?'Save changes':'Save item';
+  pendingItemPhotos = (it && Array.isArray(it.photos) && it.photos.length)
+    ? it.photos.map((p,i)=>({kind:'path', value:p, url:(it._urls&&it._urls[i])||''}))
+    : [];
+  renderItemHist(it);
+  renderItemStrip();
+  if(it && Array.isArray(it.photos) && it.photos.some((p,i)=>!(it._urls&&it._urls[i]))){
+    resolvePhotos().then(()=>{ if(itemCtx&&itemCtx.itemId===itemId && itemSheet.classList.contains('show')){ pendingItemPhotos.forEach((x,i)=>{ if(x.kind==='path') x.url=(it._urls&&it._urls[i])||x.url; }); renderItemStrip(); } });
+  }
+  showSheet(itemSheet);
+  setTimeout(()=>document.getElementById('iLabel').focus(),300);
+}
+async function saveItem(){
+  if(!itemCtx) return;
+  const o=orders.find(x=>x.id===itemCtx.orderId); if(!o) return;
+  const label=document.getElementById('iLabel').value.trim();
+  if(!label){ toast('Add a label for the phone'); document.getElementById('iLabel').focus(); return; }
+  const status=document.getElementById('iStatus').value;
+  const note=document.getElementById('iNote').value.trim();
+  const tracking=document.getElementById('iTracking').value.trim();
+  const btn=document.getElementById('iSave'); btn.disabled=true; btn.textContent='Saving…';
+  try{
+    const photoVals=[];
+    for(const x of pendingItemPhotos){
+      if(x.kind==='data'){ btn.textContent='Uploading…'; photoVals.push(await uploadPhoto(x.value)); }
+      else photoVals.push(x.value);
+    }
+    if(!Array.isArray(o.items)) o.items=[];
+    let it = itemCtx.itemId ? o.items.find(x=>x.id===itemCtx.itemId) : null;
+    const prevTracking = it ? (it.tracking||'') : '';
+    const history = (it && Array.isArray(it.history)) ? it.history.slice() : [];
+    if(prevTracking && prevTracking!==tracking){ history.unshift({tracking:prevTracking, date:ymd(today())}); }  // archive old tracking
+    const next = normItem({ id: it?it.id:uuid(), label, status, note, tracking, photos:photoVals, history });
+    if(it){ Object.assign(it, next); it._urls=null; it._url=''; it._exp=0; }
+    else { o.items.push(next); }
+    await dbUpdate(o);
+    resolvePhotos();
+    toast(itemCtx.itemId?'Item updated':'Item added');
+    const oid=o.id; hideSheets(); setTimeout(()=>openDetail(oid),260);
+  }catch(err){ toast('⚠ Couldn’t save item: '+(err.message||err)); }
+  finally{ btn.disabled=false; btn.textContent='Save item'; }
+}
+async function deleteItem(){
+  if(!itemCtx||!itemCtx.itemId) return;
+  const o=orders.find(x=>x.id===itemCtx.orderId); if(!o) return;
+  if(!confirm('Remove this item from the order?')) return;
+  o.items=(o.items||[]).filter(x=>x.id!==itemCtx.itemId);
+  try{ await dbUpdate(o); toast('Item removed'); const oid=o.id; hideSheets(); setTimeout(()=>openDetail(oid),260); }
+  catch(err){ toast('⚠ Couldn’t remove: '+(err.message||err)); }
+}
+document.getElementById('iSave').onclick=()=>saveItem();
+document.getElementById('iDelete').onclick=()=>deleteItem();
+document.getElementById('itemClose').onclick=()=>{ const oid=itemCtx?itemCtx.orderId:null; hideSheets(); if(oid) setTimeout(()=>openDetail(oid),260); };
+document.getElementById('iPhoto').addEventListener('change',e=>{
+  const files=Array.from(e.target.files||[]); e.target.value=''; if(!files.length) return;
+  const slots=Math.max(0,6-pendingItemPhotos.length);
+  if(slots<=0){ toast('Up to 6 photos'); return; }
+  const toAdd=files.slice(0,slots);
+  if(files.length>slots) toast('Added '+slots+' — max 6 photos');
+  document.getElementById('iPhotoText').textContent='Processing…';
+  let pending=toAdd.length;
+  toAdd.forEach(f=>downscale(f, d=>{ if(d) pendingItemPhotos.push({kind:'data',value:d,url:d}); if(--pending===0) renderItemStrip(); }));
+});
+document.getElementById('iPhotoStrip').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ipsdel]'); if(!b) return;
+  const i=Number(b.dataset.ipsdel); if(i>=0&&i<pendingItemPhotos.length){ pendingItemPhotos.splice(i,1); renderItemStrip(); }
+});
+
+/* search */
+const searchWrap=document.getElementById('searchWrap');
+document.getElementById('searchToggle').onclick=()=>{
+  searchWrap.classList.toggle('show');
+  if(searchWrap.classList.contains('show')) document.getElementById('searchInput').focus();
+  else { search=''; document.getElementById('searchInput').value=''; render(); }
+};
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input',e=>{ search=e.target.value; clearTimeout(searchTimer); searchTimer=setTimeout(render,120); });
+
+/* tabs */
+document.querySelectorAll('#tabs .tab').forEach(t=>t.onclick=()=>{
+  tab=t.dataset.tab;
+  document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.toggle('active', x===t));
+  window.scrollTo(0,0);
+  render();
+});
+
+/* compact view toggle */
+const ctBtn=document.getElementById('compactToggle');
+if(ctBtn) ctBtn.onclick=()=>setCompact(!compact);
+
+/* insights */
+const inBtn=document.getElementById('insightsBtn');
+if(inBtn) inBtn.onclick=openInsights;
+
+/* in-app due alert (works only while app is open; calendar handles the rest) */
+function inAppAlert(){
+  if(!('Notification' in window)) return;
+  const due=orders.filter(o=>['late','due'].includes(urgency(o)));
+  if(!due.length) return;
+  if(Notification.permission==='granted'){
+    try{ new Notification('Order Tracker', {body: due.length+' order'+(due.length>1?'s need':' needs')+' action today', icon:''}); }catch(e){}
+  } else if(Notification.permission!=='denied'){
+    // ask once, quietly
+    Notification.requestPermission().then(p=>{ if(p==='granted') inAppAlert(); });
+  }
+}
+
+/* ============================================================
+   Auth
+   ============================================================ */
+function showLogin(msg){
+  document.getElementById('loginMsg').textContent = msg||'Sign in to access your orders.';
+  document.getElementById('loginScreen').classList.add('show');
+  document.getElementById('lHint').textContent='';
+  document.getElementById('lHint').className='login-err';
+  setTimeout(()=>{ const el=document.getElementById('lEmail'); if(el) el.focus(); },200);
+}
+function hideLogin(){ document.getElementById('loginScreen').classList.remove('show'); }
+
+let loginMode='signin';
+document.getElementById('lToggle').onclick=()=>{
+  loginMode = loginMode==='signin'?'signup':'signin';
+  document.getElementById('lSubmit').textContent = loginMode==='signup'?'Create account':'Sign in';
+  document.getElementById('lToggle').textContent = loginMode==='signup'?'Already have an account? Sign in':'No account? Create one';
+  document.getElementById('lHint').textContent='';
+};
+document.getElementById('lSubmit').onclick=async ()=>{
+  const email=document.getElementById('lEmail').value.trim();
+  const pass=document.getElementById('lPass').value;
+  const hint=document.getElementById('lHint');
+  if(!email||!pass){ hint.textContent='Enter your email and password.'; return; }
+  const btn=document.getElementById('lSubmit'); btn.disabled=true; btn.textContent='…';
+  try{
+    if(loginMode==='signup'){
+      const {error}=await db.auth.signUp({email,password:pass});
+      if(error) throw error;
+      hint.className='login-ok';
+      hint.textContent='✓ Account created. Check your email — including the spam folder — to confirm, then sign in.';
+      loginMode='signin'; btn.textContent='Sign in'; btn.disabled=false;
+    } else {
+      const {data,error}=await db.auth.signInWithPassword({email,password:pass});
+      if(error) throw error;
+      // do NOT load here — onAuthStateChange(SIGNED_IN) handles it (prevents a double fetch)
+      hideLogin();
+    }
+  }catch(err){ hint.className='login-err'; hint.textContent='⚠ '+(err.message||'Authentication failed'); btn.disabled=false; btn.textContent=loginMode==='signup'?'Create account':'Sign in'; }
+};
+// allow Enter key in password field
+document.getElementById('lPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('lSubmit').click(); });
+
+async function signOut(){
+  hideSheets();
+  try{ await db.auth.signOut(); }catch(e){}
+  // onAuthStateChange(SIGNED_OUT) performs the teardown
+}
+
+/* ---------- boot ---------- */
+function anySheetOpen(){ return formSheet.classList.contains('show')||detailSheet.classList.contains('show')||insightsSheet.classList.contains('show')||itemSheet.classList.contains('show'); }
+
+let realtimeChannel=null;
+function setupRealtime(){
+  teardownRealtime();
+  if(!db || !currentUser) return;
+  try{
+    realtimeChannel = db.channel('orders-'+currentUser.id)
+      .on('postgres_changes',
+        { event:'*', schema:'public', table:'orders', filter:'user_id=eq.'+currentUser.id },
+        ()=>{ if(!anySheetOpen()) loadCloud(); })
+      .subscribe();
+  }catch(e){}
+}
+function teardownRealtime(){ if(realtimeChannel){ try{ db.removeChannel(realtimeChannel); }catch(e){} realtimeChannel=null; } }
+
+/* single, idempotent entry point for "a user is now active" */
+let alertedThisSession=false;
+function activateSession(user){
+  if(!user) return;
+  if(currentUser && currentUser.id===user.id) return;   // already active for this user — no duplicate load
+  currentUser=user;
+  hideLogin();
+  loadCloud();
+  setupRealtime();
+  if(!alertedThisSession){ alertedThisSession=true; setTimeout(inAppAlert,1500); }
+}
+function deactivateSession(){
+  currentUser=null;
+  teardownRealtime();
+  orders=[]; render();
+  alertedThisSession=false;
+  showLogin('Signed out.');
+}
+
+function boot(){
+  tickClock(); setInterval(tickClock,60000);
+  setInterval(()=>{ if(currentUser && !document.hidden) resolvePhotos(); }, 10*60*1000);  // refresh expiring signed photo URLs
+  updateCompactBtn();
+  const cfg=configError();
+  if(cfg==='setup'){
+    render();
+    setBanner('🔧 <b>One step left.</b> Paste your Supabase <b>Project URL</b> and <b>anon/publishable key</b> near the top of this file, then re-host.','warn');
+    return;
+  }
+  if(cfg){ render(); setBanner('⚠ '+esc(cfg),'err'); return; }
+  try{ initSupabase(); }
+  catch(e){ render(); setBanner('⚠ Could not start Supabase: '+esc(e.message||e),'err'); return; }
+
+  // One listener handles every auth transition; activateSession is idempotent so
+  // SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED can't trigger duplicate loads.
+  db.auth.onAuthStateChange((event, session)=>{
+    if(event==='SIGNED_OUT') deactivateSession();
+    else if(session && session.user) activateSession(session.user);
+  });
+  // Fallback for browsers/versions where INITIAL_SESSION doesn't fire.
+  db.auth.getSession().then(({data})=>{
+    const session=data&&data.session;
+    if(session && session.user) activateSession(session.user);
+    else { render(); showLogin(); }
+  }).catch(()=>{ render(); showLogin(); });
+}
+// re-render on focus so "today" math stays fresh
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ render(); resolvePhotos(); } });
+
+/* ---------- photo lightbox ---------- */
+function openLightbox(url){ if(!url) return; const lb=document.getElementById('lightbox'); document.getElementById('lightboxImg').src=url; lb.classList.add('show'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('show'); document.getElementById('lightboxImg').src=''; }
+document.getElementById('lightbox').addEventListener('click', closeLightbox);
+document.addEventListener('click', e=>{
+  const t=e.target.closest && e.target.closest('[data-light]');
+  if(t){ openLightbox(safeUrl(decodeURIComponent(t.dataset.light))); }
+});
+// wait for the Supabase library (incl. CDN fallback) to load, then start
+(function start(tries){
+  if(window.supabase && window.supabase.createClient){ boot(); }
+  else if(tries>0){ setTimeout(()=>start(tries-1), 150); }
+  else { render(); setBanner('⚠ Couldn’t load the Supabase library. The app needs internet and access to the CDN (jsdelivr / unpkg).','err'); }
+})(60);
+</script>
 </body>
 </html>
