@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order - MiStore</title>
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    margin:0;
+    padding:20px;
+}
+.container{
+    max-width:500px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,.1);
+}
+input,button{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    box-sizing:border-box;
+}
+button{
+    background:#ff6900;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+.status{
+    margin-top:20px;
+    padding:15px;
+    background:#f0f0f0;
+    border-radius:8px;
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Track Your Order</h2>
+    <input id="trackingId" placeholder="Enter Tracking ID">
+    <button onclick="trackOrder()">Track Order</button>
+
+    <div class="status" id="statusBox"></div>
+</div>
+
+<script>
+function trackOrder(){
+    const id=document.getElementById("trackingId").value;
+    const box=document.getElementById("statusBox");
+
+    if(!id){
+        alert("Enter tracking ID");
+        return;
+    }
+
+    box.style.display="block";
+    box.innerHTML=
+        "<b>Tracking ID:</b> "+id+
+        "<br><br><b>Status:</b> Processing"+
+        "<br><b>Estimated Delivery:</b> 3-5 days";
+}
+</script>
+
+</body>
+</html>
