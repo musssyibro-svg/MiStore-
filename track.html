@@ -194,7 +194,11 @@ function showEmpty(msg){
 function renderResult(row){
   let nodes = row.nodes;
   if(typeof nodes==='string'){ try{ nodes=JSON.parse(nodes); }catch(e){ nodes=null; } }
-  const name=firstName(row.customer);
+  const customerName =
+  typeof row.customer === 'string'
+    ? row.customer
+    : (row.customer?.name || '');
+const name = firstName(customerName);
   const qty=Number(row.quantity)||1;
   const onHold=!!row.on_hold;
   const wa='https://wa.me/'+WHATSAPP;
