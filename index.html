@@ -326,6 +326,7 @@
       <a href="#shop" class="on">Home</a>
       <a href="#brands">Brands</a>
       <a href="#phones">Phones</a>
+      <a href="track.html">Track order</a>
       <a href="#how">How it works</a>
       <a href="#contact">Support</a>
     </nav>
@@ -416,7 +417,7 @@
           <div>Premium phones, delivered across Nigeria. Honest grading, fair prices, free case in every order.</div>
         </div>
         <div class="fcol"><b>Shop</b><a href="#brands">Brands</a><a href="#phones">All phones</a><a href="#how">Conditions</a></div>
-        <div class="fcol"><b>Support</b><a id="ftPhone" href="#"></a><a id="ftEmail" href="#"></a><a id="ftGroup" href="#" target="_blank" rel="noopener">WhatsApp group</a></div>
+        <div class="fcol"><b>Support</b><a id="ftPhone" href="#"></a><a id="ftEmail" href="#"></a><a href="track.html">Track your order</a><a id="ftGroup" href="#" target="_blank" rel="noopener">WhatsApp group</a></div>
         <div class="fcol"><b>Delivery &amp; pay</b><div>Free shipping · 10–15 days</div><div>Express · 7–10 days (+₦10k)</div><div>Bank transfer</div></div>
       </div>
       <div class="copy">© <span id="ftYear"></span> <span id="ftBrandC"></span>. Prices include free shipping. Colour availability confirmed on order.</div>
@@ -457,9 +458,12 @@ function perPhoneDiscount(qty){ if(qty>=5) return 10000; if(qty>=3) return 5000;
    When you're ready: set source:'supabase', fill the keys, and implement
    the two fetch functions below. The UI already calls them. */
 const CONFIG = {
-  source: "local",                 // "local" (embedded) | "supabase" (future)
-  supabase: { url: "", anonKey: "" }
-  /* Planned tables when you go live:
+  source: "supabase",
+  supabase: {
+    url: "https://rnldconatvokdstvqwui.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJubGRjb25hdHZva2RzdHZxd3VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDYwNTYsImV4cCI6MjA5ODMyMjA1Nn0.6njFi2f8ntSZiEJa4VuDFaI2ayU0I5qiWDmYKHliuI4"
+  }
+}  /* Planned tables when you go live:
      catalog(brand, model, storage, condition, price_naira, image_url, in_stock)
      customer_orders(id, order_no, track_token, items_json, totals_json, customer_json, status, created_at)
      + a SECURITY DEFINER rpc get_tracking(token) returning ONLY progress (no prices). */
