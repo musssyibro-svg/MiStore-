@@ -648,7 +648,7 @@ function applyDurationsToAll(){
   render();
   if(changed.length && db){                       // one batched write, not N parallel ones
     const rows = changed.map(o=>Object.assign(toRow(o), {id:o.id}));
-    db.from('orders').upsert(rows, {onConflict:'id'}).then(({error})=>{ if(error) toast('⚠ Some new dates didn’t save: '+error.message); });
+    db.from('customer_orders').upsert(rows, {onConflict:'id'}).then(({error})=>{ if(error) toast('⚠ Some new dates didn’t save: '+error.message); });
   }
   return changed.length;
 }
@@ -703,42 +703,55 @@ function configError(){
 function initSupabase(){ db = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim()); }
 function numOrNull(v){ if(v===null||v===undefined||v==='') return null; const n=Number(v); return isNaN(n)?null:n; }
 
-/* map between DB row (snake_case) and app object (camelCase) */
+/* map between the live customer_orders table (id, order_no, tracking, customer jsonb,
+   items jsonb, nodes jsonb, status text, created_at, quantity, on_hold) and the richer
+   app object this UI works with. Only tracking/nodes/quantity/on_hold are 1:1 — everything
+   else (name, price, payments, shipping, photos, the returns log, hold notes) is packed into
+   the `items` jsonb blob as {meta, returns}, and the customer name into `customer.name`.
+   get_tracking() / track.html never read `items`, so this is invisible to customers. */
+function genOrderNo(){ return 'MI'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase(); }
 function fromRow(r){
-  const photos = (Array.isArray(r.photos)&&r.photos.length) ? r.photos.filter(p=>typeof p==='string') : (r.photo?[r.photo]:[]);
+  const meta = (r.items && typeof r.items==='object' && !Array.isArray(r.items)) ? (r.items.meta||{}) : {};
+  const returns = (r.items && Array.isArray(r.items.returns)) ? r.items.returns : [];
+  const customer = (r.customer && typeof r.customer==='object') ? (r.customer.name||'') : (r.customer||'');
+  const photos = (Array.isArray(meta.photos)&&meta.photos.length) ? meta.photos.filter(p=>typeof p==='string') : (meta.photo?[meta.photo]:[]);
   return {
-    id:r.id, name:r.name, amount:r.amount, currency:r.currency,
-    tracking:r.tracking, customer:r.customer, photo:photos[0]||null, photos:photos,
+    id:r.id, orderNo:r.order_no||null, name:meta.name, amount:meta.amount, currency:meta.currency,
+    tracking:r.tracking, customer, photo:photos[0]||null, photos:photos,
     createdAt:r.created_at,
-    nodes:(Array.isArray(r.nodes)&&r.nodes.length)?r.nodes:makeNodes(ymd(today()), !!r.skip_home),
-    price:r.price, paid:r.paid, payCurrency:r.pay_currency||'₦',
-    shipPrice:r.ship_price, shipPaid:!!r.ship_paid,
-    logiFee:r.logi_fee, logiPaid:!!r.logi_paid,
-    skipHome:!!r.skip_home,
-    shipIncluded:!!r.ship_included,
+    nodes:(Array.isArray(r.nodes)&&r.nodes.length)?r.nodes:makeNodes(ymd(today()), !!meta.skipHome),
+    price:meta.price, paid:meta.paid, payCurrency:meta.payCurrency||'₦',
+    shipPrice:meta.shipPrice, shipPaid:!!meta.shipPaid,
+    logiFee:meta.logiFee, logiPaid:!!meta.logiPaid,
+    skipHome:!!meta.skipHome,
+    shipIncluded:!!meta.shipIncluded,
     quantity:(r.quantity&&Number(r.quantity)>0)?Number(r.quantity):1,
-    items:Array.isArray(r.items)?r.items.map(normItem):[],
-    hold:r.hold||null
+    items:returns.map(normItem),
+    hold:meta.hold||null
   };
 }
 function toRow(o){
   const photos = (Array.isArray(o.photos)&&o.photos.length)?o.photos:(o.photo?[o.photo]:[]);
-  const row = {
+  const meta = {
     name:o.name||null, amount:numOrNull(o.amount), currency:o.currency||null,
-    tracking:o.tracking||null, customer:o.customer||null,
     photo:photos[0]||null, photos:photos.length?photos:null,
-    nodes:o.nodes||null, price:numOrNull(o.price), paid:numOrNull(o.paid),
-    pay_currency:o.payCurrency||'₦',
-    ship_price:numOrNull(o.shipPrice), ship_paid:!!o.shipPaid,
-    logi_fee:numOrNull(o.logiFee), logi_paid:!!o.logiPaid,
-    skip_home:!!o.skipHome,
-    ship_included:!!o.shipIncluded,
-    quantity:(o.quantity&&Number(o.quantity)>0)?Math.round(Number(o.quantity)):1,
-    items:(Array.isArray(o.items)&&o.items.length)?o.items.map(cleanItem):null,
+    price:numOrNull(o.price), paid:numOrNull(o.paid), payCurrency:o.payCurrency||'₦',
+    shipPrice:numOrNull(o.shipPrice), shipPaid:!!o.shipPaid,
+    logiFee:numOrNull(o.logiFee), logiPaid:!!o.logiPaid,
+    skipHome:!!o.skipHome, shipIncluded:!!o.shipIncluded,
     hold:o.hold||null
   };
-  if(currentUser) row.user_id = currentUser.id;
-  return row;
+  const completed = Array.isArray(o.nodes) && o.nodes.length && !o.nodes.some(n=>!n.actual);
+  return {
+    order_no:o.orderNo||genOrderNo(),
+    tracking:o.tracking||null,
+    customer:o.customer?{name:o.customer}:null,
+    items:{ meta, returns:(Array.isArray(o.items)&&o.items.length)?o.items.map(cleanItem):[] },
+    nodes:o.nodes||null,
+    quantity:(o.quantity&&Number(o.quantity)>0)?Math.round(Number(o.quantity)):1,
+    on_hold:!!o.hold,
+    status: o.hold ? 'on_hold' : (completed ? 'delivered' : 'active')
+  };
 }
 
 let loading=false, reloadPending=false;
@@ -748,8 +761,8 @@ async function loadCloud(){
   loading=true;
   setBanner('Loading your orders…','');
   try{
-    const { data, error } = await db.from('orders').select('*')
-      .eq('user_id', currentUser.id).order('created_at',{ascending:false});
+    const { data, error } = await db.from('customer_orders').select('*')
+      .order('created_at',{ascending:false});
     if(error){
       setBanner('⚠ Could not load from Supabase: '+esc(error.message)+'<br>Check the table, columns, and Row Level Security policies.','err');
       return;
@@ -764,34 +777,31 @@ async function loadCloud(){
   }
 }
 function validateRow(row){
-  if(!row || !row.name || typeof row.name!=='string') throw new Error('Order needs a name');
+  const meta = (row && row.items && row.items.meta) || {};
+  if(!meta.name || typeof meta.name!=='string') throw new Error('Order needs a name');
   if(!Array.isArray(row.nodes) || !row.nodes.length) throw new Error('Order has no route');
   for(const n of row.nodes){
     if(!n || !NODE_META[n.key]) throw new Error('Order has an invalid route stage');
     if(n.actual!=null && !isValidYMD(n.actual)) throw new Error('Order has an invalid date');
     if(n.expected!=null && !isValidYMD(n.expected)) throw new Error('Order has an invalid date');
   }
-  ['amount','price','paid','ship_price','logi_fee'].forEach(k=>{ if(row[k]!=null && (typeof row[k]!=='number'||isNaN(row[k]))) row[k]=null; });
-  if(row.photos!=null){ if(!Array.isArray(row.photos)){ row.photos=null; } else { row.photos=row.photos.filter(p=>typeof p==='string').slice(0,6); if(!row.photos.length) row.photos=null; } }
+  ['amount','price','paid','shipPrice','logiFee'].forEach(k=>{ if(meta[k]!=null && (typeof meta[k]!=='number'||isNaN(meta[k]))) meta[k]=null; });
+  if(meta.photos!=null){ if(!Array.isArray(meta.photos)){ meta.photos=null; } else { meta.photos=meta.photos.filter(p=>typeof p==='string').slice(0,6); if(!meta.photos.length) meta.photos=null; } }
   return row;
 }
 async function dbInsert(o){
   const row = validateRow(toRow(o));
-  if(!row.user_id){                                    // fallback: pull id straight from the live session
-    try{ const { data:{ user } } = await db.auth.getUser(); if(user) row.user_id = user.id; }catch(e){}
-  }
-  if(!row.user_id){ throw new Error('Not signed in — please sign out and back in'); }
-  const { data, error } = await db.from('orders').insert(row).select().single();
+  const { data, error } = await db.from('customer_orders').insert(row).select().single();
   if(error) throw error;
   return fromRow(data);
 }
 async function dbUpdate(o){
   const row = validateRow(toRow(o));
-  const { error } = await db.from('orders').update(row).eq('id', o.id);
+  const { error } = await db.from('customer_orders').update(row).eq('id', o.id);
   if(error) throw error;
 }
 async function dbDelete(id){
-  const { error } = await db.from('orders').delete().eq('id', id);
+  const { error } = await db.from('customer_orders').delete().eq('id', id);
   if(error) throw error;
 }
 /* fire-and-forget update for quick actions (optimistic UI) */
@@ -1827,7 +1837,7 @@ restoreInput.addEventListener('change',e=>{
         if(sameOwner && o.id && typeof o.id==='string' && /^[0-9a-f-]{36}$/i.test(o.id)) row.id=o.id;  // keep ids only for own backup
         return row;
       });
-      const { error } = await db.from('orders').upsert(rows, { onConflict:'id', ignoreDuplicates:false });
+      const { error } = await db.from('customer_orders').upsert(rows, { onConflict:'id', ignoreDuplicates:false });
       if(error) throw error;
       toast('Imported '+rows.length+' order(s)');
       loadCloud();
@@ -2040,7 +2050,7 @@ function setupRealtime(){
   try{
     realtimeChannel = db.channel('orders-'+currentUser.id)
       .on('postgres_changes',
-        { event:'*', schema:'public', table:'orders', filter:'user_id=eq.'+currentUser.id },
+        { event:'*', schema:'public', table:'customer_orders' },
         ()=>{ if(!anySheetOpen()) loadCloud(); })
       .subscribe();
   }catch(e){}
