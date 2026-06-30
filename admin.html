@@ -318,6 +318,16 @@
   .toolbtn:active{background:var(--line);}
   .iconbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;}
 
+  /* ---------- Catalog photos ---------- */
+  .cpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px;}
+  .cpCard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;}
+  .cpThumb{width:100%;aspect-ratio:1/1;border-radius:10px;background:var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;}
+  .cpThumb img{width:100%;height:100%;object-fit:cover;}
+  .cpThumb .ph{font-size:28px;color:var(--faint);}
+  .cpName{font-size:12.5px;font-weight:600;margin-bottom:8px;}
+  .cpBtn{width:100%;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;padding:8px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .cpBtn:active{background:var(--line);}
+
   /* ---------- Tabs ---------- */
   .tabs{display:flex;gap:6px;padding:12px 18px 0;}
   .tab{flex:1;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
@@ -432,6 +442,7 @@
 <div class="tabs" id="tabs">
   <button class="tab active" data-tab="active">On the way <span class="tabbadge" id="activeBadge"></span></button>
   <button class="tab" data-tab="history">History</button>
+  <button class="tab" data-tab="photos">Catalog photos</button>
 </div>
 
 <main id="app"></main>
@@ -771,6 +782,7 @@ async function loadCloud(){
     cloudReady = true; setBanner('');
     render();
     resolvePhotos();
+    loadProductImages().then(()=>{ if(tab==='photos') render(); });
   } finally {
     loading=false;
     if(reloadPending){ reloadPending=false; loadCloud(); }
@@ -888,6 +900,78 @@ async function resolvePhotos(){
     if(any){ render(); if(openDetailId && detailSheet.classList.contains('show')) openDetail(openDetailId); }
   }catch(e){}
 }
+
+/* ---------- catalog photos: public storefront product images ---------- *
+ * Separate from per-order photos above. Stored in a PUBLIC bucket (no signing
+ * needed — index.html has no Supabase auth and must read these anonymously)
+ * and indexed by model name in the product_images table. */
+const CATALOG_PHOTO_BUCKET = 'catalog-photos';
+const CATALOG_MODELS = [
+  'iPhone X','iPhone XR','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+  'iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max',
+  'iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max',
+  'iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max',
+  'iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max',
+  'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max'
+];
+let productImages = {};   // model -> storage path
+function catalogPhotoUrl(path){ return path ? `${SUPABASE_URL.trim()}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}` : ''; }
+function slugModel(model){ return model.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+async function loadProductImages(){
+  if(!db) return;
+  const { data, error } = await db.from('product_images').select('model,image_path');
+  if(error || !data) return;
+  productImages = {};
+  data.forEach(r=>{ if(r.model) productImages[r.model] = r.image_path; });
+}
+async function uploadCatalogPhoto(model, dataUrl){
+  if(!currentUser) throw new Error('Not signed in');
+  const blob = await (await fetch(dataUrl)).blob();
+  if(blob.size > 8*1024*1024) throw new Error('Image too large');
+  const path = slugModel(model) + '.jpg';
+  const up = await db.storage.from(CATALOG_PHOTO_BUCKET).upload(path, blob, {contentType:'image/jpeg', upsert:true});
+  if(up.error) throw up.error;
+  const { error } = await db.from('product_images').upsert({ model, image_path: path, updated_at: new Date().toISOString() }, {onConflict:'model'});
+  if(error) throw error;
+  productImages[model] = path;
+}
+function renderCatalogPhotos(){
+  return `<div class="cpGrid">` + CATALOG_MODELS.map(model=>{
+    const path = productImages[model];
+    const url = catalogPhotoUrl(path);
+    const thumb = url ? `<img src="${esc(url)}" alt="${esc(model)}">` : `<span class="ph">📷</span>`;
+    return `<div class="cpCard">
+      <div class="cpThumb">${thumb}</div>
+      <div class="cpName">${esc(model)}</div>
+      <button class="cpBtn" data-editphoto="${esc(model)}">${path?'Edit photo':'Add photo'}</button>
+    </div>`;
+  }).join('') + `</div>`;
+}
+document.getElementById('app').addEventListener('click', e=>{
+  const b = e.target.closest('[data-editphoto]');
+  if(!b) return;
+  if(!db){ toast('Supabase isn’t configured yet'); return; }
+  const model = b.dataset.editphoto;
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = () => {
+    const file = input.files && input.files[0];
+    if(!file) return;
+    downscale(file, async dataUrl=>{
+      if(!dataUrl){ toast('Could not read that image'); return; }
+      const prevLabel = b.textContent; b.textContent = 'Uploading…'; b.disabled = true;
+      try{
+        await uploadCatalogPhoto(model, dataUrl);
+        toast('Photo updated for '+model);
+        if(tab==='photos') render();
+      }catch(err){
+        toast('⚠ Upload failed: '+(err.message||err));
+        b.textContent = prevLabel; b.disabled = false;
+      }
+    });
+  };
+  input.click();
+});
 
 /* ---------- model ---------- */
 function makeNodes(buyDate, skipHome){
@@ -1102,6 +1186,13 @@ function heldCard(o){
 function render(){
   updateSub();
   updateBadge();
+
+  if(tab==='photos'){
+    app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
+      <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
+      ${renderCatalogPhotos()}`;
+    return;
+  }
 
   if(orders.length===0){
     app.innerHTML = `<div class="empty"><div class="big">📦</div>

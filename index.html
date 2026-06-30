@@ -331,6 +331,7 @@
       <a href="#contact">Support</a>
     </nav>
     <div class="navright">
+      <a class="iconbtn" id="trackBtn" href="track.html" title="Track order" style="text-decoration:none;font-size:13px;font-weight:600;width:auto;padding:0 14px;">📦 Track</a>
       <button class="iconbtn" id="openCart">🛒<span class="cartdot" id="cartN" style="display:none">0</span></button>
     </div>
   </div>
@@ -420,7 +421,7 @@
         <div class="fcol"><b>Support</b><a id="ftPhone" href="#"></a><a id="ftEmail" href="#"></a><a href="track.html">Track your order</a><a id="ftGroup" href="#" target="_blank" rel="noopener">WhatsApp group</a></div>
         <div class="fcol"><b>Delivery &amp; pay</b><div>Free shipping · 10–15 days</div><div>Express · 7–10 days (+₦10k)</div><div>Bank transfer</div></div>
       </div>
-      <div class="copy">© <span id="ftYear"></span> <span id="ftBrandC"></span>. Prices include free shipping. Colour availability confirmed on order.</div>
+      <div class="copy">© <span id="ftYear"></span> <span id="ftBrandC"></span>. Prices include free shipping. Colour availability confirmed on order. · <a href="admin.html" style="color:inherit;opacity:.55;">Staff login</a></div>
     </footer>
   </section>
 </div>
@@ -463,10 +464,11 @@ const CONFIG = {
     url: "https://rnldconatvokdstvqwui.supabase.co",
     anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJubGRjb25hdHZva2RzdHZxd3VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDYwNTYsImV4cCI6MjA5ODMyMjA1Nn0.6njFi2f8ntSZiEJa4VuDFaI2ayU0I5qiWDmYKHliuI4"
   }
-  /* Planned tables when you go live:
-     catalog(brand, model, storage, condition, price_naira, image_url, in_stock)
-     customer_orders(id, order_no, track_token, items_json, totals_json, customer_json, status, created_at)
-     + a SECURITY DEFINER rpc get_tracking(token) returning ONLY progress (no prices). */
+  /* Live tables:
+     customer_orders — order tracking, written/read by admin.html
+     product_images(model, image_path) — storefront listing photos, managed from
+       admin.html's "Catalog photos" tab, read anonymously here via loadCatalogImages().
+     Planned: a SECURITY DEFINER rpc get_tracking(token) returning ONLY progress (no prices). */
 };
 
 /* Brands. Only "apple" has products today; others show "coming soon".
@@ -501,13 +503,13 @@ const IMAGES = {
 const CATALOG = { "apple": {"clean":{"iPhone X":[["64",147100],["256",151300]],"iPhone XR":[["64",187000],["128",197500]],"iPhone 11":[["64",239500],["128",250000]],"iPhone 11 Pro":[["64",260500],["256",281500]],"iPhone 11 Pro Max":[["64",271000],["256",302500]],"iPhone 12":[["64",250000],["128",271000]],"iPhone 12 Pro":[["128",334000],["256",365500]],"iPhone 12 Pro Max":[["128",386500],["256",418000]],"iPhone 13":[["128",365500],["256",371800]],"iPhone 13 Pro":[["128",481000],["256",502000]],"iPhone 13 Pro Max":[["128",523000],["256",575500]],"iPhone 14":[["128",407500],["256",439000]],"iPhone 14 Pro":[["128",575500],["256",607000]],"iPhone 14 Pro Max":[["128",607000],["256",659500]],"iPhone 15":[["128",523000],["256",575500]],"iPhone 15 Pro":[["128",670000],["256",712000]],"iPhone 15 Pro Max":[["256",859000],["512",901000]],"iPhone 16":[["128",722500],["256",796000]],"iPhone 16 Plus":[["128",859000],["256",964000]],"iPhone 16 Pro":[["128",922000],["256",1048000]],"iPhone 16 Pro Max":[["256",1174000],["512",1237000]]},"screen":{"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",208000],["256",229000]],"iPhone 11 Pro Max":[["64",229000],["256",250000]],"iPhone 12":[["64",208000],["128",218500]],"iPhone 12 Pro":[["128",271000],["256",281500]],"iPhone 12 Pro Max":[["128",292000],["256",313000]],"iPhone 13":[["128",302500],["256",313000]],"iPhone 13 Pro":[["128",397000],["256",418000]],"iPhone 13 Pro Max":[["128",418000],["256",439000]],"iPhone 14":[["128",323500],["256",344500]],"iPhone 14 Pro":[["128",439000],["256",460000]],"iPhone 14 Pro Max":[["128",470500],["256",512500]],"iPhone 15":[["128",407500],["256",428500]],"iPhone 15 Pro":[["128",523000],["256",575500]],"iPhone 15 Pro Max":[["256",649000],["512",691000]]},"battery":{"iPhone XR":[["64",182800],["128",187000]],"iPhone XS Max":[["64",161800],["256",172300]],"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",229000],["256",250000]],"iPhone 11 Pro Max":[["64",239500],["256",271000]],"iPhone 12":[["64",229000],["128",250000]],"iPhone 12 Pro":[["128",281500],["256",302500]],"iPhone 12 Pro Max":[["128",323500],["256",344500]],"iPhone 13":[["128",334000],["256",344500]],"iPhone 13 Pro":[["128",428500],["256",449500]],"iPhone 13 Pro Max":[["128",470500],["256",491500]],"iPhone 14 Pro":[["128",523000],["256",544000]],"iPhone 14 Pro Max":[["128",554500],["256",586000]],"iPhone 15 Pro Max":[["256",733000],["512",796000]]},"double":{"iPhone 11":[["64",193300],["128",201700]],"iPhone 11 Pro":[["64",197500],["256",218500]],"iPhone 11 Pro Max":[["64",214300],["256",235300]],"iPhone 12":[["64",201700],["128",208000]],"iPhone 12 Pro":[["128",250000],["256",260500]],"iPhone 12 Pro Max":[["128",281500],["256",292000]],"iPhone 13":[["128",281500],["256",292000]],"iPhone 13 Pro":[["128",376000],["256",397000]],"iPhone 13 Pro Max":[["128",397000],["256",418000]],"iPhone 14":[["128",302500],["256",323500]],"iPhone 14 Pro":[["128",418000],["256",439000]],"iPhone 14 Pro Max":[["128",449500],["256",481000]],"iPhone 15":[["128",397000],["256",418000]],"iPhone 15 Pro":[["128",481000],["256",533500]],"iPhone 15 Pro Max":[["256",586000],["512",607000]]}} };
 
 const CONDITIONS = [
-  { key:"clean",   name:"Clean",    cls:"clean",   short:"Original parts · like new",
+  { key:"clean",   name:"Clean (London used)",  cls:"clean",   short:"Original parts · like new",
     long:"<b>Clean (London used).</b> Almost-new condition — original screen and battery, clean body, no repairs. Battery health 81–100%. No notices in Settings." },
-  { key:"screen",  name:"Screen",   cls:"screen",  short:"Screen replaced · costs less",
+  { key:"screen",  name:"Screen display",       cls:"screen",  short:"Screen replaced · costs less",
     long:"<b>Screen display.</b> The screen was professionally replaced and is still sharp. Shows a non-genuine screen notice in Settings. Works perfectly — costs less." },
-  { key:"battery", name:"Battery",  cls:"battery", short:"Battery replaced · costs less",
+  { key:"battery", name:"Battery display",      cls:"battery", short:"Battery replaced · costs less",
     long:"<b>Battery display.</b> The battery was professionally replaced and holds charge well. Shows a battery notice in Settings. Works perfectly — costs less." },
-  { key:"double",  name:"Double",   cls:"double",  short:"Both replaced · best price",
+  { key:"double",  name:"Double display",       cls:"double",  short:"Both replaced · best price",
     long:"<b>Screen &amp; battery display (double).</b> Both screen and battery replaced, so two notices show in Settings. Fully working — our most affordable option." }
 ];
 
@@ -551,9 +553,28 @@ function phoneMockup(model, large){
   return `<span class="${large?'pmL':'pm'} ${pro?'pro':''}"><span class="island">${l}</span><span class="flash"></span></span>`;
 }
 function phoneVisual(model, large){
-  const url=IMAGES[model];
+  const url=CATALOG_IMAGES[model]||IMAGES[model];
   if(url) return `<img class="${large?'pimgL':'pimg'}" src="${url}" alt="${esc(model)}" loading="lazy" onerror="this.outerHTML=phoneMockup('${model}',${large?'true':'false'})">`;
   return phoneMockup(model, large);
+}
+
+/* ---------- catalog photos uploaded via the admin dashboard ----------
+   Read-only, anonymous fetch (no SDK needed) — fails silently, page never
+   depends on it. Falls back to the static IMAGES map, then the mockup icon. */
+let CATALOG_IMAGES = {};
+async function loadCatalogImages(){
+  try{
+    const { url, anonKey } = CONFIG.supabase;
+    const res = await fetch(`${url}/rest/v1/product_images?select=model,image_path`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+    });
+    if(!res.ok) return;
+    const rows = await res.json();
+    const map = {};
+    rows.forEach(r=>{ if(r.model && r.image_path) map[r.model] = `${url}/storage/v1/object/public/catalog-photos/${r.image_path}`; });
+    CATALOG_IMAGES = map;
+    renderProducts();
+  }catch(e){ /* offline or table not set up yet — storefront keeps working */ }
 }
 
 /* ---------- hot deal ---------- */
@@ -760,7 +781,7 @@ function bootChrome(){
   $('ftGroup').href=WHATSAPP_GROUP; $('ftYear').textContent=new Date().getFullYear();
   const gl=$('groupLink'); if(WHATSAPP_GROUP){ gl.href=WHATSAPP_GROUP; } else { gl.style.display='none'; }
 }
-async function init(){ bootChrome(); renderHotDeal(); renderReviews(); await loadBrand('apple'); updateBars(); }
+async function init(){ bootChrome(); renderHotDeal(); renderReviews(); await loadBrand('apple'); updateBars(); loadCatalogImages(); }
 init();
 </script>
 </body>
