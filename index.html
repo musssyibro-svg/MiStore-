@@ -466,8 +466,9 @@ const CONFIG = {
   }
   /* Live tables:
      customer_orders — order tracking, written/read by admin.html
-     product_images(model, image_path) — storefront listing photos, managed from
-       admin.html's "Catalog photos" tab, read anonymously here via loadCatalogImages().
+     product_images(model, condition, image_path) — storefront listing photos per
+       model+condition, managed from admin.html's "Catalog photos" tab, read
+       anonymously here via loadCatalogImages().
      Planned: a SECURITY DEFINER rpc get_tracking(token) returning ONLY progress (no prices). */
 };
 
@@ -552,28 +553,30 @@ function phoneMockup(model, large){
   const pro=/Pro/.test(model); const n=pro?3:2; let l=''; for(let i=0;i<n;i++) l+='<span class="lens"></span>';
   return `<span class="${large?'pmL':'pm'} ${pro?'pro':''}"><span class="island">${l}</span><span class="flash"></span></span>`;
 }
-function phoneVisual(model, large){
-  const url=CATALOG_IMAGES[model]||IMAGES[model];
+function phoneVisual(model, c, large){
+  const url=CATALOG_IMAGES[model+'|'+c]||IMAGES[model];
   if(url) return `<img class="${large?'pimgL':'pimg'}" src="${url}" alt="${esc(model)}" loading="lazy" onerror="this.outerHTML=phoneMockup('${model}',${large?'true':'false'})">`;
   return phoneMockup(model, large);
 }
 
 /* ---------- catalog photos uploaded via the admin dashboard ----------
    Read-only, anonymous fetch (no SDK needed) — fails silently, page never
-   depends on it. Falls back to the static IMAGES map, then the mockup icon. */
+   depends on it. Keyed by model+condition since each condition can have its
+   own photo. Falls back to the static IMAGES map, then the mockup icon. */
 let CATALOG_IMAGES = {};
 async function loadCatalogImages(){
   try{
     const { url, anonKey } = CONFIG.supabase;
-    const res = await fetch(`${url}/rest/v1/product_images?select=model,image_path`, {
+    const res = await fetch(`${url}/rest/v1/product_images?select=model,condition,image_path`, {
       headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
     });
     if(!res.ok) return;
     const rows = await res.json();
     const map = {};
-    rows.forEach(r=>{ if(r.model && r.image_path) map[r.model] = `${url}/storage/v1/object/public/catalog-photos/${r.image_path}`; });
+    rows.forEach(r=>{ if(r.model && r.condition && r.image_path) map[r.model+'|'+r.condition] = `${url}/storage/v1/object/public/catalog-photos/${r.image_path}`; });
     CATALOG_IMAGES = map;
     renderProducts();
+    if(sel) renderProduct();
   }catch(e){ /* offline or table not set up yet — storefront keeps working */ }
 }
 
@@ -620,7 +623,7 @@ function renderProducts(){
   if(!list.length){ area.innerHTML=`<div class="comingsoon"><div class="big">🔍</div>No match in this condition. Try another condition or search.</div>`; return; }
   area.innerHTML = `<div class="grid">${list.map(m=>`
     <button class="pcard" data-model="${encodeURIComponent(m.model)}">
-      <div class="ptop"><div style="min-width:0"><div class="pname">${m.model}</div><div class="pmem">${m.variants.map(v=>v[0]+'GB').join(' · ')}</div></div>${phoneVisual(m.model,false)}</div>
+      <div class="ptop"><div style="min-width:0"><div class="pname">${m.model}</div><div class="pmem">${m.variants.map(v=>v[0]+'GB').join(' · ')}</div></div>${phoneVisual(m.model,cond,false)}</div>
       <div style="margin:4px 0 2px">${cbadge(cond)}</div>
       <div class="pprice"><span class="from">from</span><span class="pv mono">${fmtK(m.min)}</span><span class="pstock"><span class="d"></span>In stock</span></div>
       <div class="padd">🛒 View &amp; add</div>
@@ -641,7 +644,7 @@ function renderProduct(){
   const unit=priceFor(sel.model,sel.cond,sel.mem);
   const body=$('prodBody');
   body.innerHTML=`
-    <div style="display:flex;justify-content:center;padding:6px 0 2px;">${phoneVisual(sel.model,true)}</div>
+    <div style="display:flex;justify-content:center;padding:6px 0 2px;">${phoneVisual(sel.model,sel.cond,true)}</div>
     <div style="margin:8px 0 10px;text-align:center;">${cbadge(sel.cond)} <span style="color:var(--green);font-size:12px;font-weight:600;margin-left:4px;">● In stock</span></div>
     <div class="pcond">${c.long}</div>
     <div class="flabel">Storage</div>

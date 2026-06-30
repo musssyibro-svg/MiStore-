@@ -319,13 +319,16 @@
   .iconbtn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;}
 
   /* ---------- Catalog photos ---------- */
-  .cpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px;}
-  .cpCard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center;}
-  .cpThumb{width:100%;aspect-ratio:1/1;border-radius:10px;background:var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;}
+  .cpGrid{display:flex;flex-direction:column;gap:12px;margin-top:14px;}
+  .cpModel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;}
+  .cpModelName{font-size:13px;font-weight:700;margin-bottom:10px;}
+  .cpConds{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;}
+  .cpCond{text-align:center;}
+  .cpThumb{width:100%;aspect-ratio:1/1;border-radius:10px;background:var(--paper);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:6px;}
   .cpThumb img{width:100%;height:100%;object-fit:cover;}
-  .cpThumb .ph{font-size:28px;color:var(--faint);}
-  .cpName{font-size:12.5px;font-weight:600;margin-bottom:8px;}
-  .cpBtn{width:100%;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;padding:8px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .cpThumb .ph{font-size:22px;color:var(--faint);}
+  .cpCondName{font-size:10.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+  .cpBtn{width:100%;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;padding:6px;font-size:10.5px;font-weight:600;color:var(--muted);cursor:pointer;}
   .cpBtn:active{background:var(--line);}
 
   /* ---------- Tabs ---------- */
@@ -904,46 +907,60 @@ async function resolvePhotos(){
 /* ---------- catalog photos: public storefront product images ---------- *
  * Separate from per-order photos above. Stored in a PUBLIC bucket (no signing
  * needed — index.html has no Supabase auth and must read these anonymously)
- * and indexed by model name in the product_images table. */
+ * and indexed by model+condition in the product_images table, since each
+ * model can show a different photo per condition (clean/screen/battery/double). */
 const CATALOG_PHOTO_BUCKET = 'catalog-photos';
 const CATALOG_MODELS = [
-  'iPhone X','iPhone XR','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+  'iPhone X','iPhone XR','iPhone XS Max','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
   'iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max',
   'iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max',
   'iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max',
   'iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max',
   'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max'
 ];
-let productImages = {};   // model -> storage path
+const CATALOG_CONDITIONS = [
+  { key:'clean',   name:'Clean (London used)' },
+  { key:'screen',  name:'Screen display' },
+  { key:'battery', name:'Battery display' },
+  { key:'double',  name:'Double display' }
+];
+let productImages = {};   // "model|condition" -> storage path
+function imgKey(model, cond){ return model+'|'+cond; }
 function catalogPhotoUrl(path){ return path ? `${SUPABASE_URL.trim()}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}` : ''; }
 function slugModel(model){ return model.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 async function loadProductImages(){
   if(!db) return;
-  const { data, error } = await db.from('product_images').select('model,image_path');
+  const { data, error } = await db.from('product_images').select('model,condition,image_path');
   if(error || !data) return;
   productImages = {};
-  data.forEach(r=>{ if(r.model) productImages[r.model] = r.image_path; });
+  data.forEach(r=>{ if(r.model && r.condition) productImages[imgKey(r.model,r.condition)] = r.image_path; });
 }
-async function uploadCatalogPhoto(model, dataUrl){
+async function uploadCatalogPhoto(model, cond, dataUrl){
   if(!currentUser) throw new Error('Not signed in');
   const blob = await (await fetch(dataUrl)).blob();
   if(blob.size > 8*1024*1024) throw new Error('Image too large');
-  const path = slugModel(model) + '.jpg';
+  const path = slugModel(model) + '-' + cond + '.jpg';
   const up = await db.storage.from(CATALOG_PHOTO_BUCKET).upload(path, blob, {contentType:'image/jpeg', upsert:true});
   if(up.error) throw up.error;
-  const { error } = await db.from('product_images').upsert({ model, image_path: path, updated_at: new Date().toISOString() }, {onConflict:'model'});
+  const { error } = await db.from('product_images').upsert({ model, condition: cond, image_path: path, updated_at: new Date().toISOString() }, {onConflict:'model,condition'});
   if(error) throw error;
-  productImages[model] = path;
+  productImages[imgKey(model,cond)] = path;
 }
 function renderCatalogPhotos(){
   return `<div class="cpGrid">` + CATALOG_MODELS.map(model=>{
-    const path = productImages[model];
-    const url = catalogPhotoUrl(path);
-    const thumb = url ? `<img src="${esc(url)}" alt="${esc(model)}">` : `<span class="ph">📷</span>`;
-    return `<div class="cpCard">
-      <div class="cpThumb">${thumb}</div>
-      <div class="cpName">${esc(model)}</div>
-      <button class="cpBtn" data-editphoto="${esc(model)}">${path?'Edit photo':'Add photo'}</button>
+    const conds = CATALOG_CONDITIONS.map(c=>{
+      const path = productImages[imgKey(model,c.key)];
+      const url = catalogPhotoUrl(path);
+      const thumb = url ? `<img src="${esc(url)}" alt="${esc(model)} ${esc(c.name)}">` : `<span class="ph">📷</span>`;
+      return `<div class="cpCond">
+        <div class="cpThumb">${thumb}</div>
+        <div class="cpCondName">${esc(c.name)}</div>
+        <button class="cpBtn" data-editphoto="${esc(model)}" data-cond="${c.key}">${path?'Edit':'Add'}</button>
+      </div>`;
+    }).join('');
+    return `<div class="cpModel">
+      <div class="cpModelName">${esc(model)}</div>
+      <div class="cpConds">${conds}</div>
     </div>`;
   }).join('') + `</div>`;
 }
@@ -952,6 +969,7 @@ document.getElementById('app').addEventListener('click', e=>{
   if(!b) return;
   if(!db){ toast('Supabase isn’t configured yet'); return; }
   const model = b.dataset.editphoto;
+  const cond = b.dataset.cond;
   const input = document.createElement('input');
   input.type = 'file'; input.accept = 'image/*';
   input.onchange = () => {
@@ -959,10 +977,10 @@ document.getElementById('app').addEventListener('click', e=>{
     if(!file) return;
     downscale(file, async dataUrl=>{
       if(!dataUrl){ toast('Could not read that image'); return; }
-      const prevLabel = b.textContent; b.textContent = 'Uploading…'; b.disabled = true;
+      const prevLabel = b.textContent; b.textContent = '…'; b.disabled = true;
       try{
-        await uploadCatalogPhoto(model, dataUrl);
-        toast('Photo updated for '+model);
+        await uploadCatalogPhoto(model, cond, dataUrl);
+        toast('Photo updated for '+model+' · '+CATALOG_CONDITIONS.find(c=>c.key===cond).name);
         if(tab==='photos') render();
       }catch(err){
         toast('⚠ Upload failed: '+(err.message||err));
