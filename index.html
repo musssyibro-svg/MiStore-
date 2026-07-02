@@ -74,8 +74,7 @@
   .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .15s;}
   .pcard:active{transform:scale(.985);}
   .phero{position:relative;aspect-ratio:1/1.15;background:linear-gradient(180deg,#FBFBFD,#F0F0F4);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .phero svg{width:64%;height:84%;}
-  .phero img.real{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12px;background:#fff;}
+  .phero img{width:100%;height:100%;object-fit:contain;padding:8px;background:#fff;}
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -128,9 +127,8 @@
   /* ---------- gallery ---------- */
   .gwrap{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);}
   .gtrack{display:flex;transition:transform .3s cubic-bezier(.3,.7,.3,1);touch-action:pan-y;}
-  .gslide{flex:0 0 100%;aspect-ratio:3/4;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#FCFCFE,#F1F1F5);}
-  .gslide svg{width:70%;height:88%;}
-  .gslide img.real{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:16px;background:#fff;}
+  .gslide{flex:0 0 100%;aspect-ratio:3/4;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;}
+  .gslide img{width:100%;height:100%;object-fit:contain;padding:18px;}
   .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
   .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
   .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
@@ -142,8 +140,7 @@
   .gthumbs::-webkit-scrollbar{display:none;}
   .gth{flex:0 0 auto;width:56px;height:70px;border-radius:12px;overflow:hidden;border:2px solid transparent;background:#fff;display:flex;align-items:center;justify-content:center;opacity:.65;padding:0;}
   .gth.on{border-color:var(--red);opacity:1;}
-  .gth svg{width:70%;height:86%;}
-  .gth img{width:100%;height:100%;object-fit:contain;}
+  .gth img{width:100%;height:100%;object-fit:contain;padding:3px;}
   .gnote{font-size:11.5px;color:var(--faint);margin-top:8px;text-align:center;}
 
   /* ---------- product sheet controls ---------- */
@@ -394,134 +391,62 @@ const REVIEWS = [
 ];
 
 /* ============================================================
-   Premium SVG render engine — consistent visuals for every
-   model & colourway, generated inside this file (always loads).
+   Real product images — Apple CDN (3 colorways) + GSMArena
+   All URLs load in customer browsers; admin-uploaded photos
+   override via CATALOG_IMAGES (priority 1).
    ============================================================ */
-const CW = {
-  'iPhone XR':         [['Black','#232427'],['Blue','#2E6EB5'],['Coral','#FF6E5A']],
-  'iPhone XS Max':     [['Space Gray','#3E3E43'],['Gold','#F0D8BC'],['Silver','#E6E6EA']],
-  'iPhone 11':         [['Black','#232427'],['Green','#A9D3C2'],['Purple','#D3CBE3']],
-  'iPhone 11 Pro':     [['Midnight Green','#4E5851'],['Space Gray','#3E3E43'],['Gold','#F0D8BC']],
-  'iPhone 11 Pro Max': [['Midnight Green','#4E5851'],['Space Gray','#3E3E43'],['Gold','#F0D8BC']],
-  'iPhone 12':         [['Black','#232427'],['Blue','#2757A8'],['Purple','#C4B4DD']],
-  'iPhone 12 Pro':     [['Pacific Blue','#2B4E6B'],['Graphite','#43444B'],['Gold','#F0D3B0']],
-  'iPhone 12 Pro Max': [['Pacific Blue','#2B4E6B'],['Graphite','#43444B'],['Gold','#F0D3B0']],
-  'iPhone 13':         [['Midnight','#1E252E'],['Starlight','#EDEAE3'],['Blue','#41618E']],
-  'iPhone 13 Pro':     [['Sierra Blue','#9BB5CE'],['Graphite','#43444B'],['Gold','#F0D3B0']],
-  'iPhone 13 Pro Max': [['Sierra Blue','#9BB5CE'],['Graphite','#43444B'],['Gold','#F0D3B0']],
-  'iPhone 14':         [['Midnight','#1E252E'],['Purple','#CBC1DA'],['Blue','#A5BBD1']],
-  'iPhone 14 Pro':     [['Deep Purple','#5A5064'],['Space Black','#1D1D21'],['Gold','#F0D8BC']],
-  'iPhone 14 Pro Max': [['Deep Purple','#5A5064'],['Space Black','#1D1D21'],['Gold','#F0D8BC']],
-  'iPhone 15':         [['Blue','#CBD8E1'],['Pink','#EBD5D7'],['Black','#35393C']],
-  'iPhone 15 Pro':     [['Natural Titanium','#BFB9B1'],['Blue Titanium','#3E4552'],['Black Titanium','#3A3A3C']],
-  'iPhone 15 Pro Max': [['Natural Titanium','#BFB9B1'],['Blue Titanium','#3E4552'],['Black Titanium','#3A3A3C']],
-  'iPhone 16':         [['Ultramarine','#4B5FA6'],['Teal','#7FA8A4'],['Black','#232427']],
-  'iPhone 16 Plus':    [['Ultramarine','#4B5FA6'],['Teal','#7FA8A4'],['White','#F2F2F4']],
-  'iPhone 16 Pro':     [['Desert Titanium','#C9AD8F'],['Natural Titanium','#BFB9B1'],['Black Titanium','#3A3A3C']],
-  'iPhone 16 Pro Max': [['Desert Titanium','#C9AD8F'],['Natural Titanium','#BFB9B1'],['Black Titanium','#3A3A3C']]
+const _A='https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/';
+const _G='https://fdn2.gsmarena.com/vv/bigpic/';
+const _Q='?wid=800&hei=800&fmt=jpeg&qlt=90';
+function _i(id){ return _A+id+_Q; }
+const PHONE_IMAGES_DB = {
+  'iPhone 16 Pro Max': [_i('iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium'),   _i('iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium'), _i('iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium'),   _G+'apple-iphone-16-pro-max.jpg'],
+  'iPhone 16 Pro':     [_i('iphone-16-pro-finish-select-202409-6-3inch-blacktitanium'),       _i('iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium'),     _i('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium'),       _G+'apple-iphone-16-pro.jpg'],
+  'iPhone 16 Plus':    [_i('iphone-16-plus-finish-select-202409-6-7inch-black'),              _i('iphone-16-plus-finish-select-202409-6-7inch-white'),              _i('iphone-16-plus-finish-select-202409-6-7inch-ultramarine'),         _G+'apple-iphone-16-plus.jpg'],
+  'iPhone 16':         [_i('iphone-16-finish-select-202409-6-1inch-black'),                   _i('iphone-16-finish-select-202409-6-1inch-teal'),                    _i('iphone-16-finish-select-202409-6-1inch-ultramarine'),              _G+'apple-iphone-16.jpg'],
+  'iPhone 15 Pro Max': [_i('iphone-15-pro-max-finish-select-202309-6-7inch-blacktitanium'),   _i('iphone-15-pro-max-finish-select-202309-6-7inch-naturaltitanium'), _i('iphone-15-pro-max-finish-select-202309-6-7inch-bluetitanium'),     _G+'apple-iphone-15-pro-max.jpg'],
+  'iPhone 15 Pro':     [_i('iphone-15-pro-finish-select-202309-6-1inch-blacktitanium'),       _i('iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium'),     _i('iphone-15-pro-finish-select-202309-6-1inch-bluetitanium'),         _G+'apple-iphone-15-pro.jpg'],
+  'iPhone 15':         [_i('iphone-15-finish-select-202309-6-1inch-black'),                   _i('iphone-15-finish-select-202309-6-1inch-blue'),                    _i('iphone-15-finish-select-202309-6-1inch-pink'),                    _G+'apple-iphone-15.jpg'],
+  'iPhone 14 Pro Max': [_i('iphone-14-pro-max-finish-select-202209-6-7inch-deeppurple'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-spaceblack'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-gold'),             _G+'apple-iphone-14-pro-max.jpg'],
+  'iPhone 14 Pro':     [_i('iphone-14-pro-finish-select-202209-6-1inch-deeppurple'),          _i('iphone-14-pro-finish-select-202209-6-1inch-spaceblack'),          _i('iphone-14-pro-finish-select-202209-6-1inch-gold'),                 _G+'apple-iphone-14-pro.jpg'],
+  'iPhone 14':         [_i('iphone-14-finish-select-202209-6-1inch-midnight'),                _i('iphone-14-finish-select-202209-6-1inch-blue'),                    _i('iphone-14-finish-select-202209-6-1inch-purple'),                   _G+'apple-iphone-14.jpg'],
+  'iPhone 13 Pro Max': [_i('iphone-13-pro-max-finish-select-202109-6-7inch-graphite'),        _i('iphone-13-pro-max-finish-select-202109-6-7inch-sierrablue'),      _i('iphone-13-pro-max-finish-select-202109-6-7inch-silver'),           _G+'apple-iphone-13-pro-max.jpg'],
+  'iPhone 13 Pro':     [_i('iphone-13-pro-finish-select-202109-6-1inch-graphite'),            _i('iphone-13-pro-finish-select-202109-6-1inch-sierrablue'),          _i('iphone-13-pro-finish-select-202109-6-1inch-silver'),               _G+'apple-iphone-13-pro.jpg'],
+  'iPhone 13':         [_i('iphone-13-finish-select-202109-6-1inch-midnight'),                _i('iphone-13-finish-select-202109-6-1inch-starlight'),               _i('iphone-13-finish-select-202109-6-1inch-blue'),                    _G+'apple-iphone-13.jpg'],
+  'iPhone 12 Pro Max': [_i('iphone-12-pro-max-finish-select-202010-6-7inch-pacificblue'),     _i('iphone-12-pro-max-finish-select-202010-6-7inch-graphite'),        _i('iphone-12-pro-max-finish-select-202010-6-7inch-silver'),           _G+'apple-iphone-12-pro-max.jpg'],
+  'iPhone 12 Pro':     [_i('iphone-12-pro-finish-select-202010-6-1inch-pacificblue'),         _i('iphone-12-pro-finish-select-202010-6-1inch-graphite'),            _i('iphone-12-pro-finish-select-202010-6-1inch-silver'),               _G+'apple-iphone-12-pro.jpg'],
+  'iPhone 12':         [_i('iphone-12-finish-select-202010-6-1inch-black'),                   _i('iphone-12-finish-select-202010-6-1inch-blue'),                    _i('iphone-12-finish-select-202010-6-1inch-white'),                   _G+'apple-iphone-12.jpg'],
+  'iPhone 11 Pro Max': [_i('iphone-11-pro-max-finish-select-201909-6-5inch-spacegray'),       _i('iphone-11-pro-max-finish-select-201909-6-5inch-silver'),          _i('iphone-11-pro-max-finish-select-201909-6-5inch-gold'),             _G+'apple-iphone-11-pro-max.jpg'],
+  'iPhone 11 Pro':     [_i('iphone-11-pro-finish-select-201909-5-8inch-spacegray'),           _i('iphone-11-pro-finish-select-201909-5-8inch-silver'),              _i('iphone-11-pro-finish-select-201909-5-8inch-gold'),                 _G+'apple-iphone-11-pro.jpg'],
+  'iPhone 11':         [_i('iphone-11-finish-select-201909-6-1inch-black'),                   _i('iphone-11-finish-select-201909-6-1inch-white'),                   _i('iphone-11-finish-select-201909-6-1inch-purple'),                  _G+'apple-iphone-11.jpg'],
+  'iPhone XS Max':     [_i('iphone-xs-max-finish-select-201809-6-5inch-spacegray'),           _i('iphone-xs-max-finish-select-201809-6-5inch-silver'),              _i('iphone-xs-max-finish-select-201809-6-5inch-gold'),                 _G+'apple-iphone-xs-max.jpg'],
+  'iPhone XR':         [_i('iphone-xr-finish-select-201809-6-1inch-black'),                   _i('iphone-xr-finish-select-201809-6-1inch-white'),                   _i('iphone-xr-finish-select-201809-6-1inch-blue'),                    _G+'apple-iphone-xr.jpg'],
 };
-function cwFor(model){ return (CW[model]||[['Black','#232427']]).map(c=>({n:c[0],b:c[1]})); }
 
-function hexShade(hex,amt){
-  const h=hex.replace('#',''); const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);
-  const f=v=>Math.max(0,Math.min(255,v+amt));
-  return '#'+[f(n>>16&255),f(n>>8&255),f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
-function isLight(hex){ const h=hex.replace('#',''); const n=parseInt(h,16); const L=0.299*(n>>16&255)+0.587*(n>>8&255)+0.114*(n&255); return L>150; }
-let __svgN=0; function uid(){ return 'mg'+(++__svgN); }
-const FRAME='#101114';
-
-function camType(model){
-  if(/Pro/.test(model)) return 'pro3';
-  if(model==='iPhone XS Max') return 'vpill';
-  if(model==='iPhone XR') return 'one';
-  if(model==='iPhone 16'||model==='iPhone 16 Plus') return 'vpill16';
-  return 'diag2';
-}
-function lens(cx,cy,r){
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#0B0C10"/><circle cx="${cx}" cy="${cy}" r="${(r*0.62).toFixed(1)}" fill="#1D2434"/><circle cx="${(cx-r*0.3).toFixed(1)}" cy="${(cy-r*0.3).toFixed(1)}" r="${(r*0.2).toFixed(1)}" fill="#93A8CE" opacity=".9"/>`;
-}
-function camSVG(model,body){
-  const mod=hexShade(body,isLight(body)?-26:14);
-  const st=hexShade(body,isLight(body)?-48:-14);
-  const t=camType(model);
-  if(t==='pro3') return `<rect x="82" y="32" width="76" height="76" rx="21" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(101,53,12)}${lens(101,87,12)}${lens(135,70,12)}<circle cx="137" cy="46" r="4" fill="#F3E3C0"/><circle cx="137" cy="94" r="3.4" fill="#23262E"/>`;
-  if(t==='vpill') return `<rect x="88" y="30" width="38" height="82" rx="19" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,52,11)}${lens(107,90,11)}<circle cx="134" cy="40" r="3.4" fill="#F3E3C0"/>`;
-  if(t==='vpill16') return `<rect x="86" y="30" width="42" height="88" rx="21" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,54,12)}${lens(107,94,12)}<circle cx="138" cy="40" r="3.6" fill="#F3E3C0"/>`;
-  if(t==='one') return `<rect x="84" y="32" width="46" height="46" rx="15" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,55,12)}<circle cx="138" cy="42" r="3.4" fill="#F3E3C0"/>`;
-  return `<rect x="82" y="32" width="66" height="66" rx="19" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(101,51,11)}${lens(129,79,11)}<circle cx="130" cy="48" r="3.4" fill="#F3E3C0"/>`;
-}
-function backInner(id,model,cw){
-  return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${hexShade(cw.b,20)}"/><stop offset="1" stop-color="${cw.b}"/></linearGradient></defs>
-  <rect x="70" y="18" width="160" height="360" rx="30" fill="url(#${id}b)" stroke="${hexShade(cw.b,-30)}" stroke-width="1.4"/>
-  <rect x="72" y="20" width="156" height="356" rx="28" fill="#fff" opacity=".05"/>
-  ${camSVG(model,cw.b)}`;
-}
-function svgBack(model,cw){
-  const id=uid();
-  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — ${cw.n}, back"><ellipse cx="150" cy="384" rx="96" ry="9" fill="#000" opacity=".10"/>${backInner(id,model,cw)}</svg>`;
-}
-function svgFront(model,cw){
-  const id=uid();
-  const island=/14 Pro|iPhone 15|iPhone 16/.test(model);
-  const top=island?`<rect x="124" y="40" width="52" height="15" rx="7.5" fill="#04050A"/>`:`<path d="M116 26 h68 v10 a10 10 0 0 1 -10 10 h-48 a10 10 0 0 1 -10 -10 z" fill="${FRAME}"/>`;
-  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — front">
-  <defs>
-    <linearGradient id="${id}w" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#7E9BFF"/><stop offset="1" stop-color="#10142E"/></linearGradient>
-    <clipPath id="${id}c"><rect x="78" y="26" width="144" height="348" rx="24"/></clipPath>
-  </defs>
-  <ellipse cx="150" cy="384" rx="96" ry="9" fill="#000" opacity=".10"/>
-  <rect x="70" y="18" width="160" height="360" rx="30" fill="${FRAME}"/>
-  <rect x="78" y="26" width="144" height="348" rx="24" fill="url(#${id}w)"/>
-  <g clip-path="url(#${id}c)">
-    <circle cx="112" cy="120" r="120" fill="${cw.b}" opacity=".4"/>
-    <polygon points="78,26 152,26 100,374 78,374" fill="#fff" opacity=".06"/>
-  </g>
-  ${top}
-</svg>`;
-}
-function svgAngle(model,cw){
-  const id=uid();
-  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — angled">
-  <ellipse cx="150" cy="386" rx="100" ry="9" fill="#000" opacity=".10"/>
-  <g transform="translate(24,12) skewY(-6) scale(.94)">
-    <rect x="226" y="24" width="13" height="352" rx="6.5" fill="${hexShade(cw.b,-34)}"/>
-    ${backInner(id,model,cw)}
-  </g>
-</svg>`;
-}
-
-/* ---------- gallery slides: your photos first, SVG renders always fill ---------- */
 let CATALOG_IMAGES = {};
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
+function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
+
 function slidesFor(model,condKey){
-  const cws=cwFor(model);
-  const out=[];
   const up=CATALOG_IMAGES[model+'|'+condKey];
   const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
-  const real=[]; if(up) real.push(up); own.forEach(u=>{ if(u&&real.indexOf(u)<0) real.push(u); });
-  real.slice(0,3).forEach(u=>out.push({img:u}));
-  out.push({svg:svgFront(model,cws[0]),cap:cws[0].n});
-  out.push({svg:svgBack(model,cws[0]), cap:cws[0].n});
-  out.push({svg:svgAngle(model,cws[0]),cap:cws[0].n});
-  if(cws[1]) out.push({svg:svgBack(model,cws[1]),cap:cws[1].n});
-  if(cws[2]) out.push({svg:svgBack(model,cws[2]),cap:cws[2].n});
+  const db=PHONE_IMAGES_DB[model]||[];
+  const out=[];
+  if(up) out.push(up);
+  own.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
+  db.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
   return out.slice(0,8);
 }
-function slideHTML(s,model){
-  const fallback=svgBack(model,cwFor(model)[0]);
-  if(s.img) return `<div class="gslide">${fallback}<img class="real" loading="lazy" src="${esc(s.img)}" alt="${esc(model)}" onerror="this.style.display='none'">${s.cap?`<span class="gcap">${esc(s.cap)}</span>`:''}</div>`;
-  return `<div class="gslide">${s.svg}${s.cap?`<span class="gcap">${esc(s.cap)}</span>`:''}</div>`;
+function slideHTML(url,model,idx){
+  return `<div class="gslide"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}"></div>`;
 }
-function thumbHTML(s,model,i,on){
-  const inner=s.img?`<img loading="lazy" src="${esc(s.img)}" alt="" onerror="this.style.display='none'">`:s.svg;
-  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}">${inner}</button>`;
+function thumbHTML(url,model,i,on){
+  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt=""></button>`;
 }
 function cardVisual(model,condKey){
-  const cws=cwFor(model);
-  const real=CATALOG_IMAGES[model+'|'+condKey]||(PHONE_IMAGES[model]&&PHONE_IMAGES[model][0])||'';
-  const base=svgBack(model,cws[0]);
-  return real?base+`<img class="real" loading="lazy" src="${esc(real)}" alt="${esc(model)}" onerror="this.style.display='none'">`:base;
+  const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
+  if(!src) return `<span style="font-size:32px;opacity:.4">📱</span>`;
+  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}">`;
 }
 
 /* ============================================================
@@ -616,14 +541,14 @@ function renderProduct(){
   const slides=slidesFor(sel.model,sel.cond);
   $('prodBody').innerHTML=`
     <div class="gwrap">
-      <div class="gtrack" id="gTrack">${slides.map(s=>slideHTML(s,sel.model)).join('')}</div>
+      <div class="gtrack" id="gTrack">${slides.map((url,i)=>slideHTML(url,sel.model,i)).join('')}</div>
       <button class="gbtn prev" id="gPrev" aria-label="Previous">‹</button>
       <button class="gbtn next" id="gNext" aria-label="Next">›</button>
       <span class="gidx" id="gIdx">1/${slides.length}</span>
       <div class="gdots" id="gDots">${slides.map((_,i)=>`<button class="d ${i===0?'on':''}" data-gd="${i}" aria-label="Go to ${i+1}"></button>`).join('')}</div>
     </div>
-    <div class="gthumbs" id="gThumbs">${slides.map((s,i)=>thumbHTML(s,sel.model,i,i===0)).join('')}</div>
-    <div class="gnote">Swipe to see every angle &amp; colour · upload real photos via admin to replace these renders</div>
+    <div class="gthumbs" id="gThumbs">${slides.map((url,i)=>thumbHTML(url,sel.model,i,i===0)).join('')}</div>
+    <div class="gnote">Tap thumbnail to switch colour · Swipe or use arrows to browse</div>
     <div class="ptitle">${esc(sel.model)}</div>
     <div class="psub">${esc(c.name)} · free case included</div>
     <div class="pcond">${c.long}</div>
@@ -686,7 +611,7 @@ function renderCart(){
   $('cartBody').innerHTML=
     cart.map((it,i)=>`
       <div class="citem">
-        <div class="cthumb">${svgBack(it.model,cwFor(it.model)[0])}</div>
+        <div class="cthumb">${firstImg(it.model)?`<img loading="lazy" src="${esc(firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;">`:''}</div>
         <div class="cmainx">
           <div class="cn">${esc(it.model)} · ${it.mem}GB</div>
           <div class="cm">${esc(it.condName)}${it.color!=='No preference'?' · '+esc(it.color):''}</div>
