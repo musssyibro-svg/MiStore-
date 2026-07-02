@@ -416,6 +416,35 @@
   .statcard.pos .sv{color:var(--go);}
   .statcard.neg .sv{color:var(--late);}
 
+  /* ---------- Prices tab ---------- */
+  .prCondFilter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .prCondBtn{border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex:0 0 auto;letter-spacing:-.01em;}
+  .prCondBtn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .prModel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;}
+  .prModelTop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+  .prModelName{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+  .prSavedBadge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;}
+  .prSavedBadge.saved{background:var(--go-soft);color:var(--go);}
+  .prSavedBadge.default{background:var(--line);color:var(--faint);}
+  .prSavedBadge.partial{background:var(--due-soft);color:var(--due);}
+  .prRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);}
+  .prRow:last-of-type{border-bottom:none;}
+  .prLbl{font-size:13px;font-weight:700;color:var(--muted);min-width:54px;}
+  .prPrefix{font-size:13px;color:var(--muted);font-weight:500;}
+  .prInput{flex:1;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;font-size:15px;color:var(--ink);background:var(--surface);outline:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;-webkit-appearance:none;appearance:none;}
+  .prInput:focus{border-color:var(--go);box-shadow:0 0 0 3px var(--go-soft);}
+  .prToggle{width:44px;height:26px;border-radius:13px;background:var(--line-strong);border:none;cursor:pointer;position:relative;flex:0 0 auto;transition:background .15s;}
+  .prToggle.on{background:var(--go);}
+  .prToggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .prToggle.on::after{transform:translateX(18px);}
+  .prSaveBtn{width:100%;margin-top:11px;border:none;border-radius:10px;padding:12px;background:var(--go);color:#fff;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.01em;}
+  .prSaveBtn:disabled{opacity:.5;}
+  .prSaveBtn:active{filter:brightness(.95);}
+  .prNotice{font-size:13px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:13px 14px;margin-top:8px;line-height:1.5;}
+  .prNotice code{font-family:ui-monospace,monospace;font-size:12px;background:var(--line);padding:1px 5px;border-radius:4px;}
+  .prInitBtn{display:flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;flex:0 0 auto;}
+  .prInitBtn:active{background:var(--line);}
+
   @media (prefers-reduced-motion: reduce){
     *{animation:none!important;transition:none!important;}
   }
@@ -445,7 +474,8 @@
 <div class="tabs" id="tabs">
   <button class="tab active" data-tab="active">On the way <span class="tabbadge" id="activeBadge"></span></button>
   <button class="tab" data-tab="history">History</button>
-  <button class="tab" data-tab="photos">Catalog photos</button>
+  <button class="tab" data-tab="photos">Photos</button>
+  <button class="tab" data-tab="prices">Prices</button>
 </div>
 
 <main id="app"></main>
@@ -991,6 +1021,130 @@ document.getElementById('app').addEventListener('click', e=>{
   input.click();
 });
 
+/* ============================================================
+   Prices tab — edit catalogue prices & stock
+   Reads/writes to `catalog_prices` table in Supabase.
+   Falls back to ADMIN_CATALOG when the table doesn't exist yet.
+   SQL to create the table (run once in Supabase SQL Editor):
+   ----------------------------------------------------------------
+   create table if not exists catalog_prices (
+     id uuid default gen_random_uuid() primary key,
+     model text not null,
+     brand text not null default 'apple',
+     condition text not null,
+     storage text not null,
+     price integer not null default 0,
+     in_stock boolean not null default true,
+     updated_at timestamptz default now(),
+     unique(model, condition, storage)
+   );
+   alter table catalog_prices enable row level security;
+   create policy "cp_public_read"  on catalog_prices for select using (true);
+   create policy "cp_admin_write"  on catalog_prices for all    using (auth.uid() is not null);
+   ---------------------------------------------------------------- */
+
+const ADMIN_CATALOG = {"apple":{"clean":{"iPhone X":[["64",147100],["256",151300]],"iPhone XR":[["64",187000],["128",197500]],"iPhone 11":[["64",239500],["128",250000]],"iPhone 11 Pro":[["64",260500],["256",281500]],"iPhone 11 Pro Max":[["64",271000],["256",302500]],"iPhone 12":[["64",250000],["128",271000]],"iPhone 12 Pro":[["128",334000],["256",365500]],"iPhone 12 Pro Max":[["128",386500],["256",418000]],"iPhone 13":[["128",365500],["256",371800]],"iPhone 13 Pro":[["128",481000],["256",502000]],"iPhone 13 Pro Max":[["128",523000],["256",575500]],"iPhone 14":[["128",407500],["256",439000]],"iPhone 14 Pro":[["128",575500],["256",607000]],"iPhone 14 Pro Max":[["128",607000],["256",659500]],"iPhone 15":[["128",523000],["256",575500]],"iPhone 15 Pro":[["128",670000],["256",712000]],"iPhone 15 Pro Max":[["256",859000],["512",901000]],"iPhone 16":[["128",722500],["256",796000]],"iPhone 16 Plus":[["128",859000],["256",964000]],"iPhone 16 Pro":[["128",922000],["256",1048000]],"iPhone 16 Pro Max":[["256",1174000],["512",1237000]]},"screen":{"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",208000],["256",229000]],"iPhone 11 Pro Max":[["64",229000],["256",250000]],"iPhone 12":[["64",208000],["128",218500]],"iPhone 12 Pro":[["128",271000],["256",281500]],"iPhone 12 Pro Max":[["128",292000],["256",313000]],"iPhone 13":[["128",302500],["256",313000]],"iPhone 13 Pro":[["128",397000],["256",418000]],"iPhone 13 Pro Max":[["128",418000],["256",439000]],"iPhone 14":[["128",323500],["256",344500]],"iPhone 14 Pro":[["128",439000],["256",460000]],"iPhone 14 Pro Max":[["128",470500],["256",512500]],"iPhone 15":[["128",407500],["256",428500]],"iPhone 15 Pro":[["128",523000],["256",575500]],"iPhone 15 Pro Max":[["256",649000],["512",691000]]},"battery":{"iPhone XR":[["64",182800],["128",187000]],"iPhone XS Max":[["64",161800],["256",172300]],"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",229000],["256",250000]],"iPhone 11 Pro Max":[["64",239500],["256",271000]],"iPhone 12":[["64",229000],["128",250000]],"iPhone 12 Pro":[["128",281500],["256",302500]],"iPhone 12 Pro Max":[["128",323500],["256",344500]],"iPhone 13":[["128",334000],["256",344500]],"iPhone 13 Pro":[["128",428500],["256",449500]],"iPhone 13 Pro Max":[["128",470500],["256",491500]],"iPhone 14 Pro":[["128",523000],["256",544000]],"iPhone 14 Pro Max":[["128",554500],["256",586000]],"iPhone 15 Pro Max":[["256",733000],["512",796000]]},"double":{"iPhone 11":[["64",193300],["128",201700]],"iPhone 11 Pro":[["64",197500],["256",218500]],"iPhone 11 Pro Max":[["64",214300],["256",235300]],"iPhone 12":[["64",201700],["128",208000]],"iPhone 12 Pro":[["128",250000],["256",260500]],"iPhone 12 Pro Max":[["128",281500],["256",292000]],"iPhone 13":[["128",281500],["256",292000]],"iPhone 13 Pro":[["128",376000],["256",397000]],"iPhone 13 Pro Max":[["128",397000],["256",418000]],"iPhone 14":[["128",302500],["256",323500]],"iPhone 14 Pro":[["128",418000],["256",439000]],"iPhone 14 Pro Max":[["128",449500],["256",481000]],"iPhone 15":[["128",397000],["256",418000]],"iPhone 15 Pro":[["128",481000],["256",533500]],"iPhone 15 Pro Max":[["256",586000],["512",607000]]}}};
+
+let catalogPrices = {};   // "condition|model|storage" -> { price, in_stock }
+let pricesLoaded  = false;
+let pricesCond    = 'clean';
+
+async function loadCatalogPrices(){
+  if(!db || !currentUser) return;
+  try{
+    const { data, error } = await db.from('catalog_prices').select('model,condition,storage,price,in_stock');
+    if(error || !data) return;
+    catalogPrices = {};
+    data.forEach(r=>{ catalogPrices[`${r.condition}|${r.model}|${r.storage}`] = { price:r.price, in_stock:r.in_stock }; });
+    pricesLoaded = true;
+  }catch(e){}
+}
+
+async function saveCatalogPriceRows(model, rows){
+  const payload = rows.map(r=>({ model, brand:'apple', condition:r.condition, storage:r.storage, price:r.price, in_stock:r.in_stock, updated_at:new Date().toISOString() }));
+  const { error } = await db.from('catalog_prices').upsert(payload, { onConflict:'model,condition,storage' });
+  if(error) throw error;
+  rows.forEach(r=>{ catalogPrices[`${r.condition}|${model}|${r.storage}`] = { price:r.price, in_stock:r.in_stock }; });
+}
+
+async function initPricesFromDefault(){
+  if(!db || !currentUser){ toast('Sign in first'); return; }
+  if(!confirm('Import all default prices into the database?\nThis will overwrite any prices you have already saved.')) return;
+  const rows = [];
+  const cat = ADMIN_CATALOG.apple;
+  Object.keys(cat).forEach(cond=>{ Object.keys(cat[cond]).forEach(model=>{ cat[cond][model].forEach(([storage,price])=>{ rows.push({model,brand:'apple',condition:cond,storage,price,in_stock:true,updated_at:new Date().toISOString()}); }); }); });
+  const { error } = await db.from('catalog_prices').upsert(rows, { onConflict:'model,condition,storage' });
+  if(error){ toast('⚠ Import failed: '+(error.message||error)); return; }
+  await loadCatalogPrices();
+  toast('✓ Imported '+rows.length+' price variants');
+  if(tab==='prices') render();
+}
+
+function getPriceEntry(cond, model, storage){
+  const k = `${cond}|${model}|${storage}`;
+  if(catalogPrices[k]) return catalogPrices[k];
+  const hc = (ADMIN_CATALOG.apple[cond]||{})[model];
+  if(hc){ const v=hc.find(x=>x[0]===storage); if(v) return { price:v[1], in_stock:true }; }
+  return null;
+}
+
+function renderPricesTab(){
+  const condDefs = CATALOG_CONDITIONS;
+  const models   = CATALOG_MODELS;
+  const condKey  = pricesCond;
+  const modelsInCond = models.filter(m=>(ADMIN_CATALOG.apple[condKey]||{})[m]);
+
+  const condFilter = condDefs.map(c=>`<button class="prCondBtn${c.key===condKey?' active':''}" data-prcond="${c.key}">${esc(c.name)}</button>`).join('');
+
+  const modelCards = modelsInCond.map(model=>{
+    const variants = (ADMIN_CATALOG.apple[condKey]||{})[model]||[];
+    const savedCount = variants.filter(([s])=>catalogPrices[`${condKey}|${model}|${s}`]).length;
+    const badgeCls = savedCount===variants.length?'saved':(savedCount>0?'partial':'default');
+    const badgeTxt = savedCount===variants.length?'✓ saved':(savedCount>0?'partial':'default');
+    const mid = model.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+
+    const rows = variants.map(([storage])=>{
+      const d = getPriceEntry(condKey, model, storage);
+      const price = d?d.price:0; const inStock = d?d.in_stock:true;
+      return `<div class="prRow">
+        <span class="prLbl">${esc(storage)}GB</span>
+        <span class="prPrefix">₦</span>
+        <input class="prInput" type="number" inputmode="numeric" step="500" min="0"
+          data-prmodel="${esc(model)}" data-prstorage="${esc(storage)}" value="${price}">
+        <button class="prToggle${inStock?' on':''}" title="${inStock?'In stock':'Out of stock'}"
+          data-prtoggle="${esc(model)}" data-prstorage="${esc(storage)}"></button>
+      </div>`;
+    }).join('');
+
+    return `<div class="prModel" id="prm-${mid}">
+      <div class="prModelTop">
+        <span class="prModelName">${esc(model)}</span>
+        <span class="prSavedBadge ${badgeCls}">${badgeTxt}</span>
+      </div>
+      ${rows}
+      <button class="prSaveBtn" data-prsave="${esc(model)}">Save ${esc(model)}</button>
+    </div>`;
+  }).join('');
+
+  const sqlBox = `<div class="prNotice">
+    <b>First time?</b> Run this SQL in your <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" style="color:var(--go);">Supabase SQL Editor</a> to create the prices table, then click "Import all defaults":<br><br>
+    <code>create table if not exists catalog_prices (id uuid default gen_random_uuid() primary key, model text not null, brand text not null default 'apple', condition text not null, storage text not null, price integer not null default 0, in_stock boolean not null default true, updated_at timestamptz default now(), unique(model, condition, storage)); alter table catalog_prices enable row level security; create policy "cp_public_read" on catalog_prices for select using (true); create policy "cp_admin_write" on catalog_prices for all using (auth.uid() is not null);</code>
+  </div>`;
+
+  return `<div class="section">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.01em;">Prices &amp; Stock</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:3px;">${pricesLoaded?'Editing live database prices':'Database table not found — import defaults first'}</div>
+      </div>
+      <button class="prInitBtn" id="prInitBtn">⬆ Import all defaults</button>
+    </div>
+    ${!pricesLoaded ? sqlBox : ''}
+    <div class="prCondFilter">${condFilter}</div>
+    ${modelsInCond.length ? modelCards : `<div class="prNotice">No models available in this condition.</div>`}
+  </div>`;
+}
+
 /* ---------- model ---------- */
 function makeNodes(buyDate, skipHome){
   const keys = skipHome ? ROUTE_SKIP : ROUTE_FULL;
@@ -1209,6 +1363,36 @@ function render(){
     app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
       <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
       ${renderCatalogPhotos()}`;
+    return;
+  }
+
+  if(tab==='prices'){
+    app.innerHTML = renderPricesTab();
+    const initBtn = document.getElementById('prInitBtn');
+    if(initBtn) initBtn.onclick = initPricesFromDefault;
+    app.querySelectorAll('[data-prcond]').forEach(b=>b.onclick=()=>{ pricesCond=b.dataset.prcond; render(); });
+    app.querySelectorAll('[data-prtoggle]').forEach(btn=>btn.onclick=()=>{ btn.classList.toggle('on'); btn.title=btn.classList.contains('on')?'In stock':'Out of stock'; });
+    app.querySelectorAll('[data-prsave]').forEach(btn=>btn.onclick=async ()=>{
+      const model=btn.dataset.prsave;
+      const mid=model.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+      const card=document.getElementById('prm-'+mid);
+      if(!card) return;
+      const variants=(ADMIN_CATALOG.apple[pricesCond]||{})[model]||[];
+      const rows=variants.map(([storage])=>{
+        const inp=card.querySelector(`[data-prmodel="${model}"][data-prstorage="${storage}"]`);
+        const tog=card.querySelector(`[data-prtoggle="${model}"][data-prstorage="${storage}"]`);
+        return { condition:pricesCond, storage, price:Math.round(Number(inp?inp.value:0))||0, in_stock:tog?tog.classList.contains('on'):true };
+      });
+      const prevTxt=btn.textContent; btn.disabled=true; btn.textContent='Saving…';
+      try{
+        await saveCatalogPriceRows(model, rows);
+        toast('✓ Saved — storefront updates live');
+        render();
+      }catch(err){
+        toast('⚠ Save failed: '+(err.message||err));
+        btn.disabled=false; btn.textContent=prevTxt;
+      }
+    });
     return;
   }
 
@@ -2175,6 +2359,7 @@ function activateSession(user){
   hideLogin();
   loadCloud();
   setupRealtime();
+  loadCatalogPrices().then(()=>{ if(tab==='prices') render(); });
   if(!alertedThisSession){ alertedThisSession=true; setTimeout(inAppAlert,1500); }
 }
 function deactivateSession(){

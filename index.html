@@ -316,6 +316,16 @@
   .cswatch-btn.snone .cdot{background:repeating-linear-gradient(45deg,#ccc,#ccc 3px,#e8e8e8 3px,#e8e8e8 6px);}
   .cswatch-lbl{font-size:9.5px;font-weight:600;color:var(--muted);max-width:44px;text-align:center;line-height:1.2;}
 
+  /* ── product sheet: image gallery ── */
+  .sgallery{margin:6px 0 14px;text-align:center;}
+  .shero{width:100%;max-height:240px;object-fit:contain;border-radius:18px;background:var(--card2);display:block;}
+  .sthumbs{display:flex;gap:10px;margin-top:10px;justify-content:center;flex-wrap:wrap;}
+  .sthumb-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .sthumb{width:52px;height:52px;border-radius:11px;overflow:hidden;border:2.5px solid transparent;padding:0;background:var(--card2);flex:0 0 auto;transition:border-color .12s,transform .1s;}
+  .sthumb.on{border-color:var(--red);transform:scale(1.08);}
+  .sthumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .sthumb-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:center;line-height:1.2;}
+
   /* ===== iPhone / small-screen tuning ===== */
   @media(max-width:430px){
     .wrap{padding:0 15px;}
@@ -549,11 +559,26 @@ let cust={ name:"", phone:"", whatsapp:"", address:"", state:"", city:"", email:
 
 /* ---------- BACKEND SEAM ---------- */
 async function fetchCatalog(b){
-  // BACKEND SEAM: when CONFIG.source==='supabase', fetch rows for brand `b`
-  // from your DB and return the SAME shape used below. Prices are final Naira.
-  // e.g.: const { data } = await sb.from('catalog').select('*').eq('brand', b).eq('in_stock', true)
-  //       then reduce rows -> { condition: { model: [[storage, price], ...] } }
-  return CATALOG[b] || {};
+  try{
+    const { url, anonKey } = CONFIG.supabase;
+    const res = await fetch(
+      `${url}/rest/v1/catalog_prices?select=model,condition,storage,price&brand=eq.${encodeURIComponent(b)}&in_stock=eq.true&order=condition,model,storage`,
+      { headers:{ apikey:anonKey, Authorization:`Bearer ${anonKey}` } }
+    );
+    if(res.ok){
+      const rows = await res.json();
+      if(Array.isArray(rows) && rows.length){
+        const cat={};
+        rows.forEach(r=>{
+          if(!cat[r.condition]) cat[r.condition]={};
+          if(!cat[r.condition][r.model]) cat[r.condition][r.model]=[];
+          cat[r.condition][r.model].push([r.storage, r.price]);
+        });
+        return cat;
+      }
+    }
+  }catch(e){}
+  return CATALOG[b]||{};
 }
 async function submitOrder(order){
   // BACKEND SEAM: when live, insert `order` into customer_orders, generate a
@@ -707,8 +732,22 @@ function renderProduct(){
     </span>`;
   }).join('');
 
+  // Build image gallery — hero + condition-specific thumbnails
+  const condImgs=CONDITIONS.map(c=>({
+    cond:c.key,
+    lbl:c.key==='clean'?'Clean':c.key==='screen'?'Screen':c.key==='battery'?'Battery':'Double',
+    url:CATALOG_IMAGES[sel.model+'|'+c.key]||null
+  })).filter(x=>x.url);
+  const heroUrl=CATALOG_IMAGES[sel.model+'|'+sel.cond]||(condImgs[0]?condImgs[0].url:null);
+  const galleryHTML=heroUrl
+    ?`<div class="sgallery">
+        <img class="shero" src="${heroUrl}" alt="${esc(sel.model)}" onerror="this.style.display='none'">
+        ${condImgs.length>1?`<div class="sthumbs">${condImgs.map(x=>`<span class="sthumb-wrap"><button class="sthumb${x.cond===sel.cond?' on':''}" data-selcond="${x.cond}"><img src="${x.url}" alt="${x.lbl}" onerror="this.parentElement.style.display='none'"></button><span class="sthumb-lbl">${x.lbl}</span></span>`).join('')}</div>`:''}
+      </div>`
+    :`<div style="display:flex;justify-content:center;padding:6px 0 12px;">${phoneMockup(sel.model,true)}</div>`;
+
   body.innerHTML=`
-    <div style="display:flex;justify-content:center;padding:6px 0 12px;">${phoneVisual(sel.model,sel.cond,true)}</div>
+    ${galleryHTML}
     <div class="flabel" style="margin-top:2px;">Choose condition</div>
     <div class="scond-list">${condRowsHTML}</div>
     <div class="pcond" style="margin:12px 0 16px;">${condDef.long}</div>
