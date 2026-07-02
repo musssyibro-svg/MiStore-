@@ -291,6 +291,31 @@
   .reveal.in{opacity:1;transform:none;}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;} .reveal{opacity:1;transform:none;}}
 
+  /* ── product sheet: Design C condition radio list ── */
+  .scond-list{display:flex;flex-direction:column;gap:8px;margin:4px 0 2px;}
+  .scond-row{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:13px 14px 13px 18px;text-align:left;width:100%;position:relative;overflow:hidden;transition:border-color .12s,background .12s;}
+  .scond-row.on{border-color:var(--red);background:rgba(217,27,51,.04);}
+  .scond-row .sbar{position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .sbar-clean{background:var(--green);} .sbar-screen{background:#F59428;} .sbar-battery{background:#E9C014;} .sbar-double{background:var(--red);}
+  .scond-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--faintt);flex:0 0 auto;position:relative;transition:border-color .12s;}
+  .scond-row.on .scond-dot{border-color:var(--red);}
+  .scond-row.on .scond-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--red);}
+  .scond-cr{flex:1;min-width:0;}
+  .scond-crn{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .scond-crs{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3;}
+  .scond-pricecol{text-align:right;flex:0 0 auto;}
+  .scond-pv{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;display:block;}
+  .scond-save{font-size:10.5px;font-weight:700;color:var(--green);white-space:nowrap;margin-top:2px;display:block;}
+
+  /* ── product sheet: color swatches ── */
+  .cswatches{display:flex;flex-wrap:wrap;gap:8px 12px;margin:4px 0;}
+  .cswatch-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+  .cswatch-btn{width:38px;height:38px;border-radius:50%;border:2.5px solid transparent;display:flex;align-items:center;justify-content:center;background:none;padding:0;transition:border-color .12s,transform .1s;}
+  .cswatch-btn.on{border-color:var(--red);transform:scale(1.15);}
+  .cswatch-btn .cdot{width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,.12);box-shadow:0 1px 4px rgba(0,0,0,.18);}
+  .cswatch-btn.snone .cdot{background:repeating-linear-gradient(45deg,#ccc,#ccc 3px,#e8e8e8 3px,#e8e8e8 6px);}
+  .cswatch-lbl{font-size:9.5px;font-weight:600;color:var(--muted);max-width:44px;text-align:center;line-height:1.2;}
+
   /* ===== iPhone / small-screen tuning ===== */
   @media(max-width:430px){
     .wrap{padding:0 15px;}
@@ -637,30 +662,74 @@ function renderProducts(){
 /* ---------- product sheet ---------- */
 function priceFor(model,c,mem){ const v=(CAT[c]||{})[model]; if(!v) return 0; const f=v.find(x=>x[0]===mem); return f?f[1]:0; }
 function openProduct(model){
-  const variants=(CAT[cond]||{})[model]; if(!variants){ toast('Pick a condition that has this model'); return; }
-  sel={ model, cond, mem:variants[0][0], color:"No preference", qty:1 };
+  // Auto-select best condition: prefer the page's current cond, else first available
+  let bestCond = (CAT[cond]||{})[model] ? cond : null;
+  if(!bestCond){ for(const c of CONDITIONS){ if((CAT[c.key]||{})[model]){ bestCond=c.key; break; } } }
+  if(!bestCond){ toast('This model is not currently in stock'); return; }
+  const variants=(CAT[bestCond])[model];
+  sel={ model, cond:bestCond, mem:variants[0][0], color:"No preference", qty:1 };
   $('pTitle').textContent=model; renderProduct(); showSheet(prodSheet);
 }
 function renderProduct(){
-  const variants=(CAT[sel.cond]||{})[sel.model];
-  const c=CONDITIONS.find(x=>x.key===sel.cond);
-  const unit=priceFor(sel.model,sel.cond,sel.mem);
   const body=$('prodBody');
+  const condDef=CONDITIONS.find(x=>x.key===sel.cond);
+  const variants=(CAT[sel.cond]||{})[sel.model]||[];
+  if(!variants.find(v=>v[0]===sel.mem) && variants.length) sel.mem=variants[0][0];
+  const unit=priceFor(sel.model,sel.cond,sel.mem);
+  const cleanPrices=(CAT.clean||{})[sel.model]; const cleanMin=cleanPrices?Math.min(...cleanPrices.map(v=>v[1])):0;
+
+  // Condition radio rows — only show conditions that stock this model
+  const condRowsHTML=CONDITIONS.map(c=>{
+    const vars=(CAT[c.key]||{})[sel.model]; if(!vars) return '';
+    const minP=Math.min(...vars.map(v=>v[1]));
+    const savings=(c.key!=='clean'&&cleanMin)?cleanMin-minP:0;
+    const isOn=c.key===sel.cond;
+    return `<button class="scond-row ${isOn?'on':''}" data-selcond="${c.key}">
+      <span class="sbar sbar-${c.key}"></span>
+      <span class="scond-dot"></span>
+      <span class="scond-cr"><span class="scond-crn">${c.name}</span><span class="scond-crs">${c.short}</span></span>
+      <span class="scond-pricecol">
+        <span class="scond-pv">${fmtK(minP)}</span>
+        ${savings>0?`<span class="scond-save">Save ${fmtK(savings)}</span>`:''}
+      </span>
+    </button>`;
+  }).join('');
+
+  // Color swatches
+  const colorHTML=COLORS.map(col=>{
+    const hex=COLOR_HEX[col]; const isNone=col==='No preference'; const isOn=col===sel.color;
+    const lbl=isNone?'Any':col==='White / Silver'?'White/Silver':col;
+    return `<span class="cswatch-wrap" data-color="${encodeURIComponent(col)}">
+      <button class="cswatch-btn ${isOn?'on':''} ${isNone?'snone':''}" title="${col}">
+        <span class="cdot" ${!isNone&&hex?`style="background:${hex}"`:``}></span>
+      </button>
+      <span class="cswatch-lbl">${lbl}</span>
+    </span>`;
+  }).join('');
+
   body.innerHTML=`
-    <div style="display:flex;justify-content:center;padding:6px 0 2px;">${phoneVisual(sel.model,sel.cond,true)}</div>
-    <div style="margin:8px 0 10px;text-align:center;">${cbadge(sel.cond)} <span style="color:var(--green);font-size:12px;font-weight:600;margin-left:4px;">● In stock</span></div>
-    <div class="pcond">${c.long}</div>
+    <div style="display:flex;justify-content:center;padding:6px 0 12px;">${phoneVisual(sel.model,sel.cond,true)}</div>
+    <div class="flabel" style="margin-top:2px;">Choose condition</div>
+    <div class="scond-list">${condRowsHTML}</div>
+    <div class="pcond" style="margin:12px 0 16px;">${condDef.long}</div>
     <div class="flabel">Storage</div>
     <div class="chips">${variants.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}">${v[0]}GB</button>`).join('')}</div>
-    <div class="flabel">Colour <span style="font-weight:500;color:var(--faintt)">(we confirm availability)</span></div>
-    <div class="chips">${COLORS.map(col=>`<button class="chip sm ${col===sel.color?'on':''}" data-color="${encodeURIComponent(col)}">${swatch(col)}${col}</button>`).join('')}</div>
+    <div class="flabel">Colour <span style="font-weight:500;color:var(--faintt)">— ${sel.color==='No preference'?'any colour':'<b>'+esc(sel.color)+'</b>'} (we confirm availability)</span></div>
+    <div class="cswatches">${colorHTML}</div>
     <div class="flabel">Quantity</div>
     <div class="stepper"><button data-q="-1">−</button><span class="q mono" id="pQty">${sel.qty}</span><button data-q="1">+</button></div>
     <div class="pricebig"><span class="pv mono">${fmtFull(unit*sel.qty)}</span><span class="per">${sel.qty>1?fmtFull(unit)+' each':'incl. free shipping'}</span></div>
     <div class="pricesub">🎁 Free case included${sel.qty>=3?' · bulk discount applies in your order':''}</div>
     <button class="addbtn" id="pAdd">Add to order — ${fmtFull(unit*sel.qty)}</button>`;
+
+  body.querySelectorAll('[data-selcond]').forEach(b=>b.onclick=()=>{
+    sel.cond=b.dataset.selcond;
+    const nv=(CAT[sel.cond]||{})[sel.model]||[];
+    if(!nv.find(v=>v[0]===sel.mem)&&nv.length) sel.mem=nv[0][0];
+    renderProduct();
+  });
   body.querySelectorAll('[data-mem]').forEach(b=>b.onclick=()=>{ sel.mem=b.dataset.mem; renderProduct(); });
-  body.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{ sel.color=decodeURIComponent(b.dataset.color); renderProduct(); });
+  body.querySelectorAll('.cswatch-wrap[data-color]').forEach(w=>w.onclick=()=>{ sel.color=decodeURIComponent(w.dataset.color); renderProduct(); });
   body.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ sel.qty=Math.max(1,Math.min(20,sel.qty+Number(b.dataset.q))); renderProduct(); });
   $('pAdd').onclick=addToCart;
 }
