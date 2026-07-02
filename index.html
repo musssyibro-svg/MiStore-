@@ -526,13 +526,36 @@ const REVIEWS = [
   { text:"Fast replies on WhatsApp and delivery came as promised.", name:"Repeat customer", stars:5 }
 ];
 
-/* Product images — OPTIONAL. Add a URL to show a real photo for that model;
-   otherwise a premium device mockup is shown automatically.
-   Example:  "iPhone 15 Pro Max": "https://your-host.com/15promax.png"  */
-const IMAGES = {
-  // "iPhone 16 Pro Max": "",
-  // "iPhone 15 Pro Max": "",
+/* Automatic phone image database — Apple product shot CDN.
+   Loaded automatically in every product card and detail sheet; no admin upload needed.
+   Admin-uploaded CATALOG_IMAGES take priority when present. onerror → CSS mockup. */
+const PHONE_IMAGES_DB = {
+  "iPhone 16 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 16 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 16 Plus":    "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-plus-finish-select-202409-6-7inch-teal?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 16":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 15 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 15 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 15":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 14 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-max-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 14 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-1inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 14":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-yellow?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 13 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-pro-max-finish-select-202109-6-7inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 13 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-pro-finish-select-202109-6-1inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 13":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-finish-select-202109-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 12 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-max-finish-select-202010-6-7inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 12 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-finish-select-202010-6-1inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 12":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-finish-select-202010-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 11 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-pro-max-finish-select-201909-6-5inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 11 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-pro-finish-select-201909-5-8inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone 11":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-finish-select-201909-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone XS Max":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-xs-max-finish-select-201809-6-5inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone XR":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-xr-finish-select-201809-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
+  "iPhone X":          "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-x-finish-select-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
 };
+
+/* Models hidden from the storefront (e.g. discontinued, out of stock entirely). */
+const HIDDEN_MODELS = new Set(['iPhone X']);
 
 /* ---------- catalogue (final Naira prices — your ¥ cost is never shown) ----------
    Nested by brand so adding Samsung/Pixel later is clean. */
@@ -604,11 +627,10 @@ function phoneMockup(model, large){
   return `<span class="${large?'pmL':'pm'} ${pro?'pro':''}"><span class="island">${l}</span><span class="flash"></span></span>`;
 }
 function phoneVisual(model, c, large){
-  // Show the same photo for all conditions — customers don't need condition-specific images.
-  // Pick the first photo uploaded for this model across any condition.
   const url=CATALOG_IMAGES[model+'|clean']||CATALOG_IMAGES[model+'|screen']
-    ||CATALOG_IMAGES[model+'|battery']||CATALOG_IMAGES[model+'|double']||IMAGES[model];
-  if(url) return `<img class="${large?'pimgL':'pimg'}" src="${url}" alt="${esc(model)}" loading="lazy" onerror="this.outerHTML=phoneMockup('${model}',${large?'true':'false'})">`;
+    ||CATALOG_IMAGES[model+'|battery']||CATALOG_IMAGES[model+'|double']
+    ||PHONE_IMAGES_DB[model];
+  if(url) return `<img class="${large?'pimgL':'pimg'}" src="${url}" alt="${esc(model)}" loading="lazy" onerror="this.outerHTML=phoneMockup('${esc(model)}',${large?'true':'false'})">`;
   return phoneMockup(model, large);
 }
 
@@ -659,7 +681,9 @@ function renderConds(){
 /* ---------- products ---------- */
 function modelsForCond(){
   const obj=CAT[cond]||{};
-  let list=Object.keys(obj).map(model=>{ const prices=obj[model].map(v=>v[1]); return { model, min:Math.min(...prices), variants:obj[model] }; });
+  let list=Object.keys(obj)
+    .filter(model=>!HIDDEN_MODELS.has(model))
+    .map(model=>{ const prices=obj[model].map(v=>v[1]); return { model, min:Math.min(...prices), variants:obj[model] }; });
   if(search){ const q=search.toLowerCase().replace(/\s+/g,''); list=list.filter(m=>m.model.toLowerCase().replace(/\s+/g,'').includes(q)); }
   return list;
 }
@@ -687,6 +711,7 @@ function renderProducts(){
 /* ---------- product sheet ---------- */
 function priceFor(model,c,mem){ const v=(CAT[c]||{})[model]; if(!v) return 0; const f=v.find(x=>x[0]===mem); return f?f[1]:0; }
 function openProduct(model){
+  if(HIDDEN_MODELS.has(model)) return;
   // Auto-select best condition: prefer the page's current cond, else first available
   let bestCond = (CAT[cond]||{})[model] ? cond : null;
   if(!bestCond){ for(const c of CONDITIONS){ if((CAT[c.key]||{})[model]){ bestCond=c.key; break; } } }
@@ -732,17 +757,19 @@ function renderProduct(){
     </span>`;
   }).join('');
 
-  // Build image gallery — hero + condition-specific thumbnails
+  // Build image gallery — admin-uploaded condition photos take priority; auto-DB image as fallback
   const condImgs=CONDITIONS.map(c=>({
     cond:c.key,
     lbl:c.key==='clean'?'Clean':c.key==='screen'?'Screen':c.key==='battery'?'Battery':'Double',
     url:CATALOG_IMAGES[sel.model+'|'+c.key]||null
   })).filter(x=>x.url);
-  const heroUrl=CATALOG_IMAGES[sel.model+'|'+sel.cond]||(condImgs[0]?condImgs[0].url:null);
+  const adminHero=CATALOG_IMAGES[sel.model+'|'+sel.cond]||(condImgs[0]?condImgs[0].url:null);
+  const heroUrl=adminHero||PHONE_IMAGES_DB[sel.model]||null;
+  const hasAdminThumbs=condImgs.length>1;
   const galleryHTML=heroUrl
     ?`<div class="sgallery">
         <img class="shero" src="${heroUrl}" alt="${esc(sel.model)}" onerror="this.style.display='none'">
-        ${condImgs.length>1?`<div class="sthumbs">${condImgs.map(x=>`<span class="sthumb-wrap"><button class="sthumb${x.cond===sel.cond?' on':''}" data-selcond="${x.cond}"><img src="${x.url}" alt="${x.lbl}" onerror="this.parentElement.style.display='none'"></button><span class="sthumb-lbl">${x.lbl}</span></span>`).join('')}</div>`:''}
+        ${hasAdminThumbs?`<div class="sthumbs">${condImgs.map(x=>`<span class="sthumb-wrap"><button class="sthumb${x.cond===sel.cond?' on':''}" data-selcond="${x.cond}"><img src="${x.url}" alt="${x.lbl}" onerror="this.parentElement.style.display='none'"></button><span class="sthumb-lbl">${x.lbl}</span></span>`).join('')}</div>`:''}
       </div>`
     :`<div style="display:flex;justify-content:center;padding:6px 0 12px;">${phoneMockup(sel.model,true)}</div>`;
 
