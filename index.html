@@ -1,524 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>M.i Store · Premium Phones, delivered across Nigeria</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F5F7">
+<title>MiPhones — Premium iPhones, delivered across Nigeria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F6F6FA; --bg2:#FFFFFF; --card:#FFFFFF; --card2:#F0F0F6; --raise:#E8E8F0;
-    --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.14);
-    --ink:#0C0C12; --muted:#6B6B7A; --faint:rgba(0,0,0,.05);
-    --faintt:#9090A2;
-    --red:#D91B33; --red-deep:#B81429; --red-soft:rgba(217,27,51,.10);
-    --green:#16A35B; --amber:#C07800;
-    --shadow:0 22px 60px rgba(0,0,0,.12); --shadow-sm:0 8px 24px rgba(0,0,0,.08);
-    --r:18px;
+    --bg:#F5F5F7; --card:#FFFFFF; --ink:#1D1D1F; --muted:#6E6E73; --faint:#9A9AA1;
+    --line:rgba(0,0,0,.07); --line2:rgba(0,0,0,.12);
+    --red:#FF3B30; --red-soft:rgba(255,59,48,.10);
+    --green:#1F9D5B; --green-soft:rgba(31,157,91,.12);
+    --amber:#B96A00; --amber-soft:rgba(185,106,0,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.08);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.16);
+    --r:22px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;overflow-x:hidden;}
-  body{
-    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;
-    padding-bottom:96px;
-  }
-  h1,h2,h3,.logo,.dispf{font-family:"Sora","Inter",sans-serif;}
-  .mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
+  body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
   button{font-family:inherit;cursor:pointer;color:inherit;}
   a{color:inherit;text-decoration:none;}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 18px;}
+  .mono{font-variant-numeric:tabular-nums;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
 
-  /* ===== nav ===== */
-  header{position:sticky;top:0;z-index:40;background:rgba(246,246,250,.88);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
-  .nav{max-width:1120px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:18px;}
-  .logo{font-weight:800;font-size:22px;letter-spacing:-.04em;}
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:40;background:rgba(245,245,247,.8);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  .nav{max-width:1080px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .logo{font-weight:800;font-size:21px;letter-spacing:-.045em;}
   .logo .dash{color:var(--red);}
-  .navlinks{display:none;gap:24px;margin-left:16px;flex:1;}
-  .navlinks a{font-size:14px;font-weight:500;color:var(--muted);transition:color .15s;}
-  .navlinks a:hover,.navlinks a.on{color:var(--ink);}
-  .navright{margin-left:auto;display:flex;align-items:center;gap:12px;}
-  .iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:18px;position:relative;transition:border-color .15s;}
-  .iconbtn:hover{border-color:var(--line2);}
-  .cartdot{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:11px;font-weight:800;min-width:19px;height:19px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg);}
-  @media(min-width:860px){ .navlinks{display:flex;} }
+  .navlinks{display:flex;gap:20px;font-size:13.5px;font-weight:600;color:var(--muted);}
+  .navlinks a:active{color:var(--ink);}
+  .cartbtn{position:relative;border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:8px 15px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .cartbtn .n{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10.5px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 5px;}
+  .cartbtn .n.show{display:inline-flex;}
 
-  /* ===== hero ===== */
-  .hero{position:relative;padding:54px 0 30px;}
-  .hero::before{content:"";position:absolute;top:-180px;right:-160px;width:620px;height:620px;border-radius:50%;
-    background:radial-gradient(circle, rgba(255,52,66,.22), rgba(255,52,66,.04) 46%, transparent 68%);z-index:0;pointer-events:none;}
-  .herogrid{position:relative;z-index:1;display:grid;grid-template-columns:1fr;gap:34px;align-items:center;}
-  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);}
-  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);}
-  .hero h1{font-size:42px;line-height:1.03;letter-spacing:-.04em;margin:16px 0 16px;font-weight:800;}
-  .hero h1 .accent{background:linear-gradient(100deg,var(--ink) 10%,var(--red) 92%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-  .hero p.sub{color:var(--muted);font-size:16px;margin:0 0 26px;max-width:44ch;line-height:1.6;}
-  .herobtns{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:30px;}
-  .btn{display:inline-flex;align-items:center;gap:9px;border-radius:14px;padding:15px 24px;font-weight:700;font-size:15px;border:none;transition:transform .08s,filter .15s,border-color .15s;}
-  .btn:active{transform:scale(.98);}
-  .btn.primary{background:var(--red);color:#fff;box-shadow:0 14px 34px rgba(255,52,66,.34);}
-  .btn.primary:hover{filter:brightness(1.08);}
-  .btn.ghost{background:rgba(255,255,255,.03);color:var(--ink);border:1px solid var(--line2);}
-  .btn.ghost:hover{border-color:#3a3a44;}
-  .heromini{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;max-width:470px;}
-  .hm{display:flex;gap:11px;align-items:flex-start;}
-  .hm .hi{color:var(--red);font-size:18px;margin-top:1px;}
-  .hm .ht{font-weight:700;font-size:13.5px;}
-  .hm .hs{font-size:11.5px;color:var(--faintt);}
-  /* premium hero device (front face) */
-  .herophone{position:relative;display:flex;justify-content:center;align-items:center;min-height:460px;}
-  .glow{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,52,66,.24),transparent 62%);filter:blur(30px);z-index:0;}
-  .device{width:206px;height:418px;border-radius:50px;padding:7px;position:relative;z-index:2;
-    background:linear-gradient(150deg,#46464f 0%,#26262d 26%,#101014 72%,#1c1c22 100%);
-    box-shadow:0 54px 96px rgba(0,0,0,.72), inset 0 2px 1px rgba(255,255,255,.16), inset 0 -3px 3px rgba(0,0,0,.55);}
-  .device .screen{position:absolute;inset:7px;border-radius:43px;overflow:hidden;
-    background:radial-gradient(130% 95% at 50% -12%, #3c1820 0%, #18181f 38%, #09090d 100%);}
-  .device .screen::after{content:"";position:absolute;top:-25%;left:-38%;width:68%;height:175%;
-    background:linear-gradient(80deg,transparent,rgba(255,255,255,.085) 50%,transparent);transform:rotate(15deg);}
-  .device .island{position:absolute;top:21px;left:50%;transform:translateX(-50%);width:84px;height:26px;border-radius:15px;background:#000;z-index:4;box-shadow:0 0 0 1px rgba(255,255,255,.06);}
-  .device .island::after{content:"";position:absolute;right:9px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a2a35,#000);}
-  .device .innerglow{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:135%;height:46%;background:radial-gradient(circle,rgba(255,52,66,.4),transparent 62%);filter:blur(22px);z-index:1;}
-  .deviceshadow{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);width:168px;height:32px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.7),transparent 72%);filter:blur(8px);}
-  .hotdeal{position:absolute;bottom:34px;left:2px;z-index:5;background:rgba(16,16,21,.82);backdrop-filter:blur(12px);border:1px solid var(--line2);border-radius:16px;padding:14px 16px;width:206px;box-shadow:var(--shadow);}
-  .hotdeal .tagline{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--red);background:var(--red-soft);border-radius:6px;padding:2px 9px;}
-  .hotdeal .hd-name{font-weight:700;font-size:14.5px;margin-top:9px;}
-  .hotdeal .hd-sub{font-size:12px;color:var(--muted);margin-top:2px;}
-  .hotdeal .hd-link{color:var(--red);font-weight:700;font-size:12.5px;margin-top:9px;display:inline-block;}
-  @media(min-width:860px){ .herogrid{grid-template-columns:1.05fr .95fr;gap:24px;} .hero h1{font-size:54px;} }
+  /* ---------- hero ---------- */
+  .hero{padding:44px 0 10px;text-align:center;}
+  .hero .eyebrow{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);background:var(--red-soft);border-radius:999px;padding:6px 13px;}
+  .hero h1{font-size:clamp(30px,6vw,46px);letter-spacing:-.04em;line-height:1.08;margin:16px auto 10px;font-weight:800;max-width:17ch;}
+  .hero p{color:var(--muted);font-size:16px;max-width:44ch;margin:0 auto;}
+  .heroctas{display:flex;gap:11px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
+  .cta{border:none;background:var(--ink);color:#fff;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;box-shadow:0 12px 28px rgba(0,0,0,.18);}
+  .cta.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line2);box-shadow:none;}
+  .hotdeal{display:inline-flex;align-items:center;gap:9px;margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 15px;font-size:13px;box-shadow:var(--shadow);}
+  .hotdeal .fire{font-size:16px;}
+  .hotdeal b{letter-spacing:-.01em;}
+  .hotdeal .hp{color:var(--red);font-weight:800;}
 
-  /* ===== sections ===== */
-  .sec{padding:32px 0 4px;}
-  .sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px;}
+  /* ---------- trust strip ---------- */
+  .trust{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 8px;}
+  .titem{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--muted);}
+
+  /* ---------- sections ---------- */
+  section{padding:34px 0 6px;}
+  .sechead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:6px;}
   .sechead h2{font-size:24px;letter-spacing:-.03em;margin:0;font-weight:800;}
-  .sechead .sub{font-size:13px;color:var(--faintt);}
+  .sechead p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
 
-  /* brands */
-  .brands{display:flex;gap:11px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-  .brands::-webkit-scrollbar{display:none;}
-  .brand{flex:0 0 auto;min-width:112px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px 14px;text-align:center;transition:border-color .15s,transform .08s,background .15s;position:relative;}
-  .brand:active{transform:scale(.98);}
-  .brand.on{border-color:var(--red);background:linear-gradient(180deg,rgba(255,52,66,.09),var(--card));}
-  .brand .bg{height:30px;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;letter-spacing:-.02em;}
-  .brand .bn{font-size:12.5px;font-weight:600;margin-top:8px;color:var(--muted);}
-  .brand.on .bn{color:var(--ink);}
-  .brand .soon{position:absolute;top:8px;right:8px;font-size:9px;font-weight:800;letter-spacing:.05em;color:var(--amber);background:rgba(245,178,62,.14);border-radius:5px;padding:1px 5px;}
+  /* ---------- condition tabs ---------- */
+  .condtabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .condtabs::-webkit-scrollbar{display:none;}
+  .ctab{flex:0 0 auto;border:1px solid var(--line2);background:var(--card);color:var(--muted);border-radius:999px;padding:10px 17px;font-weight:700;font-size:13.5px;white-space:nowrap;letter-spacing:-.01em;}
+  .ctab.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .condblurb{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin:8px 0 16px;line-height:1.5;}
+  .condblurb b{color:var(--ink);}
 
-  /* conditions */
-  .conds{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .cond{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px;transition:border-color .15s,transform .07s,box-shadow .15s;position:relative;overflow:hidden;}
-  .cond:active{transform:scale(.99);}
-  .cond.on{border-color:var(--line2);box-shadow:var(--shadow-sm);}
-  .cond .bar{position:absolute;left:0;top:0;bottom:0;width:4px;}
-  .cond.clean .bar{background:var(--green);} .cond.screen .bar{background:#F59428;} .cond.battery .bar{background:#E9C014;} .cond.double .bar{background:var(--red);}
-  .cond .ct{font-weight:800;font-size:15.5px;letter-spacing:-.01em;}
-  .cond .cs{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.4;}
-  .cond.on::after{content:"✓";position:absolute;top:14px;right:15px;color:var(--ink);font-weight:800;font-size:13px;}
-  .condmore{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px;margin-top:12px;line-height:1.55;}
-  .condmore b{color:var(--ink);}
-  @media(min-width:680px){ .conds{grid-template-columns:1fr 1fr 1fr 1fr;} }
+  /* ---------- product grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .15s;}
+  .pcard:active{transform:scale(.985);}
+  .phero{position:relative;aspect-ratio:1/1.15;background:linear-gradient(180deg,#FBFBFD,#F0F0F4);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .phero svg{width:64%;height:84%;}
+  .phero img.real{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12px;background:#fff;}
+  .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
+  .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
+  .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
+  .pmem{font-size:12px;color:var(--faint);font-weight:600;}
+  .prow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;}
+  .pfrom{font-size:12px;color:var(--muted);}
+  .pfrom b{font-size:16.5px;color:var(--ink);letter-spacing:-.02em;}
+  .stock{font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;}
+  .stock::before{content:"";width:7px;height:7px;border-radius:50%;}
+  .stock.in{color:var(--green);} .stock.in::before{background:var(--green);}
+  .stock.out{color:var(--faint);} .stock.out::before{background:var(--faint);}
+  .viewbtn{margin-top:10px;border:1px solid var(--line2);background:var(--bg);border-radius:12px;padding:10px;font-weight:700;font-size:13px;}
+  .viewbtn:active{background:var(--line);}
+  .comingsoon{grid-column:1/-1;text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line2);border-radius:var(--r);padding:40px 18px;font-size:14px;}
+  .comingsoon .big{font-size:34px;margin-bottom:8px;}
 
-  /* search + products */
-  .searchrow{position:relative;margin-bottom:16px;}
-  .searchrow input{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:13px;padding:14px 15px 14px 44px;font-size:16px;color:var(--ink);outline:none;}
-  .searchrow input::placeholder{color:var(--faintt);}
-  .searchrow input:focus{border-color:var(--line2);}
-  .searchrow .mag{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--faintt);font-size:16px;}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;display:flex;flex-direction:column;transition:border-color .15s,transform .1s,box-shadow .2s;text-align:left;}
-  .pcard:hover{border-color:var(--line2);box-shadow:var(--shadow-sm);transform:translateY(-2px);}
-  .pcard:active{transform:scale(.995);}
-  .pcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;}
-  .pname{font-weight:700;font-size:15.5px;letter-spacing:-.01em;line-height:1.2;}
-  .pmem{font-size:11.5px;color:var(--faintt);margin-top:3px;}
-  .pprice{margin-top:auto;}
-  .pprice .from{font-size:10.5px;color:var(--faintt);}
-  .pprice .pv{font-weight:800;font-size:19px;color:var(--ink);letter-spacing:-.02em;display:block;line-height:1.15;}
-  .pstock{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:600;margin-top:6px;}
-  .pstock .d{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
-  .padd{margin-top:12px;border:1px solid var(--line2);background:var(--card2);color:var(--ink);border-radius:11px;padding:11px;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,border-color .15s,color .15s;}
-  .pcard:hover .padd{border-color:var(--red);color:var(--red);}
-  @media(min-width:560px){ .grid{grid-template-columns:1fr 1fr 1fr;} }
-  @media(min-width:860px){ .grid{grid-template-columns:1fr 1fr 1fr 1fr;} }
+  /* ---------- how it works ---------- */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px;}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);}
+  .step .num{width:30px;height:30px;border-radius:10px;background:var(--red-soft);color:var(--red);font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .step b{display:block;font-size:15px;letter-spacing:-.01em;margin-bottom:4px;}
+  .step p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;}
 
-  /* realistic phone visuals (mockup back-view + image slot) */
-  .pm,.pmL{position:relative;flex:0 0 auto;background:linear-gradient(150deg,#32323b,#15151a);border:1px solid var(--line2);box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 8px 18px rgba(0,0,0,.45);}
-  .pm{width:58px;height:78px;border-radius:14px;}
-  .pmL{width:120px;height:160px;border-radius:28px;}
-  .pm .island,.pmL .island{position:absolute;background:linear-gradient(160deg,#22222a,#0b0b0f);border:1px solid #2c2c34;box-shadow:inset 0 0 8px #000;display:grid;gap:3px;}
-  .pm .island{top:7px;left:7px;grid-template-columns:1fr;width:14px;padding:3px;border-radius:7px;}
-  .pm.pro .island{grid-template-columns:1fr 1fr;width:24px;border-radius:8px;}
-  .pmL .island{top:14px;left:14px;grid-template-columns:1fr;width:28px;padding:6px;gap:6px;border-radius:13px;}
-  .pmL.pro .island{grid-template-columns:1fr 1fr;width:50px;border-radius:15px;}
-  .lens{border-radius:50%;background:radial-gradient(circle at 35% 30%,#6e6e78,#0a0a0e);box-shadow:inset 0 0 0 1px #000;aspect-ratio:1;}
-  .pm .lens{width:7px;}
-  .pmL .lens{width:14px;}
-  .pm .flash,.pmL .flash{position:absolute;border-radius:50%;background:#d8d8c0;opacity:.5;}
-  .pm .flash{width:4px;height:4px;top:9px;left:34px;} .pm.pro .flash{left:34px;}
-  .pmL .flash{width:8px;height:8px;top:20px;left:70px;}
-  .pimg{width:58px;height:78px;border-radius:14px;object-fit:cover;border:1px solid var(--line2);flex:0 0 auto;background:#E4E4EE;}
-  .pimgL{width:120px;height:160px;border-radius:26px;object-fit:cover;border:1px solid var(--line2);background:#E4E4EE;}
+  /* ---------- reviews ---------- */
+  .revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px;}
+  .rev{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:17px;box-shadow:var(--shadow);}
+  .rev .q{font-size:26px;color:var(--red);line-height:.6;font-weight:800;}
+  .rev .rt{font-size:13.5px;margin:8px 0 12px;color:var(--ink);}
+  .rev .rb{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);}
+  .rev .stars{color:#E8A33D;letter-spacing:1px;}
 
-  .comingsoon{text-align:center;color:var(--muted);padding:50px 16px;background:var(--card);border:1px dashed var(--line2);border-radius:var(--r);}
-  .comingsoon .big{font-size:44px;margin-bottom:12px;}
-  .comingsoon a{color:var(--red);font-weight:700;}
-  .freebanner{display:flex;gap:11px;align-items:center;background:linear-gradient(100deg,rgba(255,52,66,.09),var(--card));border:1px solid var(--line2);border-radius:16px;padding:15px 17px;margin-top:18px;font-size:13px;color:var(--ink);}
-  .freebanner b{font-weight:700;}
+  /* ---------- footer ---------- */
+  footer{margin-top:44px;background:var(--card);border-top:1px solid var(--line);padding:28px 0 32px;}
+  .fcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;}
+  .fcol b{display:block;font-size:13px;margin-bottom:9px;}
+  .fcol a{display:block;font-size:13px;color:var(--muted);margin-bottom:7px;}
+  .fnote{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 
-  /* trust */
-  .trustgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-  .tcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;}
-  .tcard .ic{width:44px;height:44px;border-radius:13px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:21px;}
-  .tcard .tt{font-weight:800;font-size:15px;margin-top:12px;letter-spacing:-.01em;}
-  .tcard .td{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.45;}
-  @media(min-width:680px){ .trustgrid{grid-template-columns:1fr 1fr 1fr 1fr;} }
-
-  /* reviews */
-  .revgrid{display:grid;grid-template-columns:1fr;gap:13px;}
-  .rev{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;}
-  .rev .q{color:var(--red);font-size:32px;font-weight:800;line-height:.5;font-family:Georgia,serif;}
-  .rev .rt{font-size:13.5px;color:var(--ink);margin:12px 0 14px;line-height:1.55;}
-  .rev .rb{display:flex;align-items:center;justify-content:space-between;}
-  .rev .rn{font-weight:700;font-size:13px;}
-  .rev .stars{color:var(--red);font-size:12px;letter-spacing:1px;}
-  @media(min-width:680px){ .revgrid{grid-template-columns:1fr 1fr;} }
-  @media(min-width:980px){ .revgrid{grid-template-columns:1fr 1fr 1fr 1fr;} }
-
-  /* group + footer */
-  .grouplink{display:flex;align-items:center;gap:13px;background:linear-gradient(100deg,rgba(31,170,83,.13),var(--card));border:1px solid rgba(31,170,83,.3);border-radius:var(--r);padding:16px 18px;margin-top:18px;}
-  .grouplink .wa{width:42px;height:42px;border-radius:12px;background:#1faa53;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto;}
-  .grouplink .gt{font-weight:700;font-size:14.5px;}
-  .grouplink .gs{font-size:12px;color:var(--muted);}
-  .grouplink .go{margin-left:auto;color:var(--green);font-weight:700;font-size:13px;}
-  footer{margin-top:36px;border-top:1px solid var(--line);padding:28px 0 12px;color:var(--muted);font-size:13.5px;}
-  footer .fb{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-start;}
-  footer .fcol b{color:var(--ink);display:block;margin-bottom:8px;font-family:"Sora",sans-serif;font-size:14px;}
-  footer .fcol a,footer .fcol div{display:block;color:var(--muted);padding:2px 0;}
-  footer .fcol a:hover{color:var(--ink);}
-  footer .copy{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);color:var(--faintt);font-size:12px;}
-
-  /* cart bar */
-  .cartbar{position:fixed;left:0;right:0;bottom:0;z-index:45;transform:translateY(135%);transition:transform .3s cubic-bezier(.32,.72,0,1);padding:12px 16px calc(12px + env(safe-area-inset-bottom));}
-  .cartbar.show{transform:none;}
-  .cartbar .inner{max-width:1120px;margin:0 auto;background:linear-gradient(180deg,#1c1c23,#131318);border:1px solid var(--line2);color:#fff;border-radius:17px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 20px 48px rgba(0,0,0,.65);}
-  .cartbar .lab{font-size:12px;color:var(--muted);}
-  .cartbar .tot{font-weight:800;font-size:19px;letter-spacing:-.02em;}
-  .cartbar .view{background:var(--red);color:#fff;border:none;border-radius:12px;padding:12px 21px;font-weight:800;font-size:14px;box-shadow:0 10px 24px rgba(255,52,66,.34);}
-
-  /* sheets */
-  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.7);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;}
+  /* ---------- sheets ---------- */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.34);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s;}
   .scrim.show{opacity:1;pointer-events:auto;}
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg2);border:1px solid var(--line);border-bottom:none;border-radius:26px 26px 0 0;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);max-height:94vh;display:flex;flex-direction:column;}
-  .sheet.show{transform:none;}
-  @media(min-width:640px){ .sheet{max-width:480px;left:50%;transform:translate(-50%,100%);border-radius:26px;bottom:16px;max-height:88vh;} .sheet.show{transform:translateX(-50%);} }
-  .grab{width:38px;height:4px;border-radius:4px;background:#C4C4D4;margin:11px auto 2px;flex:0 0 auto;}
-  .shead{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 6px;}
-  .shead h3{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em;}
-  .xbtn{border:none;background:var(--card2);color:var(--ink);width:34px;height:34px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;}
-  .sbody{overflow:auto;padding:6px 20px calc(26px + env(safe-area-inset-bottom));}
-  .pcond{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:8px 0 16px;line-height:1.5;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--bg);border-radius:24px 24px 0 0;box-shadow:var(--shadow-lg);transform:translateY(102%);transition:transform .32s cubic-bezier(.32,.72,0,1);max-height:93vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 22px);}
+  .sheet.show{transform:translateY(0);}
+  .grab{width:38px;height:4px;background:var(--line2);border-radius:99px;margin:10px auto 4px;}
+  .shead{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:2;}
+  .shead h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em;}
+  .xbtn{border:none;background:var(--line);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
+  .sbody{padding:16px 20px 0;max-width:640px;margin:0 auto;width:100%;}
+
+  /* ---------- gallery ---------- */
+  .gwrap{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);}
+  .gtrack{display:flex;transition:transform .3s cubic-bezier(.3,.7,.3,1);touch-action:pan-y;}
+  .gslide{flex:0 0 100%;aspect-ratio:3/4;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#FCFCFE,#F1F1F5);}
+  .gslide svg{width:70%;height:88%;}
+  .gslide img.real{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:16px;background:#fff;}
+  .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
+  .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
+  .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
+  .gidx{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.45);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px;z-index:3;}
+  .gdots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;z-index:3;}
+  .gdots .d{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);border:none;padding:0;}
+  .gdots .d.on{background:#fff;}
+  .gthumbs{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .gthumbs::-webkit-scrollbar{display:none;}
+  .gth{flex:0 0 auto;width:56px;height:70px;border-radius:12px;overflow:hidden;border:2px solid transparent;background:#fff;display:flex;align-items:center;justify-content:center;opacity:.65;padding:0;}
+  .gth.on{border-color:var(--red);opacity:1;}
+  .gth svg{width:70%;height:86%;}
+  .gth img{width:100%;height:100%;object-fit:contain;}
+  .gnote{font-size:11.5px;color:var(--faint);margin-top:8px;text-align:center;}
+
+  /* ---------- product sheet controls ---------- */
+  .ptitle{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:16px 0 2px;}
+  .psub{font-size:13px;color:var(--muted);}
+  .pcond{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:13px 0;line-height:1.5;}
   .pcond b{color:var(--ink);}
-  .flabel{font-size:12.5px;font-weight:700;color:var(--ink);margin:16px 0 9px;}
-  .chips{display:flex;flex-wrap:wrap;gap:9px;}
-  .chip{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 16px;font-size:14.5px;font-weight:600;color:var(--ink);transition:border-color .12s,background .12s;}
-  .chip.on{border-color:var(--red);background:var(--red-soft);color:#fff;}
-  .chip.sm{padding:9px 13px;font-size:13px;}
-  .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);}
-  .stepper button{border:none;background:transparent;width:46px;height:46px;font-size:21px;color:var(--ink);}
+  .flabel{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:15px 0 8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:7px;color:var(--ink);}
+  .chip .cp{font-size:11px;color:var(--muted);font-weight:600;}
+  .chip.on{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .chip.on .cp{color:rgba(255,255,255,.75);}
+  .chip:disabled{opacity:.42;text-decoration:line-through;cursor:not-allowed;}
+  .chip.sm{padding:8px 12px;font-size:12.5px;}
+  .sw{width:13px;height:13px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block;}
+  .stepper{display:inline-flex;align-items:center;gap:0;border:1.5px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--card);}
+  .stepper button{width:44px;height:44px;border:none;background:transparent;font-size:19px;font-weight:700;}
   .stepper .q{min-width:44px;text-align:center;font-weight:800;font-size:16px;}
-  .pricebig{margin:20px 0 4px;display:flex;align-items:baseline;gap:9px;}
-  .pricebig .pv{font-size:31px;font-weight:800;letter-spacing:-.02em;font-family:"Sora",sans-serif;}
-  .pricebig .per{font-size:13px;color:var(--muted);}
-  .pricesub{font-size:12.5px;color:var(--green);font-weight:600;}
-  .addbtn{width:100%;border:none;background:var(--red);color:#fff;border-radius:14px;padding:17px;font-weight:800;font-size:16px;margin-top:18px;box-shadow:0 14px 32px rgba(255,52,66,.3);}
-  .addbtn:active{filter:brightness(1.06);}
+  .pricebig{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:18px 0 4px;}
+  .pricebig .pl{font-size:13px;color:var(--muted);}
+  .pricebig .pv{font-size:26px;font-weight:800;letter-spacing:-.03em;}
+  .addbtn{width:100%;border:none;background:var(--red);color:#fff;border-radius:15px;padding:16px;font-weight:800;font-size:16px;margin-top:10px;box-shadow:0 12px 28px rgba(255,59,48,.28);}
+  .addbtn:disabled{opacity:.45;box-shadow:none;}
+  .freebie{text-align:center;font-size:12.5px;color:var(--green);font-weight:600;margin-top:11px;}
 
-  .cbadge{display:inline-block;font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 8px;letter-spacing:.02em;vertical-align:middle;}
-  .cbadge.clean{background:rgba(16,140,75,.12);color:#0c7a48;}
-  .cbadge.screen{background:rgba(190,100,10,.12);color:#9a5000;}
-  .cbadge.battery{background:rgba(160,110,0,.12);color:#7a5400;}
-  .cbadge.double{background:rgba(200,20,40,.12);color:#a81024;}
-  .sw{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid rgba(255,255,255,.25);margin-right:7px;vertical-align:-2px;}
-  .sw.none{background:repeating-linear-gradient(45deg,#ccc,#ccc 3px,#e0e0e0 3px,#e0e0e0 6px);}
+  /* ---------- cart ---------- */
+  .citem{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;}
+  .cthumb{width:52px;height:66px;border-radius:12px;background:linear-gradient(180deg,#FBFBFD,#F0F0F4);display:flex;align-items:center;justify-content:center;flex:0 0 auto;overflow:hidden;}
+  .cthumb svg{width:72%;height:86%;}
+  .cmainx{flex:1;min-width:0;}
+  .cn{font-weight:700;font-size:14px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cm{font-size:12px;color:var(--muted);margin-top:2px;}
+  .cpriceq{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;}
+  .cq{display:inline-flex;align-items:center;border:1px solid var(--line2);border-radius:10px;overflow:hidden;}
+  .cq button{width:32px;height:32px;border:none;background:transparent;font-size:16px;font-weight:700;}
+  .cq span{min-width:30px;text-align:center;font-weight:800;font-size:13.5px;}
+  .cv{font-weight:800;font-size:14.5px;letter-spacing:-.01em;}
+  .cdel{border:none;background:none;color:var(--faint);font-size:17px;padding:4px;}
+  .subs{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-top:6px;}
+  .subline{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);margin-bottom:7px;}
+  .subline .g{color:var(--green);font-weight:700;}
+  .tot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:11px;border-top:1px solid var(--line);}
+  .tot .tl{font-weight:700;font-size:14px;}
+  .tot .tv{font-weight:800;font-size:21px;letter-spacing:-.02em;}
+  .exprow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;margin-top:10px;}
+  .exprow .xt b{font-size:13.5px;} .exprow .xt p{margin:2px 0 0;font-size:12px;color:var(--muted);}
+  .tog{width:48px;height:28px;border-radius:14px;background:var(--line2);border:none;position:relative;transition:background .15s;flex:0 0 auto;}
+  .tog.on{background:var(--green);}
+  .tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .tog.on::after{transform:translateX(20px);}
+  .empty{text-align:center;color:var(--muted);padding:34px 14px;}
+  .empty .big{font-size:36px;margin-bottom:8px;}
 
-  .citem{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);}
-  .citem .ci{flex:1;min-width:0;}
-  .citem .cn{font-weight:700;font-size:15px;letter-spacing:-.01em;}
-  .citem .cm{font-size:12px;color:var(--muted);margin-top:3px;}
-  .citem .cp{font-weight:800;font-size:15px;white-space:nowrap;}
-  .citem .rm{border:none;background:none;color:var(--faintt);font-size:12px;text-decoration:underline;padding:6px 0 0;}
-  .ministep{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;margin-top:9px;}
-  .ministep button{border:none;background:transparent;width:34px;height:34px;font-size:18px;color:var(--ink);}
-  .ministep .q{min-width:30px;text-align:center;font-weight:700;font-size:14px;}
-  .saveline{display:flex;align-items:center;gap:9px;background:rgba(55,208,138,.1);border:1px solid rgba(55,208,138,.28);border-radius:13px;padding:13px 14px;margin:15px 0;font-size:13px;color:#46d99a;font-weight:600;}
-  .nudge{font-size:12.5px;color:var(--amber);background:rgba(245,178,62,.1);border:1px solid rgba(245,178,62,.25);border-radius:11px;padding:11px 13px;margin:10px 0;font-weight:600;}
-  .shipopt{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
-  .ship{display:flex;align-items:center;gap:13px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:14px;text-align:left;width:100%;}
-  .ship.on{border-color:var(--red);background:var(--red-soft);}
-  .ship .rad{width:21px;height:21px;border-radius:50%;border:2px solid var(--faintt);flex:0 0 auto;position:relative;}
-  .ship.on .rad{border-color:var(--red);}
-  .ship.on .rad::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--red);}
-  .ship .st{font-weight:700;font-size:14.5px;}
-  .ship .ss{font-size:12px;color:var(--muted);}
-  .ship .sx{margin-left:auto;font-weight:800;font-size:14px;}
-  .totrow{display:flex;align-items:baseline;justify-content:space-between;padding:15px 0 4px;border-top:2px solid var(--line2);margin-top:8px;}
-  .totrow .tl{font-weight:700;font-size:15px;}
-  .totrow .tv{font-weight:800;font-size:25px;letter-spacing:-.02em;font-family:"Sora",sans-serif;}
-  .subline{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:3px 0;}
-  .cust{margin:14px 0 4px;}
-  .cust .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .cust input{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:14px;font-size:16px;color:var(--ink);outline:none;margin-top:10px;}
-  .cust input::placeholder{color:var(--faintt);}
-  .cust input:focus{border-color:var(--line2);}
-  .bankbox{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:4px 15px;margin:14px 0 6px;}
-  .bankrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line);}
-  .bankrow:last-child{border-bottom:none;}
-  .bankrow .bn{font-weight:700;font-size:14px;}
-  .bankrow .bd{font-size:12px;color:var(--muted);}
-  .bankrow .bnum{font-weight:800;font-size:17px;letter-spacing:.02em;}
-  .copybtn{border:1px solid var(--line2);background:var(--card2);border-radius:10px;padding:9px 13px;font-size:12.5px;font-weight:700;color:var(--ink);}
-  .ctas{display:flex;flex-direction:column;gap:11px;margin-top:10px;}
-  .wabtn{width:100%;border:none;background:#1faa53;color:#fff;border-radius:14px;padding:17px;font-weight:800;font-size:16px;}
-  .copyorder{width:100%;border:1.5px solid var(--line2);background:var(--card);color:var(--ink);border-radius:14px;padding:15px;font-weight:700;font-size:15px;}
-  .emptycart{text-align:center;color:var(--muted);padding:48px 12px;}
-  .emptycart .big{font-size:44px;margin-bottom:12px;}
+  /* ---------- checkout ---------- */
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+  .field input{width:100%;border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:13px 14px;font-size:16px;color:var(--ink);outline:none;font-family:inherit;}
+  .field input:focus{border-color:var(--ink);}
+  .row2{display:flex;gap:10px;} .row2 .field{flex:1;}
+  .bank{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-top:6px;}
+  .bank .bh{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:9px;}
+  .bank .brow{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;margin-bottom:7px;}
+  .bank .brow b{font-variant-numeric:tabular-nums;}
+  .wabtn{width:100%;border:none;background:#1FAA53;color:#fff;border-radius:15px;padding:16px;font-weight:800;font-size:15.5px;margin-top:12px;box-shadow:0 12px 26px rgba(31,170,83,.28);}
+  .copybtn{width:100%;border:1.5px solid var(--line2);background:var(--card);border-radius:15px;padding:14px;font-weight:700;font-size:14px;margin-top:9px;}
+  .cerr{color:var(--red);font-size:12.5px;min-height:16px;margin-top:8px;text-align:center;font-weight:600;}
 
-  .toast{position:fixed;left:50%;bottom:106px;transform:translateX(-50%) translateY(20px);background:#fff;color:#08080b;padding:13px 20px;border-radius:999px;font-size:13.5px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;box-shadow:var(--shadow);max-width:90vw;text-align:center;}
-  .toast.show{opacity:1;transform:translateX(-50%);}
+  /* ---------- cart bar ---------- */
+  .cartbar{position:fixed;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:50;background:var(--ink);color:#fff;border-radius:17px;padding:13px 17px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 16px 40px rgba(0,0,0,.3);cursor:pointer;}
+  .cartbar.show{display:flex;}
+  .cartbar .cl{font-size:13px;font-weight:600;opacity:.85;}
+  .cartbar .cr{font-weight:800;font-size:15px;letter-spacing:-.01em;}
 
-  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
-  .reveal.in{opacity:1;transform:none;}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;} .reveal{opacity:1;transform:none;}}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:90;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:88vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* ── product sheet: Design C condition radio list ── */
-  .scond-list{display:flex;flex-direction:column;gap:8px;margin:4px 0 2px;}
-  .scond-row{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:13px 14px 13px 18px;text-align:left;width:100%;position:relative;overflow:hidden;transition:border-color .12s,background .12s;}
-  .scond-row.on{border-color:var(--red);background:rgba(217,27,51,.04);}
-  .scond-row .sbar{position:absolute;left:0;top:0;bottom:0;width:4px;}
-  .sbar-clean{background:var(--green);} .sbar-screen{background:#F59428;} .sbar-battery{background:#E9C014;} .sbar-double{background:var(--red);}
-  .scond-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--faintt);flex:0 0 auto;position:relative;transition:border-color .12s;}
-  .scond-row.on .scond-dot{border-color:var(--red);}
-  .scond-row.on .scond-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--red);}
-  .scond-cr{flex:1;min-width:0;}
-  .scond-crn{font-size:13.5px;font-weight:700;color:var(--ink);}
-  .scond-crs{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3;}
-  .scond-pricecol{text-align:right;flex:0 0 auto;}
-  .scond-pv{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;display:block;}
-  .scond-save{font-size:10.5px;font-weight:700;color:var(--green);white-space:nowrap;margin-top:2px;display:block;}
-
-  /* ── product sheet: color swatches ── */
-  .cswatches{display:flex;flex-wrap:wrap;gap:8px 12px;margin:4px 0;}
-  .cswatch-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
-  .cswatch-btn{width:38px;height:38px;border-radius:50%;border:2.5px solid transparent;display:flex;align-items:center;justify-content:center;background:none;padding:0;transition:border-color .12s,transform .1s;}
-  .cswatch-btn.on{border-color:var(--red);transform:scale(1.15);}
-  .cswatch-btn .cdot{width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,0,0,.12);box-shadow:0 1px 4px rgba(0,0,0,.18);}
-  .cswatch-btn.snone .cdot{background:repeating-linear-gradient(45deg,#ccc,#ccc 3px,#e8e8e8 3px,#e8e8e8 6px);}
-  .cswatch-lbl{font-size:9.5px;font-weight:600;color:var(--muted);max-width:44px;text-align:center;line-height:1.2;}
-
-  /* ── product sheet: image gallery ── */
-  .sgallery{margin:6px 0 14px;text-align:center;}
-  .shero{width:100%;max-height:240px;object-fit:contain;border-radius:18px;background:var(--card2);display:block;}
-  .sthumbs{display:flex;gap:10px;margin-top:10px;justify-content:center;flex-wrap:wrap;}
-  .sthumb-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
-  .sthumb{width:52px;height:52px;border-radius:11px;overflow:hidden;border:2.5px solid transparent;padding:0;background:var(--card2);flex:0 0 auto;transition:border-color .12s,transform .1s;}
-  .sthumb.on{border-color:var(--red);transform:scale(1.08);}
-  .sthumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .sthumb-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:center;line-height:1.2;}
-
-  /* ===== iPhone / small-screen tuning ===== */
-  @media(max-width:430px){
-    .wrap{padding:0 15px;}
-    .hero{padding:40px 0 22px;}
-    .hero h1{font-size:34px;}
-    .hero p.sub{font-size:15px;}
-    .herophone{min-height:400px;}
-    .device{width:178px;height:362px;border-radius:44px;}
-    .device .screen{border-radius:38px;}
-    .device .island{width:74px;height:23px;top:18px;}
-    .hotdeal{width:186px;left:0;bottom:26px;padding:12px 14px;}
-    .heromini{grid-template-columns:1fr 1fr;gap:13px 14px;}
-    .sechead h2{font-size:21px;}
-    .grid{gap:11px;}
-    .pcard{padding:13px;}
-    .pname{font-size:14.5px;}
-    .pprice .pv{font-size:18px;}
+  @media (max-width:640px){ .navlinks{display:none;} }
+  @media (max-width:500px){
+    .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+    .pname{font-size:14px;} .pfrom b{font-size:15px;}
+    .hero h1{font-size:29px;}
+    .field input{font-size:16px;}
   }
-  @media(max-width:360px){
-    .hero h1{font-size:30px;}
-    .device{width:160px;height:330px;}
-    .hotdeal{width:170px;}
-    .heromini{grid-template-columns:1fr;}
-  }
+  @media (max-width:360px){ .grid{grid-template-columns:1fr 1fr;gap:9px;} .pinfo{padding:11px 11px 12px;} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important;} }
 </style>
 </head>
 <body>
 
 <header>
   <div class="nav">
-    <div class="logo" id="logo"></div>
+    <a class="logo" href="#" id="logo"></a>
     <nav class="navlinks">
-      <a href="#shop" class="on">Home</a>
-      <a href="#brands">Brands</a>
       <a href="#phones">Phones</a>
       <a href="track.html">Track order</a>
       <a href="#how">How it works</a>
-      <a href="#contact">Support</a>
     </nav>
-    <div class="navright">
-      <a class="iconbtn" id="trackBtn" href="track.html" title="Track order" style="text-decoration:none;font-size:13px;font-weight:600;width:auto;padding:0 14px;">📦 Track</a>
-      <button class="iconbtn" id="openCart">🛒<span class="cartdot" id="cartN" style="display:none">0</span></button>
-    </div>
+    <button class="cartbtn" id="openCart">🛒 Cart <span class="n" id="cartN"></span></button>
   </div>
 </header>
 
-<div class="wrap" id="shop">
+<div class="wrap">
 
-  <!-- HERO -->
   <section class="hero">
-    <div class="herogrid">
-      <div class="herocopy">
-        <div class="eyebrow">Premium phones · Nigeria</div>
-        <h1>The phone you want.<br><span class="accent">Delivered with trust.</span></h1>
-        <p class="sub">Original iPhones in stock now — Samsung, Pixel, Xiaomi &amp; more landing soon. Honestly graded, fairly priced, and every box ships with a free case.</p>
-        <div class="herobtns">
-          <button class="btn primary" id="heroShop">Shop phones →</button>
-          <a class="btn ghost" href="#how">How grading works</a>
-        </div>
-        <div class="heromini">
-          <div class="hm"><span class="hi">🛡</span><div><div class="ht">Honest grading</div><div class="hs">We tell you what was repaired</div></div></div>
-          <div class="hm"><span class="hi">🎁</span><div><div class="ht">Free case</div><div class="hs">In every order</div></div></div>
-          <div class="hm"><span class="hi">🚚</span><div><div class="ht">Nationwide delivery</div><div class="hs">10–15 days, free</div></div></div>
-          <div class="hm"><span class="hi">💳</span><div><div class="ht">Secure transfer</div><div class="hs">Pay &amp; send receipt</div></div></div>
-        </div>
-      </div>
-      <div class="herophone">
-        <div class="glow"></div>
-        <div class="device"><span class="screen"></span><span class="island"></span><span class="innerglow"></span></div>
-        <div class="deviceshadow"></div>
-        <div class="hotdeal" id="hotDeal"></div>
-      </div>
+    <span class="eyebrow">UK-used · Delivered nationwide</span>
+    <h1>The phone you want. Delivered with trust.</h1>
+    <p>Premium London-used iPhones, honestly graded, shipped to your door anywhere in Nigeria — with a free case on every phone.</p>
+    <div class="heroctas">
+      <button class="cta" id="heroShop">Browse phones</button>
+      <a class="cta ghost" href="track.html">Track my order</a>
+    </div>
+    <div class="hotdeal" id="hotdeal" style="display:none;">
+      <span class="fire">🔥</span><span>Hot deal: <b id="hdName"></b> from <span class="hp" id="hdPrice"></span></span>
     </div>
   </section>
 
-  <!-- BRANDS -->
-  <section class="sec" id="brands">
-    <div class="sechead"><h2>Shop by brand</h2><span class="sub">More brands coming soon</span></div>
-    <div class="brands" id="brandRow"></div>
+  <div class="trust">
+    <span class="titem">🎁 Free case with every phone</span>
+    <span class="titem">🚚 Free shipping · 10–15 days</span>
+    <span class="titem">⚡ Express 7–10 days · +₦10,000</span>
+    <span class="titem">✅ Condition explained before you pay</span>
+  </div>
+
+  <section id="phones">
+    <div class="sechead">
+      <div><h2>iPhones</h2><p>Pick a condition, then tap any phone to see it from every angle.</p></div>
+    </div>
+    <div class="condtabs" id="condTabs"></div>
+    <div class="condblurb" id="condBlurb"></div>
+    <div class="grid" id="grid"></div>
   </section>
 
-  <!-- CONDITIONS -->
-  <section class="sec" id="how">
-    <div class="sechead"><h2>Choose a condition</h2><span class="sub">Every phone graded honestly</span></div>
-    <div class="conds" id="conds"></div>
-    <div class="condmore" id="condMore"></div>
-  </section>
-
-  <!-- PRODUCTS -->
-  <section class="sec" id="phones">
-    <div class="sechead"><h2 id="phonesTitle">iPhones in stock</h2><span class="sub" id="modelCount"></span></div>
-    <div class="searchrow"><span class="mag">⌕</span><input id="search" placeholder="Search a model — e.g. 13 Pro Max" autocomplete="off" /></div>
-    <div id="productArea"></div>
-    <div class="freebanner">🎁&nbsp;<div><b>Free case + free shipping</b> on every phone. Shipping (10–15 days) is already included — no surprises. Express (7–10 days) available at checkout.</div></div>
-  </section>
-
-  <!-- TRUST -->
-  <section class="sec">
-    <div class="sechead"><h2>Why shop with us</h2></div>
-    <div class="trustgrid">
-      <div class="tcard"><div class="ic">✅</div><div class="tt">Authentic stock</div><div class="td">Real phones, honest grading. What you see is what arrives.</div></div>
-      <div class="tcard"><div class="ic">🚚</div><div class="tt">Nationwide delivery</div><div class="td">Fast, reliable shipping to your city. Express option available.</div></div>
-      <div class="tcard"><div class="ic">🛡</div><div class="tt">Secure payment</div><div class="td">Pay by bank transfer and confirm with your receipt.</div></div>
-      <div class="tcard"><div class="ic">💬</div><div class="tt">Always reachable</div><div class="td">Questions? Reach us on WhatsApp any time before and after you buy.</div></div>
+  <section id="how">
+    <div class="sechead"><div><h2>How it works</h2><p>Simple, transparent, and on WhatsApp the whole way.</p></div></div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><b>Build your order</b><p>Choose your phone, storage and colour preference, then check out — your order is sent to us on WhatsApp.</p></div>
+      <div class="step"><div class="num">2</div><b>Pay to a verified account</b><p>Transfer to the bank details shown at checkout. We confirm your payment and give you a tracking number.</p></div>
+      <div class="step"><div class="num">3</div><b>Track to your door</b><p>Follow your delivery step by step on our tracking page until it arrives — free case included.</p></div>
     </div>
   </section>
 
-  <!-- REVIEWS -->
-  <section class="sec">
-    <div class="sechead"><h2>Trusted by customers</h2></div>
-    <div class="revgrid" id="reviews"></div>
+  <section>
+    <div class="sechead"><div><h2>What customers say</h2></div></div>
+    <div class="revs" id="reviews"></div>
   </section>
 
-  <!-- GROUP + FOOTER -->
-  <section class="sec" id="contact">
-    <a class="grouplink" id="groupLink" target="_blank" rel="noopener">
-      <span class="wa">💬</span>
-      <span><span class="gt">More phones &amp; deals on WhatsApp</span><br><span class="gs">Join the group for fresh stock and offers</span></span>
-      <span class="go">Join →</span>
-    </a>
-    <footer>
-      <div class="fb">
-        <div class="fcol" style="max-width:270px;">
-          <b id="ftLogo" style="font-size:20px;"></b>
-          <div>Premium phones, delivered across Nigeria. Honest grading, fair prices, free case in every order.</div>
-        </div>
-        <div class="fcol"><b>Shop</b><a href="#brands">Brands</a><a href="#phones">All phones</a><a href="#how">Conditions</a></div>
-        <div class="fcol"><b>Support</b><a id="ftPhone" href="#"></a><a id="ftEmail" href="#"></a><a href="track.html">Track your order</a><a id="ftGroup" href="#" target="_blank" rel="noopener">WhatsApp group</a></div>
-        <div class="fcol"><b>Delivery &amp; pay</b><div>Free shipping · 10–15 days</div><div>Express · 7–10 days (+₦10k)</div><div>Bank transfer</div></div>
-      </div>
-      <div class="copy">© <span id="ftYear"></span> <span id="ftBrandC"></span>. Prices include free shipping. Colour availability confirmed on order. · <a href="admin.html" style="color:inherit;opacity:.55;">Staff login</a></div>
-    </footer>
-  </section>
 </div>
 
-<!-- sticky cart bar -->
-<div class="cartbar" id="cartBar"><div class="inner"><div><div class="lab" id="barLab">0 phones</div><div class="tot mono" id="barTot">₦0</div></div><button class="view" id="barView">View order</button></div></div>
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div class="fcol"><b id="ftBrandCol"></b><a href="#phones">Browse phones</a><a href="track.html">Track your order</a><a href="#how">How it works</a></div>
+      <div class="fcol"><b>Support</b><a id="ftPhone" href="#"></a><a id="ftEmail" href="#"></a><a id="ftGroup" href="#" target="_blank" rel="noopener">Join our WhatsApp group</a><a href="admin.html" style="font-weight:700;color:var(--red);">⚙ Admin</a></div>
+      <div class="fcol"><b>Payments</b><a id="ftBank1"></a><a id="ftBank2"></a></div>
+    </div>
+    <div class="fnote"><span>© <span id="ftYear"></span> <span id="ftBrand"></span> · All prices in Naira (₦)</span><a href="admin.html" style="opacity:.55">Admin</a></div>
+  </div>
+</footer>
 
+<!-- cart bar -->
+<div class="cartbar" id="cartbar"><span class="cl" id="barL"></span><span class="cr" id="barR"></span></div>
+
+<!-- ===== sheets ===== -->
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="prodSheet"><div class="grab"></div><div class="shead"><h3 id="pTitle">iPhone</h3><button class="xbtn" id="pClose">✕</button></div><div class="sbody" id="prodBody"></div></div>
-<div class="sheet" id="cartSheet"><div class="grab"></div><div class="shead"><h3>Your order</h3><button class="xbtn" id="cClose">✕</button></div><div class="sbody" id="cartBody"></div></div>
+
+<div class="sheet" id="prodSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="pTitle">Phone</h2><button class="xbtn" id="pClose">✕</button></div>
+  <div class="sbody" id="prodBody"></div>
+</div>
+
+<div class="sheet" id="cartSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Your cart</h2><button class="xbtn" id="cClose">✕</button></div>
+  <div class="sbody" id="cartBody"></div>
+</div>
+
+<div class="sheet" id="checkoutSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Checkout</h2><button class="xbtn" id="kClose">✕</button></div>
+  <div class="sbody" id="checkoutBody"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s);"></script>
 <script>
-/* ════════════════════════════════════════════════════════════════════
-   M.i Store storefront
-   BACKEND-READY: data + orders flow through a small seam (DataLayer)
-   so you can later swap the embedded catalogue for Supabase without
-   touching the UI. Search for "BACKEND SEAM" to find the hook points.
-   ════════════════════════════════════════════════════════════════════ */
+/* ============================================================
+   MiPhones storefront
+   • Prices load live from Supabase catalog_prices, fallback to
+     baked catalog below.
+   • Photos: admin-uploaded via product_images / catalog-photos
+     bucket come first; built-in SVG renders fill every other slot
+     so the page always looks complete with zero external CDN.
+   ============================================================ */
 
-/* ---------- BUSINESS SETTINGS (edit these) ---------- */
-const BRAND = "M.i Store";                          // ← change to "MiStore" if you prefer (one line)
-const WHATSAPP = "2348130164763";                  // your WhatsApp number, digits only
+/* ===== BUSINESS SETTINGS ===== */
+const BRAND        = "MiPhones";
+const WHATSAPP     = "2348130164763";
 const CONTACT_PHONE = "+234 813 016 4763";
 const CONTACT_EMAIL = "Musssyibro@gmail.com";
 const WHATSAPP_GROUP = "https://chat.whatsapp.com/Fz7Siuft9kBDPcx6eBxR3h?mode=gi_t";
 const BANKS = [
-  { bank:"Opay",     number:"8130164763", name:"Mus'ab Ibrahim Abdullahi" },
-  { bank:"UBA Bank", number:"2227127889", name:"Mus'ab Ibrahim Abdullahi" }
+  { bank:"Opay", number:"8130164763", name:"Mus'ab Ibrahim Abdullahi" },
+  { bank:"UBA",  number:"2227127889", name:"Mus'ab Ibrahim Abdullahi" }
 ];
 const EXPRESS_FEE = 10000;
 function perPhoneDiscount(qty){ if(qty>=5) return 10000; if(qty>=3) return 5000; return 0; }
 
-/* ---------- BACKEND CONFIG (for the future admin/Supabase) ----------
-   When you're ready: set source:'supabase', fill the keys, and implement
-   the two fetch functions below. The UI already calls them. */
-const CONFIG = {
-  source: "supabase",
-  supabase: {
-    url: "https://pisfsnmwwotxxuouogqz.supabase.co",
-    anonKey: "sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc"
-  }
-  /* Live tables:
-     customer_orders — order tracking, written/read by admin.html
-     product_images(model, condition, image_path) — storefront listing photos per
-       model+condition, managed from admin.html's "Catalog photos" tab, read
-       anonymously here via loadCatalogImages().
-     Planned: a SECURITY DEFINER rpc get_tracking(token) returning ONLY progress (no prices). */
-};
+/* ===== Supabase ===== */
+const SUPABASE_URL      = 'https://pisfsnmwwotxxuouogqz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';
+const CATALOG_PHOTO_BUCKET = 'catalog-photos';
 
-/* Brands. Only "apple" has products today; others show "coming soon".
-   Later your admin will add Samsung/Pixel/etc., and they appear here automatically. */
-const BRANDS = [
-  { key:"apple",   name:"Apple",     glyph:'<svg viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.9-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.88 2.65 3.22 2.6 1.29-.05 1.78-.83 3.34-.83 1.56 0 2 .83 3.37.81 1.39-.03 2.27-1.27 3.12-2.53.98-1.45 1.39-2.85 1.41-2.92-.03-.01-2.71-1.04-2.74-4.13zM14.69 4.81c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44z"/></svg>' },
-  { key:"samsung", name:"Samsung",   glyph:"S" },
-  { key:"google",  name:"Pixel",     glyph:"G" },
-  { key:"xiaomi",  name:"Xiaomi",    glyph:"Xi" },
-  { key:"oneplus", name:"OnePlus",   glyph:"1+" },
-  { key:"more",    name:"More soon",  glyph:"⋯" }
+/* ===== YOUR OWN PHOTOS (optional, highest priority) =====
+   Paste direct https image URLs per model and they appear FIRST
+   in that phone's gallery, before the built-in renders. Example:
+   "iPhone 14 Pro": ["https://…/front.jpg","https://…/back.jpg"]  */
+const PHONE_IMAGES = {};
+
+/* ===== Baked price catalog (fallback when Supabase is unreachable) ===== */
+const RAW_CATALOG = {"apple":{"clean":{"iPhone XR":[["64",187000],["128",197500]],"iPhone XS Max":[["64",161800],["256",172300]],"iPhone 11":[["64",239500],["128",250000]],"iPhone 11 Pro":[["64",260500],["256",281500]],"iPhone 11 Pro Max":[["64",271000],["256",302500]],"iPhone 12":[["64",250000],["128",271000]],"iPhone 12 Pro":[["128",334000],["256",365500]],"iPhone 12 Pro Max":[["128",386500],["256",418000]],"iPhone 13":[["128",365500],["256",371800]],"iPhone 13 Pro":[["128",481000],["256",502000]],"iPhone 13 Pro Max":[["128",523000],["256",575500]],"iPhone 14":[["128",407500],["256",439000]],"iPhone 14 Pro":[["128",575500],["256",607000]],"iPhone 14 Pro Max":[["128",607000],["256",659500]],"iPhone 15":[["128",523000],["256",575500]],"iPhone 15 Pro":[["128",670000],["256",712000]],"iPhone 15 Pro Max":[["256",859000],["512",901000]],"iPhone 16":[["128",722500],["256",796000]],"iPhone 16 Plus":[["128",859000],["256",964000]],"iPhone 16 Pro":[["128",922000],["256",1048000]],"iPhone 16 Pro Max":[["256",1174000],["512",1237000]]},"screen":{"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",208000],["256",229000]],"iPhone 11 Pro Max":[["64",229000],["256",250000]],"iPhone 12":[["64",208000],["128",218500]],"iPhone 12 Pro":[["128",271000],["256",281500]],"iPhone 12 Pro Max":[["128",292000],["256",313000]],"iPhone 13":[["128",302500],["256",313000]],"iPhone 13 Pro":[["128",397000],["256",418000]],"iPhone 13 Pro Max":[["128",418000],["256",439000]],"iPhone 14":[["128",323500],["256",344500]],"iPhone 14 Pro":[["128",439000],["256",460000]],"iPhone 14 Pro Max":[["128",470500],["256",512500]],"iPhone 15":[["128",407500],["256",428500]],"iPhone 15 Pro":[["128",523000],["256",575500]],"iPhone 15 Pro Max":[["256",649000],["512",691000]]},"battery":{"iPhone XR":[["64",182800],["128",187000]],"iPhone XS Max":[["64",161800],["256",172300]],"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",229000],["256",250000]],"iPhone 11 Pro Max":[["64",239500],["256",271000]],"iPhone 12":[["64",229000],["128",250000]],"iPhone 12 Pro":[["128",281500],["256",302500]],"iPhone 12 Pro Max":[["128",323500],["256",344500]],"iPhone 13":[["128",334000],["256",344500]],"iPhone 13 Pro":[["128",428500],["256",449500]],"iPhone 13 Pro Max":[["128",470500],["256",491500]],"iPhone 14 Pro":[["128",523000],["256",544000]],"iPhone 14 Pro Max":[["128",554500],["256",586000]],"iPhone 15 Pro Max":[["256",733000],["512",796000]]},"double":{"iPhone 11":[["64",193300],["128",201700]],"iPhone 11 Pro":[["64",197500],["256",218500]],"iPhone 11 Pro Max":[["64",214300],["256",235300]],"iPhone 12":[["64",201700],["128",208000]],"iPhone 12 Pro":[["128",250000],["256",260500]],"iPhone 12 Pro Max":[["128",281500],["256",292000]],"iPhone 13":[["128",281500],["256",292000]],"iPhone 13 Pro":[["128",376000],["256",397000]],"iPhone 13 Pro Max":[["128",397000],["256",418000]],"iPhone 14":[["128",302500],["256",323500]],"iPhone 14 Pro":[["128",418000],["256",439000]],"iPhone 14 Pro Max":[["128",449500],["256",481000]],"iPhone 15":[["128",397000],["256",418000]],"iPhone 15 Pro":[["128",481000],["256",533500]],"iPhone 15 Pro Max":[["256",586000],["512",607000]]}}};
+
+/* iPhone X excluded — not currently stocked */
+const CATALOG_MODELS = [
+  'iPhone XR','iPhone XS Max','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+  'iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max',
+  'iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max',
+  'iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max',
+  'iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max',
+  'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max'
 ];
+const CONDITIONS = [
+  { key:'clean',   name:'Clean (London used)', short:'Original parts',   long:'<b>Clean (London used).</b> Original screen and battery. Excellent cosmetic condition — our premium grade.' },
+  { key:'screen',  name:'Screen display',      short:'Replaced screen',  long:'<b>Screen display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
+  { key:'battery', name:'Battery display',     short:'Replaced battery', long:'<b>Battery display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
+  { key:'double',  name:'Double display',      short:'Screen + battery', long:'<b>Double display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
+];
+const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
 
-/* Reviews — REPLACE with real customer reviews (shown on the homepage). */
 const REVIEWS = [
   { text:"Phone arrived clean and exactly as described. Smooth process.", name:"A. from Kano", stars:5 },
   { text:"Good price and the free case was a nice touch. Will buy again.", name:"Verified buyer", stars:5 },
@@ -526,347 +393,363 @@ const REVIEWS = [
   { text:"Fast replies on WhatsApp and delivery came as promised.", name:"Repeat customer", stars:5 }
 ];
 
-/* Automatic phone image database — Apple product shot CDN.
-   Loaded automatically in every product card and detail sheet; no admin upload needed.
-   Admin-uploaded CATALOG_IMAGES take priority when present. onerror → CSS mockup. */
-const PHONE_IMAGES_DB = {
-  "iPhone 16 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 16 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 16 Plus":    "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-plus-finish-select-202409-6-7inch-teal?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 16":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 15 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-finish-select-202309-6-7inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 15 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 15":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 14 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-max-finish-select-202209-6-7inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 14 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-1inch-deeppurple?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 14":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-yellow?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 13 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-pro-max-finish-select-202109-6-7inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 13 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-pro-finish-select-202109-6-1inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 13":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-finish-select-202109-6-1inch-midnight?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 12 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-max-finish-select-202010-6-7inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 12 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-pro-finish-select-202010-6-1inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 12":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-12-finish-select-202010-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 11 Pro Max": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-pro-max-finish-select-201909-6-5inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 11 Pro":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-pro-finish-select-201909-5-8inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone 11":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-11-finish-select-201909-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone XS Max":     "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-xs-max-finish-select-201809-6-5inch-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone XR":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-xr-finish-select-201809-6-1inch-white?wid=800&hei=800&fmt=jpeg&qlt=90",
-  "iPhone X":          "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-x-finish-select-silver?wid=800&hei=800&fmt=jpeg&qlt=90",
+/* ============================================================
+   Premium SVG render engine — consistent visuals for every
+   model & colourway, generated inside this file (always loads).
+   ============================================================ */
+const CW = {
+  'iPhone XR':         [['Black','#232427'],['Blue','#2E6EB5'],['Coral','#FF6E5A']],
+  'iPhone XS Max':     [['Space Gray','#3E3E43'],['Gold','#F0D8BC'],['Silver','#E6E6EA']],
+  'iPhone 11':         [['Black','#232427'],['Green','#A9D3C2'],['Purple','#D3CBE3']],
+  'iPhone 11 Pro':     [['Midnight Green','#4E5851'],['Space Gray','#3E3E43'],['Gold','#F0D8BC']],
+  'iPhone 11 Pro Max': [['Midnight Green','#4E5851'],['Space Gray','#3E3E43'],['Gold','#F0D8BC']],
+  'iPhone 12':         [['Black','#232427'],['Blue','#2757A8'],['Purple','#C4B4DD']],
+  'iPhone 12 Pro':     [['Pacific Blue','#2B4E6B'],['Graphite','#43444B'],['Gold','#F0D3B0']],
+  'iPhone 12 Pro Max': [['Pacific Blue','#2B4E6B'],['Graphite','#43444B'],['Gold','#F0D3B0']],
+  'iPhone 13':         [['Midnight','#1E252E'],['Starlight','#EDEAE3'],['Blue','#41618E']],
+  'iPhone 13 Pro':     [['Sierra Blue','#9BB5CE'],['Graphite','#43444B'],['Gold','#F0D3B0']],
+  'iPhone 13 Pro Max': [['Sierra Blue','#9BB5CE'],['Graphite','#43444B'],['Gold','#F0D3B0']],
+  'iPhone 14':         [['Midnight','#1E252E'],['Purple','#CBC1DA'],['Blue','#A5BBD1']],
+  'iPhone 14 Pro':     [['Deep Purple','#5A5064'],['Space Black','#1D1D21'],['Gold','#F0D8BC']],
+  'iPhone 14 Pro Max': [['Deep Purple','#5A5064'],['Space Black','#1D1D21'],['Gold','#F0D8BC']],
+  'iPhone 15':         [['Blue','#CBD8E1'],['Pink','#EBD5D7'],['Black','#35393C']],
+  'iPhone 15 Pro':     [['Natural Titanium','#BFB9B1'],['Blue Titanium','#3E4552'],['Black Titanium','#3A3A3C']],
+  'iPhone 15 Pro Max': [['Natural Titanium','#BFB9B1'],['Blue Titanium','#3E4552'],['Black Titanium','#3A3A3C']],
+  'iPhone 16':         [['Ultramarine','#4B5FA6'],['Teal','#7FA8A4'],['Black','#232427']],
+  'iPhone 16 Plus':    [['Ultramarine','#4B5FA6'],['Teal','#7FA8A4'],['White','#F2F2F4']],
+  'iPhone 16 Pro':     [['Desert Titanium','#C9AD8F'],['Natural Titanium','#BFB9B1'],['Black Titanium','#3A3A3C']],
+  'iPhone 16 Pro Max': [['Desert Titanium','#C9AD8F'],['Natural Titanium','#BFB9B1'],['Black Titanium','#3A3A3C']]
 };
+function cwFor(model){ return (CW[model]||[['Black','#232427']]).map(c=>({n:c[0],b:c[1]})); }
 
-/* Models hidden from the storefront (e.g. discontinued, out of stock entirely). */
-const HIDDEN_MODELS = new Set(['iPhone X']);
-
-/* ---------- catalogue (final Naira prices — your ¥ cost is never shown) ----------
-   Nested by brand so adding Samsung/Pixel later is clean. */
-const CATALOG = { "apple": {"clean":{"iPhone X":[["64",147100],["256",151300]],"iPhone XR":[["64",187000],["128",197500]],"iPhone 11":[["64",239500],["128",250000]],"iPhone 11 Pro":[["64",260500],["256",281500]],"iPhone 11 Pro Max":[["64",271000],["256",302500]],"iPhone 12":[["64",250000],["128",271000]],"iPhone 12 Pro":[["128",334000],["256",365500]],"iPhone 12 Pro Max":[["128",386500],["256",418000]],"iPhone 13":[["128",365500],["256",371800]],"iPhone 13 Pro":[["128",481000],["256",502000]],"iPhone 13 Pro Max":[["128",523000],["256",575500]],"iPhone 14":[["128",407500],["256",439000]],"iPhone 14 Pro":[["128",575500],["256",607000]],"iPhone 14 Pro Max":[["128",607000],["256",659500]],"iPhone 15":[["128",523000],["256",575500]],"iPhone 15 Pro":[["128",670000],["256",712000]],"iPhone 15 Pro Max":[["256",859000],["512",901000]],"iPhone 16":[["128",722500],["256",796000]],"iPhone 16 Plus":[["128",859000],["256",964000]],"iPhone 16 Pro":[["128",922000],["256",1048000]],"iPhone 16 Pro Max":[["256",1174000],["512",1237000]]},"screen":{"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",208000],["256",229000]],"iPhone 11 Pro Max":[["64",229000],["256",250000]],"iPhone 12":[["64",208000],["128",218500]],"iPhone 12 Pro":[["128",271000],["256",281500]],"iPhone 12 Pro Max":[["128",292000],["256",313000]],"iPhone 13":[["128",302500],["256",313000]],"iPhone 13 Pro":[["128",397000],["256",418000]],"iPhone 13 Pro Max":[["128",418000],["256",439000]],"iPhone 14":[["128",323500],["256",344500]],"iPhone 14 Pro":[["128",439000],["256",460000]],"iPhone 14 Pro Max":[["128",470500],["256",512500]],"iPhone 15":[["128",407500],["256",428500]],"iPhone 15 Pro":[["128",523000],["256",575500]],"iPhone 15 Pro Max":[["256",649000],["512",691000]]},"battery":{"iPhone XR":[["64",182800],["128",187000]],"iPhone XS Max":[["64",161800],["256",172300]],"iPhone 11":[["64",201700],["128",212200]],"iPhone 11 Pro":[["64",229000],["256",250000]],"iPhone 11 Pro Max":[["64",239500],["256",271000]],"iPhone 12":[["64",229000],["128",250000]],"iPhone 12 Pro":[["128",281500],["256",302500]],"iPhone 12 Pro Max":[["128",323500],["256",344500]],"iPhone 13":[["128",334000],["256",344500]],"iPhone 13 Pro":[["128",428500],["256",449500]],"iPhone 13 Pro Max":[["128",470500],["256",491500]],"iPhone 14 Pro":[["128",523000],["256",544000]],"iPhone 14 Pro Max":[["128",554500],["256",586000]],"iPhone 15 Pro Max":[["256",733000],["512",796000]]},"double":{"iPhone 11":[["64",193300],["128",201700]],"iPhone 11 Pro":[["64",197500],["256",218500]],"iPhone 11 Pro Max":[["64",214300],["256",235300]],"iPhone 12":[["64",201700],["128",208000]],"iPhone 12 Pro":[["128",250000],["256",260500]],"iPhone 12 Pro Max":[["128",281500],["256",292000]],"iPhone 13":[["128",281500],["256",292000]],"iPhone 13 Pro":[["128",376000],["256",397000]],"iPhone 13 Pro Max":[["128",397000],["256",418000]],"iPhone 14":[["128",302500],["256",323500]],"iPhone 14 Pro":[["128",418000],["256",439000]],"iPhone 14 Pro Max":[["128",449500],["256",481000]],"iPhone 15":[["128",397000],["256",418000]],"iPhone 15 Pro":[["128",481000],["256",533500]],"iPhone 15 Pro Max":[["256",586000],["512",607000]]}} };
-
-const CONDITIONS = [
-  { key:"clean",   name:"Clean (London Used)",  cls:"clean",   short:"Original parts · premium quality",
-    long:"<b>Clean (London Used).</b> Original screen and battery, clean body, and premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone." },
-  { key:"screen",  name:"Screen Display",       cls:"screen",  short:"Screen replaced · best value",
-    long:"<b>Screen Display.</b> Screen professionally replaced with sharp visuals and smooth touch response. A more affordable option for buyers who want great performance at a lower price." },
-  { key:"battery", name:"Battery Display",      cls:"battery", short:"Battery replaced · value saver",
-    long:"<b>Battery Display.</b> Battery professionally replaced for reliable daily use and good battery life. Ideal for buyers who want better value while saving money." },
-  { key:"double",  name:"Double Display",       cls:"double",  short:"Best price · budget deal",
-    long:"<b>Double Display.</b> Screen and battery professionally replaced. Fully functional and our most affordable option for budget-conscious buyers." }
-];
-
-const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
-const COLOR_HEX = {"No preference":"","Black":"#1c1c1e","White / Silver":"#e9e9ee","Blue":"#3b5a7a","Green":"#5d7060","Gold":"#e3c9a0","Purple":"#b3aad6","Red":"#b22222","Pink":"#e9c2cb","Titanium":"#8e8e92"};
-
-/* ---------- state ---------- */
-let brand="apple", cond="clean", cart=[], express=false, search="", sel=null;
-let CAT={};   // current brand's catalogue { clean:{...}, screen:{...}, ... }
-let cust={ name:"", phone:"", whatsapp:"", address:"", state:"", city:"", email:"" };
-
-/* ---------- BACKEND SEAM ---------- */
-async function fetchCatalog(b){
-  try{
-    const { url, anonKey } = CONFIG.supabase;
-    const res = await fetch(
-      `${url}/rest/v1/catalog_prices?select=model,condition,storage,price&brand=eq.${encodeURIComponent(b)}&in_stock=eq.true&order=condition,model,storage`,
-      { headers:{ apikey:anonKey, Authorization:`Bearer ${anonKey}` } }
-    );
-    if(res.ok){
-      const rows = await res.json();
-      if(Array.isArray(rows) && rows.length){
-        const cat={};
-        rows.forEach(r=>{
-          if(!cat[r.condition]) cat[r.condition]={};
-          if(!cat[r.condition][r.model]) cat[r.condition][r.model]=[];
-          cat[r.condition][r.model].push([r.storage, r.price]);
-        });
-        return cat;
-      }
-    }
-  }catch(e){}
-  return CATALOG[b]||{};
+function hexShade(hex,amt){
+  const h=hex.replace('#',''); const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);
+  const f=v=>Math.max(0,Math.min(255,v+amt));
+  return '#'+[f(n>>16&255),f(n>>8&255),f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
-async function submitOrder(order){
-  // BACKEND SEAM: when live, insert `order` into customer_orders, generate a
-  // track_token, and return it so we can show the customer a tracking link.
-  // For now we return null and the order is sent via WhatsApp / copy.
-  return null;
-}
+function isLight(hex){ const h=hex.replace('#',''); const n=parseInt(h,16); const L=0.299*(n>>16&255)+0.587*(n>>8&255)+0.114*(n&255); return L>150; }
+let __svgN=0; function uid(){ return 'mg'+(++__svgN); }
+const FRAME='#101114';
 
-/* ---------- helpers ---------- */
-const $=id=>document.getElementById(id);
-function fmtK(n){ return n>=1000000 ? ('₦'+n.toLocaleString()) : ('₦'+Math.floor(n/1000)+'k'); }
-function fmtFull(n){ return '₦'+Math.round(n).toLocaleString(); }
-function condName(k){ const c=CONDITIONS.find(x=>x.key===k); return c?c.name:k; }
-function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function cbadge(key){ const m={clean:'Clean',screen:'Screen Display',battery:'Battery Display',double:'Double Display'}; return `<span class="cbadge ${key}">${m[key]||key}</span>`; }
-function swatch(col){ const h=COLOR_HEX[col]; return col==='No preference'?`<span class="sw none"></span>`:(h?`<span class="sw" style="background:${h}"></span>`:''); }
-function logoHTML(){ if(/^Mi/i.test(BRAND)){ return 'Mi<span class="dash">'+esc(BRAND.slice(2))+'</span>'; } return esc(BRAND); }
-const scrim=$('scrim'), prodSheet=$('prodSheet'), cartSheet=$('cartSheet');
-
-/* ---------- realistic phone visual ---------- */
-function phoneMockup(model, large){
-  const pro=/Pro/.test(model); const n=pro?3:2; let l=''; for(let i=0;i<n;i++) l+='<span class="lens"></span>';
-  return `<span class="${large?'pmL':'pm'} ${pro?'pro':''}"><span class="island">${l}</span><span class="flash"></span></span>`;
+function camType(model){
+  if(/Pro/.test(model)) return 'pro3';
+  if(model==='iPhone XS Max') return 'vpill';
+  if(model==='iPhone XR') return 'one';
+  if(model==='iPhone 16'||model==='iPhone 16 Plus') return 'vpill16';
+  return 'diag2';
 }
-function phoneVisual(model, c, large){
-  const url=CATALOG_IMAGES[model+'|clean']||CATALOG_IMAGES[model+'|screen']
-    ||CATALOG_IMAGES[model+'|battery']||CATALOG_IMAGES[model+'|double']
-    ||PHONE_IMAGES_DB[model];
-  if(url) return `<img class="${large?'pimgL':'pimg'}" src="${url}" alt="${esc(model)}" loading="lazy" onerror="this.outerHTML=phoneMockup('${esc(model)}',${large?'true':'false'})">`;
-  return phoneMockup(model, large);
+function lens(cx,cy,r){
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#0B0C10"/><circle cx="${cx}" cy="${cy}" r="${(r*0.62).toFixed(1)}" fill="#1D2434"/><circle cx="${(cx-r*0.3).toFixed(1)}" cy="${(cy-r*0.3).toFixed(1)}" r="${(r*0.2).toFixed(1)}" fill="#93A8CE" opacity=".9"/>`;
+}
+function camSVG(model,body){
+  const mod=hexShade(body,isLight(body)?-26:14);
+  const st=hexShade(body,isLight(body)?-48:-14);
+  const t=camType(model);
+  if(t==='pro3') return `<rect x="82" y="32" width="76" height="76" rx="21" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(101,53,12)}${lens(101,87,12)}${lens(135,70,12)}<circle cx="137" cy="46" r="4" fill="#F3E3C0"/><circle cx="137" cy="94" r="3.4" fill="#23262E"/>`;
+  if(t==='vpill') return `<rect x="88" y="30" width="38" height="82" rx="19" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,52,11)}${lens(107,90,11)}<circle cx="134" cy="40" r="3.4" fill="#F3E3C0"/>`;
+  if(t==='vpill16') return `<rect x="86" y="30" width="42" height="88" rx="21" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,54,12)}${lens(107,94,12)}<circle cx="138" cy="40" r="3.6" fill="#F3E3C0"/>`;
+  if(t==='one') return `<rect x="84" y="32" width="46" height="46" rx="15" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(107,55,12)}<circle cx="138" cy="42" r="3.4" fill="#F3E3C0"/>`;
+  return `<rect x="82" y="32" width="66" height="66" rx="19" fill="${mod}" stroke="${st}" stroke-width="1.2"/>${lens(101,51,11)}${lens(129,79,11)}<circle cx="130" cy="48" r="3.4" fill="#F3E3C0"/>`;
+}
+function backInner(id,model,cw){
+  return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${hexShade(cw.b,20)}"/><stop offset="1" stop-color="${cw.b}"/></linearGradient></defs>
+  <rect x="70" y="18" width="160" height="360" rx="30" fill="url(#${id}b)" stroke="${hexShade(cw.b,-30)}" stroke-width="1.4"/>
+  <rect x="72" y="20" width="156" height="356" rx="28" fill="#fff" opacity=".05"/>
+  ${camSVG(model,cw.b)}`;
+}
+function svgBack(model,cw){
+  const id=uid();
+  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — ${cw.n}, back"><ellipse cx="150" cy="384" rx="96" ry="9" fill="#000" opacity=".10"/>${backInner(id,model,cw)}</svg>`;
+}
+function svgFront(model,cw){
+  const id=uid();
+  const island=/14 Pro|iPhone 15|iPhone 16/.test(model);
+  const top=island?`<rect x="124" y="40" width="52" height="15" rx="7.5" fill="#04050A"/>`:`<path d="M116 26 h68 v10 a10 10 0 0 1 -10 10 h-48 a10 10 0 0 1 -10 -10 z" fill="${FRAME}"/>`;
+  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — front">
+  <defs>
+    <linearGradient id="${id}w" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#7E9BFF"/><stop offset="1" stop-color="#10142E"/></linearGradient>
+    <clipPath id="${id}c"><rect x="78" y="26" width="144" height="348" rx="24"/></clipPath>
+  </defs>
+  <ellipse cx="150" cy="384" rx="96" ry="9" fill="#000" opacity=".10"/>
+  <rect x="70" y="18" width="160" height="360" rx="30" fill="${FRAME}"/>
+  <rect x="78" y="26" width="144" height="348" rx="24" fill="url(#${id}w)"/>
+  <g clip-path="url(#${id}c)">
+    <circle cx="112" cy="120" r="120" fill="${cw.b}" opacity=".4"/>
+    <polygon points="78,26 152,26 100,374 78,374" fill="#fff" opacity=".06"/>
+  </g>
+  ${top}
+</svg>`;
+}
+function svgAngle(model,cw){
+  const id=uid();
+  return `<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model} — angled">
+  <ellipse cx="150" cy="386" rx="100" ry="9" fill="#000" opacity=".10"/>
+  <g transform="translate(24,12) skewY(-6) scale(.94)">
+    <rect x="226" y="24" width="13" height="352" rx="6.5" fill="${hexShade(cw.b,-34)}"/>
+    ${backInner(id,model,cw)}
+  </g>
+</svg>`;
 }
 
-/* ---------- catalog photos uploaded via the admin dashboard ----------
-   Read-only, anonymous fetch (no SDK needed) — fails silently, page never
-   depends on it. Keyed by model+condition since each condition can have its
-   own photo. Falls back to the static IMAGES map, then the mockup icon. */
+/* ---------- gallery slides: your photos first, SVG renders always fill ---------- */
 let CATALOG_IMAGES = {};
-async function loadCatalogImages(){
+function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
+function slidesFor(model,condKey){
+  const cws=cwFor(model);
+  const out=[];
+  const up=CATALOG_IMAGES[model+'|'+condKey];
+  const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
+  const real=[]; if(up) real.push(up); own.forEach(u=>{ if(u&&real.indexOf(u)<0) real.push(u); });
+  real.slice(0,3).forEach(u=>out.push({img:u}));
+  out.push({svg:svgFront(model,cws[0]),cap:cws[0].n});
+  out.push({svg:svgBack(model,cws[0]), cap:cws[0].n});
+  out.push({svg:svgAngle(model,cws[0]),cap:cws[0].n});
+  if(cws[1]) out.push({svg:svgBack(model,cws[1]),cap:cws[1].n});
+  if(cws[2]) out.push({svg:svgBack(model,cws[2]),cap:cws[2].n});
+  return out.slice(0,8);
+}
+function slideHTML(s,model){
+  const fallback=svgBack(model,cwFor(model)[0]);
+  if(s.img) return `<div class="gslide">${fallback}<img class="real" loading="lazy" src="${esc(s.img)}" alt="${esc(model)}" onerror="this.style.display='none'">${s.cap?`<span class="gcap">${esc(s.cap)}</span>`:''}</div>`;
+  return `<div class="gslide">${s.svg}${s.cap?`<span class="gcap">${esc(s.cap)}</span>`:''}</div>`;
+}
+function thumbHTML(s,model,i,on){
+  const inner=s.img?`<img loading="lazy" src="${esc(s.img)}" alt="" onerror="this.style.display='none'">`:s.svg;
+  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}">${inner}</button>`;
+}
+function cardVisual(model,condKey){
+  const cws=cwFor(model);
+  const real=CATALOG_IMAGES[model+'|'+condKey]||(PHONE_IMAGES[model]&&PHONE_IMAGES[model][0])||'';
+  const base=svgBack(model,cws[0]);
+  return real?base+`<img class="real" loading="lazy" src="${esc(real)}" alt="${esc(model)}" onerror="this.style.display='none'">`:base;
+}
+
+/* ============================================================
+   Data: live prices from Supabase, fallback to baked catalog
+   ============================================================ */
+let sb=null, CAT={}, liveLoaded=false;
+function buildFallbackCAT(){
+  CAT={};
+  const src=RAW_CATALOG.apple;
+  Object.keys(src).forEach(cond=>{ CAT[cond]={}; Object.keys(src[cond]).forEach(m=>{ CAT[cond][m]=src[cond][m].map(v=>[v[0],v[1],true]); }); });
+}
+function getClient(){ if(sb) return sb; try{ if(window.supabase) sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){} return sb; }
+async function loadLive(){
+  const c=getClient(); if(!c) return;
   try{
-    const { url, anonKey } = CONFIG.supabase;
-    const res = await fetch(`${url}/rest/v1/product_images?select=model,condition,image_path`, {
-      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
-    });
-    if(!res.ok) return;
-    const rows = await res.json();
-    const map = {};
-    rows.forEach(r=>{ if(r.model && r.condition && r.image_path) map[r.model+'|'+r.condition] = `${url}/storage/v1/object/public/catalog-photos/${r.image_path}`; });
-    CATALOG_IMAGES = map;
-    renderProducts();
-    if(sel) renderProduct();
-  }catch(e){ /* offline or table not set up yet — storefront keeps working */ }
+    const [{data:prices},{data:imgs}]=await Promise.all([
+      c.from('catalog_prices').select('model,condition,storage,price,in_stock'),
+      c.from('product_images').select('model,condition,image_path')
+    ]);
+    if(Array.isArray(imgs)&&imgs.length){ CATALOG_IMAGES={}; imgs.forEach(r=>{ if(r.model&&r.condition&&r.image_path) CATALOG_IMAGES[r.model+'|'+r.condition]=catalogPhotoUrl(r.image_path); }); }
+    if(Array.isArray(prices)&&prices.length){
+      const next={};
+      prices.forEach(r=>{ (next[r.condition]=next[r.condition]||{}); (next[r.condition][r.model]=next[r.condition][r.model]||[]).push([String(r.storage),Number(r.price)||0,r.in_stock!==false]); });
+      Object.keys(next).forEach(cd=>Object.keys(next[cd]).forEach(m=>next[cd][m].sort((a,b)=>Number(a[0])-Number(b[0]))));
+      CAT=next; liveLoaded=true;
+    }
+    renderGrid(); renderHotDeal();
+  }catch(e){}
 }
 
-/* ---------- hot deal ---------- */
-function renderHotDeal(){
-  const v=CATALOG.apple && CATALOG.apple.clean["iPhone 15 Pro Max"]; const price=v?v[0][1]:0;
-  $('hotDeal').innerHTML=`<span class="tagline">🔥 Hot deal</span><div class="hd-name">iPhone 15 Pro Max</div><div class="hd-sub">Clean · from ${fmtK(price)}</div><span class="hd-link" id="hdShop">Shop now →</span>`;
-  const b=$('hdShop'); if(b) b.onclick=()=>{ cond='clean'; renderConds(); openProduct('iPhone 15 Pro Max'); };
-}
+/* ============================================================
+   Store state + rendering
+   ============================================================ */
+const $=id=>document.getElementById(id);
+function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
+function fmtK(n){ return n>=1000000?('₦'+n.toLocaleString()):('₦'+Math.floor(n/1000)+'k'); }
+function fmtFull(n){ return '₦'+Math.round(n).toLocaleString(); }
+function condDef(k){ return CONDITIONS.find(c=>c.key===k)||CONDITIONS[0]; }
 
-/* ---------- brands ---------- */
-function renderBrands(){
-  $('brandRow').innerHTML = BRANDS.map(b=>`<button class="brand ${b.key===brand?'on':''}" data-brand="${b.key}">${b.key==='apple'?'':'<span class="soon">Soon</span>'}<div class="bg">${b.glyph}</div><div class="bn">${b.name}</div></button>`).join('');
-  document.querySelectorAll('[data-brand]').forEach(el=>el.onclick=()=>{
-    if(el.dataset.brand==='apple'){ loadBrand('apple'); document.getElementById('phones').scrollIntoView({behavior:'smooth'}); }
-    else toast(BRANDS.find(x=>x.key===el.dataset.brand).name+' coming soon — join our WhatsApp');
+let cond='clean';
+let sel=null;
+let cart=[];
+let express=false;
+const cust={name:'',phone:'',whatsapp:'',address:'',city:'',state:'',email:''};
+
+function variantsOf(model,c){ return (CAT[c]||{})[model]||[]; }
+function priceFor(model,c,mem){ const v=variantsOf(model,c).find(x=>x[0]===mem); return v?v[1]:0; }
+function inStock(model,c,mem){ const v=variantsOf(model,c).find(x=>x[0]===mem); return v?v[2]!==false:false; }
+function modelsForCond(){
+  return CATALOG_MODELS.filter(m=>variantsOf(m,cond).length).map(m=>{
+    const vs=variantsOf(m,cond);
+    const live=vs.filter(v=>v[2]!==false);
+    const pool=live.length?live:vs;
+    return { model:m, mems:vs.map(v=>v[0]), min:Math.min(...pool.map(v=>v[1])), any:live.length>0 };
   });
 }
 
-/* ---------- conditions ---------- */
-function renderConds(){
-  $('conds').innerHTML = CONDITIONS.map(c=>`<button class="cond ${c.cls} ${c.key===cond?'on':''}" data-cond="${c.key}"><span class="bar"></span><div class="ct">${c.name}</div><div class="cs">${c.short}</div></button>`).join('');
-  $('condMore').innerHTML = CONDITIONS.find(c=>c.key===cond).long;
-  document.querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{ cond=b.dataset.cond; renderConds(); renderProducts(); });
+function renderTabs(){
+  $('condTabs').innerHTML=CONDITIONS.map(c=>`<button class="ctab ${c.key===cond?'on':''}" data-cond="${c.key}">${esc(c.name)}</button>`).join('');
+  $('condTabs').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{ cond=b.dataset.cond; renderTabs(); renderGrid(); });
+  $('condBlurb').innerHTML=condDef(cond).long+' <span style="color:var(--faint)">· Free case included with every phone.</span>';
 }
-
-/* ---------- products ---------- */
-function modelsForCond(){
-  const obj=CAT[cond]||{};
-  let list=Object.keys(obj)
-    .filter(model=>!HIDDEN_MODELS.has(model))
-    .map(model=>{ const prices=obj[model].map(v=>v[1]); return { model, min:Math.min(...prices), variants:obj[model] }; });
-  if(search){ const q=search.toLowerCase().replace(/\s+/g,''); list=list.filter(m=>m.model.toLowerCase().replace(/\s+/g,'').includes(q)); }
-  return list;
-}
-function renderProducts(){
-  const area=$('productArea');
-  $('phonesTitle').textContent = brand==='apple' ? (cond==='clean'?'iPhones · Clean':'iPhones · '+condName(cond)+' display') : 'Phones';
-  if(brand!=='apple'){
-    $('modelCount').textContent='';
-    area.innerHTML=`<div class="comingsoon"><div class="big">🚀</div><div><b style="color:var(--ink)">${BRANDS.find(b=>b.key===brand).name} coming soon.</b><br>We're adding more brands. <a href="${WHATSAPP_GROUP}" target="_blank" rel="noopener">Join our WhatsApp</a> to be first to know.</div></div>`;
-    return;
-  }
+function renderGrid(){
   const list=modelsForCond();
-  $('modelCount').textContent = list.length+' model'+(list.length===1?'':'s');
-  if(!list.length){ area.innerHTML=`<div class="comingsoon"><div class="big">🔍</div>No match in this condition. Try another condition or search.</div>`; return; }
-  area.innerHTML = `<div class="grid">${list.map(m=>`
-    <button class="pcard" data-model="${encodeURIComponent(m.model)}">
-      <div class="ptop"><div style="min-width:0"><div class="pname">${m.model}</div><div class="pmem">${m.variants.map(v=>v[0]+'GB').join(' · ')}</div></div>${phoneVisual(m.model,cond,false)}</div>
-      <div style="margin:4px 0 2px">${cbadge(cond)}</div>
-      <div class="pprice"><span class="from">from</span><span class="pv mono">${fmtK(m.min)}</span><span class="pstock"><span class="d"></span>In stock</span></div>
-      <div class="padd">🛒 View &amp; add</div>
-    </button>`).join('')}</div>`;
-  area.querySelectorAll('[data-model]').forEach(b=>b.onclick=()=>openProduct(decodeURIComponent(b.dataset.model)));
+  if(!list.length){ $('grid').innerHTML=`<div class="comingsoon"><div class="big">📦</div>No phones in this condition right now — check another tab or <a href="https://wa.me/${WHATSAPP}" style="color:var(--red);font-weight:700">message us</a>.</div>`; return; }
+  $('grid').innerHTML=list.map(x=>`
+    <article class="pcard" data-open="${esc(x.model)}">
+      <div class="phero"><span class="condchip">${esc(condDef(cond).short)}</span>${cardVisual(x.model,cond)}</div>
+      <div class="pinfo">
+        <div class="pname">${esc(x.model)}</div>
+        <div class="pmem">${x.mems.join('GB · ')}GB</div>
+        <div class="prow"><span class="pfrom">from <b>${fmtK(x.min)}</b></span><span class="stock ${x.any?'in':'out'}">${x.any?'In stock':'Out of stock'}</span></div>
+        <button class="viewbtn">View &amp; add</button>
+      </div>
+    </article>`).join('');
+  $('grid').querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openProduct(el.dataset.open));
 }
 
-/* ---------- product sheet ---------- */
-function priceFor(model,c,mem){ const v=(CAT[c]||{})[model]; if(!v) return 0; const f=v.find(x=>x[0]===mem); return f?f[1]:0; }
+/* ---------- product sheet + swipeable gallery ---------- */
 function openProduct(model){
-  if(HIDDEN_MODELS.has(model)) return;
-  // Auto-select best condition: prefer the page's current cond, else first available
-  let bestCond = (CAT[cond]||{})[model] ? cond : null;
-  if(!bestCond){ for(const c of CONDITIONS){ if((CAT[c.key]||{})[model]){ bestCond=c.key; break; } } }
-  if(!bestCond){ toast('This model is not currently in stock'); return; }
-  const variants=(CAT[bestCond])[model];
-  sel={ model, cond:bestCond, mem:variants[0][0], color:"No preference", qty:1 };
-  $('pTitle').textContent=model; renderProduct(); showSheet(prodSheet);
+  const vs=variantsOf(model,cond); if(!vs.length) return;
+  const firstLive=vs.find(v=>v[2]!==false)||vs[0];
+  sel={model,cond,mem:firstLive[0],color:COLORS[0],qty:1};
+  renderProduct(); showSheet(prodSheet);
 }
 function renderProduct(){
-  const body=$('prodBody');
-  const condDef=CONDITIONS.find(x=>x.key===sel.cond);
-  const variants=(CAT[sel.cond]||{})[sel.model]||[];
-  if(!variants.find(v=>v[0]===sel.mem) && variants.length) sel.mem=variants[0][0];
+  const c=condDef(sel.cond);
+  const vs=variantsOf(sel.model,sel.cond);
   const unit=priceFor(sel.model,sel.cond,sel.mem);
-  const cleanPrices=(CAT.clean||{})[sel.model]; const cleanMin=cleanPrices?Math.min(...cleanPrices.map(v=>v[1])):0;
-
-  // Condition radio rows — only show conditions that stock this model
-  const condRowsHTML=CONDITIONS.map(c=>{
-    const vars=(CAT[c.key]||{})[sel.model]; if(!vars) return '';
-    const minP=Math.min(...vars.map(v=>v[1]));
-    const savings=(c.key!=='clean'&&cleanMin)?cleanMin-minP:0;
-    const isOn=c.key===sel.cond;
-    return `<button class="scond-row ${isOn?'on':''}" data-selcond="${c.key}">
-      <span class="sbar sbar-${c.key}"></span>
-      <span class="scond-dot"></span>
-      <span class="scond-cr"><span class="scond-crn">${c.name}</span><span class="scond-crs">${c.short}</span></span>
-      <span class="scond-pricecol">
-        <span class="scond-pv">${fmtK(minP)}</span>
-        ${savings>0?`<span class="scond-save">Save ${fmtK(savings)}</span>`:''}
-      </span>
-    </button>`;
-  }).join('');
-
-  // Color swatches
-  const colorHTML=COLORS.map(col=>{
-    const hex=COLOR_HEX[col]; const isNone=col==='No preference'; const isOn=col===sel.color;
-    const lbl=isNone?'Any':col==='White / Silver'?'White/Silver':col;
-    return `<span class="cswatch-wrap" data-color="${encodeURIComponent(col)}">
-      <button class="cswatch-btn ${isOn?'on':''} ${isNone?'snone':''}" title="${col}">
-        <span class="cdot" ${!isNone&&hex?`style="background:${hex}"`:``}></span>
-      </button>
-      <span class="cswatch-lbl">${lbl}</span>
-    </span>`;
-  }).join('');
-
-  // Build image gallery — admin-uploaded condition photos take priority; auto-DB image as fallback
-  const condImgs=CONDITIONS.map(c=>({
-    cond:c.key,
-    lbl:c.key==='clean'?'Clean':c.key==='screen'?'Screen':c.key==='battery'?'Battery':'Double',
-    url:CATALOG_IMAGES[sel.model+'|'+c.key]||null
-  })).filter(x=>x.url);
-  const adminHero=CATALOG_IMAGES[sel.model+'|'+sel.cond]||(condImgs[0]?condImgs[0].url:null);
-  const heroUrl=adminHero||PHONE_IMAGES_DB[sel.model]||null;
-  const hasAdminThumbs=condImgs.length>1;
-  const galleryHTML=heroUrl
-    ?`<div class="sgallery">
-        <img class="shero" src="${heroUrl}" alt="${esc(sel.model)}" onerror="this.style.display='none'">
-        ${hasAdminThumbs?`<div class="sthumbs">${condImgs.map(x=>`<span class="sthumb-wrap"><button class="sthumb${x.cond===sel.cond?' on':''}" data-selcond="${x.cond}"><img src="${x.url}" alt="${x.lbl}" onerror="this.parentElement.style.display='none'"></button><span class="sthumb-lbl">${x.lbl}</span></span>`).join('')}</div>`:''}
-      </div>`
-    :`<div style="display:flex;justify-content:center;padding:6px 0 12px;">${phoneMockup(sel.model,true)}</div>`;
-
-  body.innerHTML=`
-    ${galleryHTML}
-    <div class="flabel" style="margin-top:2px;">Choose condition</div>
-    <div class="scond-list">${condRowsHTML}</div>
-    <div class="pcond" style="margin:12px 0 16px;">${condDef.long}</div>
+  const ok=inStock(sel.model,sel.cond,sel.mem);
+  $('pTitle').textContent=sel.model;
+  const slides=slidesFor(sel.model,sel.cond);
+  $('prodBody').innerHTML=`
+    <div class="gwrap">
+      <div class="gtrack" id="gTrack">${slides.map(s=>slideHTML(s,sel.model)).join('')}</div>
+      <button class="gbtn prev" id="gPrev" aria-label="Previous">‹</button>
+      <button class="gbtn next" id="gNext" aria-label="Next">›</button>
+      <span class="gidx" id="gIdx">1/${slides.length}</span>
+      <div class="gdots" id="gDots">${slides.map((_,i)=>`<button class="d ${i===0?'on':''}" data-gd="${i}" aria-label="Go to ${i+1}"></button>`).join('')}</div>
+    </div>
+    <div class="gthumbs" id="gThumbs">${slides.map((s,i)=>thumbHTML(s,sel.model,i,i===0)).join('')}</div>
+    <div class="gnote">Swipe to see every angle &amp; colour · upload real photos via admin to replace these renders</div>
+    <div class="ptitle">${esc(sel.model)}</div>
+    <div class="psub">${esc(c.name)} · free case included</div>
+    <div class="pcond">${c.long}</div>
     <div class="flabel">Storage</div>
-    <div class="chips">${variants.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}">${v[0]}GB</button>`).join('')}</div>
-    <div class="flabel">Colour <span style="font-weight:500;color:var(--faintt)">— ${sel.color==='No preference'?'any colour':'<b>'+esc(sel.color)+'</b>'} (we confirm availability)</span></div>
-    <div class="cswatches">${colorHTML}</div>
-    <div class="flabel">Quantity</div>
-    <div class="stepper"><button data-q="-1">−</button><span class="q mono" id="pQty">${sel.qty}</span><button data-q="1">+</button></div>
-    <div class="pricebig"><span class="pv mono">${fmtFull(unit*sel.qty)}</span><span class="per">${sel.qty>1?fmtFull(unit)+' each':'incl. free shipping'}</span></div>
-    <div class="pricesub">🎁 Free case included${sel.qty>=3?' · bulk discount applies in your order':''}</div>
-    <button class="addbtn" id="pAdd">Add to order — ${fmtFull(unit*sel.qty)}</button>`;
+    <div class="chips">${vs.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}" ${v[2]===false?'disabled':''}>${v[0]}GB <span class="cp">${fmtK(v[1])}</span></button>`).join('')}</div>
+    <div class="flabel">Colour preference <span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--faint)">(we confirm availability on WhatsApp)</span></div>
+    <div class="chips">${COLORS.map(col=>`<button class="chip sm ${col===sel.color?'on':''}" data-color="${encodeURIComponent(col)}">${swatch(col)}${esc(col)}</button>`).join('')}</div>
+    <div class="flabel">Quantity <span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--faint)">(3+ save ₦5,000 each · 5+ save ₦10,000 each)</span></div>
+    <div class="stepper"><button data-q="-1" aria-label="Less">−</button><span class="q">${sel.qty}</span><button data-q="1" aria-label="More">+</button></div>
+    <div class="pricebig"><span class="pl">${sel.qty>1?sel.qty+' × '+fmtFull(unit):'Price'}</span><span class="pv">${fmtFull(unit*sel.qty)}</span></div>
+    <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to cart':'Out of stock'}</button>
+    <div class="freebie">🎁 Free case · Free shipping 10–15 days · Express +₦10,000</div>`;
 
-  body.querySelectorAll('[data-selcond]').forEach(b=>b.onclick=()=>{
-    sel.cond=b.dataset.selcond;
-    const nv=(CAT[sel.cond]||{})[sel.model]||[];
-    if(!nv.find(v=>v[0]===sel.mem)&&nv.length) sel.mem=nv[0][0];
-    renderProduct();
-  });
-  body.querySelectorAll('[data-mem]').forEach(b=>b.onclick=()=>{ sel.mem=b.dataset.mem; renderProduct(); });
-  body.querySelectorAll('.cswatch-wrap[data-color]').forEach(w=>w.onclick=()=>{ sel.color=decodeURIComponent(w.dataset.color); renderProduct(); });
-  body.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ sel.qty=Math.max(1,Math.min(20,sel.qty+Number(b.dataset.q))); renderProduct(); });
-  $('pAdd').onclick=addToCart;
+  let gi=0; const N=slides.length;
+  const track=$('gTrack'),dots=$('gDots'),thumbs=$('gThumbs'),idx=$('gIdx');
+  function go(i){
+    gi=(i+N)%N;
+    track.style.transform=`translateX(-${gi*100}%)`;
+    idx.textContent=(gi+1)+'/'+N;
+    dots.querySelectorAll('.d').forEach((d,k)=>d.classList.toggle('on',k===gi));
+    thumbs.querySelectorAll('.gth').forEach((t,k)=>t.classList.toggle('on',k===gi));
+  }
+  $('gPrev').onclick=e=>{ e.stopPropagation(); go(gi-1); };
+  $('gNext').onclick=e=>{ e.stopPropagation(); go(gi+1); };
+  dots.querySelectorAll('[data-gd]').forEach(d=>d.onclick=e=>{ e.stopPropagation(); go(Number(d.dataset.gd)); });
+  thumbs.querySelectorAll('[data-gth]').forEach(t=>t.onclick=()=>go(Number(t.dataset.gth)));
+  let sx=0,mx=0,dragging=false;
+  track.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; mx=sx; dragging=true; },{passive:true});
+  track.addEventListener('touchmove', e=>{ if(dragging) mx=e.touches[0].clientX; },{passive:true});
+  track.addEventListener('touchend', ()=>{ if(!dragging) return; dragging=false; const d=mx-sx; if(Math.abs(d)>55){ d<0?go(gi+1):go(gi-1); } });
+
+  $('prodBody').querySelectorAll('[data-mem]').forEach(b=>b.onclick=()=>{ sel.mem=b.dataset.mem; renderProduct(); });
+  $('prodBody').querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{ sel.color=decodeURIComponent(b.dataset.color); renderProduct(); });
+  $('prodBody').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ sel.qty=Math.max(1,Math.min(50,sel.qty+Number(b.dataset.q))); renderProduct(); });
+  const add=$('pAdd'); if(add) add.onclick=addToCart;
 }
+function swatch(col){
+  const map={"Black":"#1F2023","White / Silver":"#EDEDF0","Blue":"#3E6DB5","Green":"#7FAF9B","Gold":"#EBD3AE","Purple":"#B8A8D6","Red":"#D8382E","Pink":"#EFC2CB","Titanium":"#BFB9B1"};
+  return map[col]?`<span class="sw" style="background:${map[col]}"></span>`:'';
+}
+
+/* ---------- cart ---------- */
 function addToCart(){
-  const unit=priceFor(sel.model,sel.cond,sel.mem);
-  const key=[sel.model,sel.cond,sel.mem,sel.color].join('|');
-  const ex=cart.find(x=>x.key===key);
-  if(ex) ex.qty=Math.min(50,ex.qty+sel.qty);
-  else cart.push({ key, model:sel.model, mem:sel.mem, cond:sel.cond, condName:condName(sel.cond), color:sel.color, price:unit, qty:sel.qty });
-  hideSheets(); updateBars(); toast('Added to your order');
+  const price=priceFor(sel.model,sel.cond,sel.mem);
+  const key=x=>x.model+'|'+x.cond+'|'+x.mem+'|'+x.color;
+  const existing=cart.find(x=>key(x)===key(sel));
+  if(existing) existing.qty+=sel.qty;
+  else cart.push({model:sel.model,cond:sel.cond,condName:condDef(sel.cond).name,mem:sel.mem,color:sel.color,qty:sel.qty,price});
+  toast('Added to cart 🛒');
+  hideSheets(); updateBars();
 }
-
-/* ---------- totals ---------- */
-function totalQty(){ return cart.reduce((n,i)=>n+i.qty,0); }
-function subtotal(){ return cart.reduce((n,i)=>n+i.price*i.qty,0); }
+function totalQty(){ return cart.reduce((a,x)=>a+x.qty,0); }
+function subtotal(){ return cart.reduce((a,x)=>a+x.price*x.qty,0); }
 function discountPer(){ return perPhoneDiscount(totalQty()); }
 function discountTotal(){ return discountPer()*totalQty(); }
 function grandTotal(){ return subtotal()-discountTotal()+(express?EXPRESS_FEE:0); }
-function updateBars(){
-  const q=totalQty(); const n=$('cartN'); n.textContent=q; n.style.display=q>0?'flex':'none';
-  $('barLab').textContent=q+' phone'+(q===1?'':'s'); $('barTot').textContent=fmtFull(grandTotal());
-  $('cartBar').classList.toggle('show', q>0 && !cartSheet.classList.contains('show') && !prodSheet.classList.contains('show'));
+
+function renderCart(){
+  if(!cart.length){ $('cartBody').innerHTML=`<div class="empty"><div class="big">🛒</div><b>Your cart is empty</b><p style="font-size:13px;">Browse the phones and add one you like.</p></div>`; return; }
+  $('cartBody').innerHTML=
+    cart.map((it,i)=>`
+      <div class="citem">
+        <div class="cthumb">${svgBack(it.model,cwFor(it.model)[0])}</div>
+        <div class="cmainx">
+          <div class="cn">${esc(it.model)} · ${it.mem}GB</div>
+          <div class="cm">${esc(it.condName)}${it.color!=='No preference'?' · '+esc(it.color):''}</div>
+          <div class="cpriceq">
+            <span class="cq"><button data-cq="${i}:-1">−</button><span>${it.qty}</span><button data-cq="${i}:1">+</button></span>
+            <span class="cv">${fmtFull(it.price*it.qty)}</span>
+          </div>
+        </div>
+        <button class="cdel" data-cdel="${i}" aria-label="Remove">✕</button>
+      </div>`).join('')
+    +`<div class="exprow"><div class="xt"><b>⚡ Express delivery</b><p>7–10 days instead of 10–15 · +₦10,000</p></div><button class="tog ${express?'on':''}" id="expTog" aria-label="Toggle express"></button></div>
+    <div class="subs">
+      <div class="subline"><span>Subtotal (${totalQty()} phone${totalQty()>1?'s':''})</span><span class="mono">${fmtFull(subtotal())}</span></div>
+      ${discountTotal()>0?`<div class="subline"><span>Bulk discount (₦${discountPer().toLocaleString()} off each)</span><span class="g mono">−${fmtFull(discountTotal())}</span></div>`:''}
+      <div class="subline"><span>Shipping</span><span class="mono">${express?fmtFull(EXPRESS_FEE):'Free'}</span></div>
+      <div class="subline"><span>Free case</span><span class="g">Included 🎁</span></div>
+      <div class="tot"><span class="tl">Total</span><span class="tv">${fmtFull(grandTotal())}</span></div>
+    </div>
+    <button class="addbtn" id="goCheckout" style="margin-top:14px;">Checkout</button>`;
+  $('cartBody').querySelectorAll('[data-cq]').forEach(b=>b.onclick=()=>{ const [i,d]=b.dataset.cq.split(':').map(Number); cart[i].qty=Math.max(1,cart[i].qty+d); renderCart(); updateBars(); });
+  $('cartBody').querySelectorAll('[data-cdel]').forEach(b=>b.onclick=()=>{ cart.splice(Number(b.dataset.cdel),1); renderCart(); updateBars(); });
+  const et=$('expTog'); if(et) et.onclick=()=>{ express=!express; renderCart(); updateBars(); };
+  const gc=$('goCheckout'); if(gc) gc.onclick=()=>{ hideSheets(); setTimeout(()=>{ renderCheckout(); showSheet(checkoutSheet); },240); };
 }
 
-/* ---------- cart sheet ---------- */
-function renderCart(){
-  const body=$('cartBody');
-  if(!cart.length){ body.innerHTML=`<div class="emptycart"><div class="big">🛒</div><div>Your order is empty.<br>Pick a phone to get started.</div></div>`; return; }
-  const per=discountPer(), q=totalQty();
-  let nudge=''; if(per===0 && q>0) nudge=`Add ${3-q} more to unlock <b>₦5,000 off each phone</b>.`; else if(per===5000) nudge=`Add ${5-q} more to unlock <b>₦10,000 off each phone</b>.`;
-  body.innerHTML=`
-    ${cart.map((it,idx)=>`<div class="citem"><div class="ci"><div class="cn">${it.model}</div><div class="cm">${it.mem}GB ${cbadge(it.cond)} ${it.color}</div><div class="ministep"><button data-dec="${idx}">−</button><span class="q mono">${it.qty}</span><button data-inc="${idx}">+</button></div></div><div style="text-align:right"><div class="cp mono">${fmtFull(it.price*it.qty)}</div><button class="rm" data-rm="${idx}">remove</button></div></div>`).join('')}
-    ${discountTotal()>0?`<div class="saveline">✓ Bulk discount: ₦${discountPer().toLocaleString()} off each — you save ${fmtFull(discountTotal())}</div>`:''}
-    ${nudge?`<div class="nudge">${nudge}</div>`:''}
-    <div class="flabel">Shipping</div>
-    <div class="shipopt">
-      <button class="ship ${!express?'on':''}" data-exp="0"><span class="rad"></span><span><span class="st">Free shipping</span><br><span class="ss">10–15 days · included</span></span><span class="sx">Free</span></button>
-      <button class="ship ${express?'on':''}" data-exp="1"><span class="rad"></span><span><span class="st">Express</span><br><span class="ss">7–10 days</span></span><span class="sx">+₦10,000</span></button>
+/* ---------- checkout ---------- */
+function renderCheckout(){
+  $('checkoutBody').innerHTML=`
+    <div class="field"><label>Full name *</label><input id="kName" value="${esc(cust.name)}" autocomplete="name"></div>
+    <div class="field"><label>Phone number *</label><input id="kPhone" value="${esc(cust.phone)}" inputmode="tel" autocomplete="tel"></div>
+    <div class="field"><label>WhatsApp (if different)</label><input id="kWa" value="${esc(cust.whatsapp)}" inputmode="tel"></div>
+    <div class="field"><label>Delivery address *</label><input id="kAddr" value="${esc(cust.address)}" autocomplete="street-address"></div>
+    <div class="row2">
+      <div class="field"><label>City</label><input id="kCity" value="${esc(cust.city)}"></div>
+      <div class="field"><label>State</label><input id="kState" value="${esc(cust.state)}"></div>
     </div>
-    <div class="subline"><span>Subtotal (${q} phone${q===1?'':'s'})</span><span class="mono">${fmtFull(subtotal())}</span></div>
-    ${discountTotal()>0?`<div class="subline"><span>Bulk discount</span><span class="mono">−${fmtFull(discountTotal())}</span></div>`:''}
-    <div class="subline"><span>Shipping</span><span class="mono">${express?fmtFull(EXPRESS_FEE):'Free'}</span></div>
-    <div class="totrow"><span class="tl">Total to pay</span><span class="tv mono">${fmtFull(grandTotal())}</span></div>
-    <div style="font-size:12.5px;color:var(--green);font-weight:600;margin-top:6px;">🎁 Free case included with every phone</div>
-    <div class="flabel" style="margin-top:18px;">Your details</div>
-    <div class="cust">
-      <input id="cuName" placeholder="Full name *" value="${esc(cust.name)}" autocomplete="name">
-      <div class="row2"><input id="cuPhone" placeholder="Phone number *" value="${esc(cust.phone)}" inputmode="tel" autocomplete="tel"><input id="cuWhats" placeholder="WhatsApp (if different)" value="${esc(cust.whatsapp)}" inputmode="tel"></div>
-      <input id="cuAddr" placeholder="Delivery address *" value="${esc(cust.address)}" autocomplete="street-address">
-      <div class="row2"><input id="cuCity" placeholder="City" value="${esc(cust.city)}"><input id="cuState" placeholder="State" value="${esc(cust.state)}"></div>
-      <input id="cuEmail" placeholder="Email (optional)" value="${esc(cust.email)}" inputmode="email" autocomplete="email">
+    <div class="field"><label>Email (optional)</label><input id="kEmail" value="${esc(cust.email)}" inputmode="email" autocomplete="email"></div>
+    <div class="subs">
+      <div class="subline"><span>${totalQty()} phone${totalQty()>1?'s':''}${discountTotal()>0?' · bulk discount applied':''}</span><span class="mono">${fmtFull(subtotal()-discountTotal())}</span></div>
+      <div class="subline"><span>Shipping</span><span class="mono">${express?'Express '+fmtFull(EXPRESS_FEE):'Free (10–15 days)'}</span></div>
+      <div class="tot"><span class="tl">Total to pay</span><span class="tv">${fmtFull(grandTotal())}</span></div>
     </div>
-    <div class="flabel" style="margin-top:18px;">Pay by transfer</div>
-    <div class="bankbox">${BANKS.map((b,i)=>`<div class="bankrow"><div><div class="bn">${b.bank}</div><div class="bnum mono">${b.number}</div><div class="bd">${b.name}</div></div><button class="copybtn" data-copybank="${i}">Copy</button></div>`).join('')}</div>
-    <div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">Transfer the total, then send your receipt with this order.</div>
-    <div class="ctas">${WHATSAPP?`<button class="wabtn" id="waBtn">Send order on WhatsApp</button>`:''}<button class="copyorder" id="copyOrderBtn">Copy order details</button></div>`;
-  body.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{ cart[+b.dataset.inc].qty=Math.min(50,cart[+b.dataset.inc].qty+1); renderCart(); updateBars(); });
-  body.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.dec; cart[i].qty--; if(cart[i].qty<=0) cart.splice(i,1); renderCart(); updateBars(); });
-  body.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ cart.splice(+b.dataset.rm,1); renderCart(); updateBars(); });
-  body.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{ express=b.dataset.exp==='1'; renderCart(); updateBars(); });
-  body.querySelectorAll('[data-copybank]').forEach(b=>b.onclick=()=>copyText(BANKS[+b.dataset.copybank].number,'Account number copied'));
-  [['Name','name'],['Phone','phone'],['Whats','whatsapp'],['Addr','address'],['City','city'],['State','state'],['Email','email']].forEach(([sfx,key])=>{ const el=$('cu'+sfx); if(el) el.oninput=()=>{ cust[key]=el.value; }; });
-  const wa=$('waBtn'); if(wa) wa.onclick=sendWhatsApp;
-  const co=$('copyOrderBtn'); if(co) co.onclick=()=>{ if(!validateCust()) return; copyText(orderText(),'Order copied — send it to us with your receipt'); };
+    <div class="bank"><div class="bh">Pay to</div>
+      ${BANKS.map(b=>`<div class="brow"><span>${esc(b.bank)} · ${esc(b.name)}</span><b>${esc(b.number)}</b></div>`).join('')}
+      <div style="font-size:12px;color:var(--faint);margin-top:4px;">Send your order first — we confirm before you pay.</div>
+    </div>
+    <button class="wabtn" id="kSend">Send order on WhatsApp</button>
+    <button class="copybtn" id="kCopy">Copy order instead</button>
+    <div class="cerr" id="kErr"></div>`;
+  $('kSend').onclick=sendWhatsApp;
+  $('kCopy').onclick=copyOrder;
+}
+function readCust(){
+  cust.name=$('kName').value.trim(); cust.phone=$('kPhone').value.trim(); cust.whatsapp=$('kWa').value.trim();
+  cust.address=$('kAddr').value.trim(); cust.city=$('kCity').value.trim(); cust.state=$('kState').value.trim(); cust.email=$('kEmail').value.trim();
 }
 function validateCust(){
-  if(!cart.length){ toast('Your order is empty'); return false; }
-  if(!cust.name.trim()){ toast('Add your full name'); const e=$('cuName'); if(e) e.focus(); return false; }
-  if(!cust.phone.trim()){ toast('Add your phone number'); const e=$('cuPhone'); if(e) e.focus(); return false; }
-  if(!cust.address.trim()){ toast('Add your delivery address'); const e=$('cuAddr'); if(e) e.focus(); return false; }
-  return true;
+  readCust();
+  if(!cart.length){ $('kErr').textContent='Your cart is empty.'; return false; }
+  if(!cust.name){ $('kErr').textContent='Please enter your full name.'; $('kName').focus(); return false; }
+  if(!/^[0-9+\s-]{7,}$/.test(cust.phone)){ $('kErr').textContent='Please enter a valid phone number.'; $('kPhone').focus(); return false; }
+  if(!cust.address){ $('kErr').textContent='Please enter your delivery address.'; $('kAddr').focus(); return false; }
+  $('kErr').textContent=''; return true;
 }
 function orderText(){
   const q=totalQty();
@@ -883,47 +766,69 @@ function orderText(){
   BANKS.forEach(b=>{ t+=`${b.bank} — ${b.number} — ${b.name}\n`; });
   return t;
 }
-async function sendWhatsApp(){
+function sendWhatsApp(){
   if(!validateCust()) return;
-  // BACKEND SEAM (future): const r = await submitOrder({items:cart, customer:cust, totals:{...}});
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderText())}`,'_blank');
 }
+function copyOrder(){
+  if(!validateCust()) return;
+  const t=orderText();
+  if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>toast('Order copied — paste it to us on WhatsApp')).catch(()=>toast('Could not copy')); }
+  else toast('Could not copy on this browser');
+}
 
-/* ---------- sheets ---------- */
+/* ---------- sheets / bars / toast ---------- */
+const scrim=$('scrim'),prodSheet=$('prodSheet'),cartSheet=$('cartSheet'),checkoutSheet=$('checkoutSheet');
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); prodSheet.classList.remove('show'); cartSheet.classList.remove('show'); document.body.style.overflow=''; updateBars(); }
-scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets;
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet].forEach(s=>s.classList.remove('show')); document.body.style.overflow=''; updateBars(); }
+scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
-$('openCart').onclick=openCart; $('barView').onclick=openCart;
+$('openCart').onclick=openCart;
 $('heroShop').onclick=()=>document.getElementById('phones').scrollIntoView({behavior:'smooth'});
+$('cartbar').onclick=openCart;
+function updateBars(){
+  const q=totalQty();
+  const n=$('cartN'); n.textContent=q; n.classList.toggle('show',q>0);
+  const sheetOpen=[prodSheet,cartSheet,checkoutSheet].some(s=>s.classList.contains('show'));
+  const bar=$('cartbar');
+  if(q>0&&!sheetOpen){ $('barL').textContent=q+' phone'+(q>1?'s':'')+' in cart'; $('barR').textContent=fmtFull(grandTotal())+' · View →'; bar.classList.add('show'); }
+  else bar.classList.remove('show');
+}
+let toastTimer;
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2400); }
 
-/* ---------- reviews ---------- */
-function renderReviews(){ $('reviews').innerHTML = REVIEWS.map(r=>`<div class="rev"><div class="q">“</div><div class="rt">${esc(r.text)}</div><div class="rb"><span class="rn">${esc(r.name)}</span><span class="stars">${'★'.repeat(r.stars)}</span></div></div>`).join(''); }
+/* ---------- hot deal — picks most expensive in-stock clean phone ---------- */
+function renderHotDeal(){
+  let best=null, bestPrice=0;
+  CATALOG_MODELS.forEach(m=>{
+    variantsOf(m,'clean').forEach(v=>{ if(v[2]!==false&&v[1]>bestPrice){ bestPrice=v[1]; best={model:m,price:v[1]}; } });
+  });
+  if(best){ $('hdName').textContent=best.model; $('hdPrice').textContent=fmtFull(best.price); $('hotdeal').style.display='inline-flex'; }
+  else $('hotdeal').style.display='none';
+}
 
-/* ---------- toast / copy ---------- */
-let toastT;
-function toast(m){ const el=$('toast'); el.textContent=m; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2000); }
-function copyText(t,msg){ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast(msg||'Copied')).catch(()=>toast(t)); } else { const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');toast(msg||'Copied');}catch(e){toast(t);} document.body.removeChild(ta); } }
-
-/* ---------- search + reveal ---------- */
-$('search').addEventListener('input', e=>{ search=e.target.value.trim(); renderProducts(); });
-const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } }),{threshold:.06});
-document.querySelectorAll('.sec').forEach(s=>{ s.classList.add('reveal'); io.observe(s); });
-
-/* ---------- load a brand (uses the backend seam) ---------- */
-async function loadBrand(b){ brand=b; CAT = await fetchCatalog(b); renderBrands(); renderConds(); renderProducts(); }
-
-/* ---------- boot ---------- */
+/* ---------- chrome ---------- */
 function bootChrome(){
-  $('logo').innerHTML=logoHTML(); $('ftLogo').innerHTML=logoHTML(); $('ftBrandC').textContent=BRAND;
-  document.title=BRAND+" · Premium Phones, delivered across Nigeria";
+  $('logo').innerHTML='Mi<span class="dash">Phones</span>';
+  $('ftBrand').textContent=BRAND; $('ftBrandCol').textContent=BRAND; $('ftYear').textContent=new Date().getFullYear();
   $('ftPhone').textContent='📞 '+CONTACT_PHONE; $('ftPhone').href='tel:'+CONTACT_PHONE.replace(/\s/g,'');
   $('ftEmail').textContent='✉ '+CONTACT_EMAIL; $('ftEmail').href='mailto:'+CONTACT_EMAIL;
-  $('ftGroup').href=WHATSAPP_GROUP; $('ftYear').textContent=new Date().getFullYear();
-  const gl=$('groupLink'); if(WHATSAPP_GROUP){ gl.href=WHATSAPP_GROUP; } else { gl.style.display='none'; }
+  $('ftGroup').href=WHATSAPP_GROUP;
+  BANKS.forEach((b,i)=>{ const el=$('ftBank'+(i+1)); if(el) el.textContent=b.bank+' · '+b.number; });
+  $('reviews').innerHTML=REVIEWS.map(r=>`<div class="rev"><div class="q">"</div><div class="rt">${esc(r.text)}</div><div class="rb"><span>${esc(r.name)}</span><span class="stars">${'★'.repeat(r.stars)}</span></div></div>`).join('');
 }
-async function init(){ bootChrome(); renderHotDeal(); renderReviews(); await loadBrand('apple'); updateBars(); loadCatalogImages(); }
-init();
+
+/* ---------- boot ---------- */
+buildFallbackCAT();
+bootChrome();
+renderTabs();
+renderGrid();
+renderHotDeal();
+updateBars();
+(function waitSb(tries){
+  if(window.supabase){ loadLive(); }
+  else if(tries>0){ setTimeout(()=>waitSb(tries-1),150); }
+})(40);
 </script>
 </body>
 </html>
