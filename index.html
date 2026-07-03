@@ -508,6 +508,32 @@ let CATALOG_IMAGES = {};
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
 function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 
+/* SVG phone silhouette shown when all real images fail to load */
+const PHONE_SVG='data:image/svg+xml,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'+
+  '<rect width="200" height="280" fill="#f5f5f7"/>'+
+  '<rect x="62" y="28" width="76" height="140" rx="16" fill="#e0e0e8" stroke="#ccc" stroke-width="1.5"/>'+
+  '<rect x="74" y="42" width="52" height="94" rx="6" fill="#d0d0dc"/>'+
+  '<circle cx="100" cy="156" r="8" fill="#d8d8e0"/>'+
+  '<rect x="83" y="20" width="34" height="5" rx="2.5" fill="#d0d0d8"/>'+
+  '</svg>'
+);
+
+/* Try next URL in PHONE_IMAGES_DB cascade; final fallback = PHONE_SVG */
+function imgFallback(img){
+  img.onerror=null;
+  const model=img.dataset.model||img.alt||'';
+  const srcs=PHONE_IMAGES_DB[model]||[];
+  const cur=img.getAttribute('src');
+  const i=srcs.indexOf(cur);
+  if(i>=0&&i<srcs.length-1){
+    img.onerror=()=>imgFallback(img);
+    img.src=srcs[i+1];
+  } else {
+    img.src=PHONE_SVG;
+  }
+}
+
 function slidesFor(model,condKey){
   const up=CATALOG_IMAGES[model+'|'+condKey];
   const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
@@ -519,15 +545,15 @@ function slidesFor(model,condKey){
   return out.slice(0,8);
 }
 function slideHTML(url,model,idx){
-  return `<div class="gslide"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}"></div>`;
+  return `<div class="gslide"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="imgFallback(this)"></div>`;
 }
 function thumbHTML(url,model,i,on){
-  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt=""></button>`;
+  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" onerror="imgFallback(this)"></button>`;
 }
 function cardVisual(model,condKey){
   const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
   if(!src) return `<span style="font-size:32px;opacity:.4">📱</span>`;
-  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}">`;
+  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="imgFallback(this)">`;
 }
 
 /* ============================================================
