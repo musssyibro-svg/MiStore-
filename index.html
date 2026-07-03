@@ -472,41 +472,41 @@ const REVIEWS = [
 ];
 
 /* ============================================================
-   Images — GSMArena composite renders (front+back) are the
-   primary source; they load reliably for all 21 models.
-   Admin uploads (Supabase) always override when present.
-   Extra slides activate automatically once you add paths to
-   PHONE_IMAGES[model] (e.g. local WebP assets).
+   Images — Apple CDN finish-select renders: clean front+back
+   composites on white, 3 color variants per model = 3 slides.
+   Admin uploads (Supabase) always take priority.
+   Extra slides: add URLs to PHONE_IMAGES[model] array.
    ============================================================ */
-const _G='https://fdn2.gsmarena.com/vv/bigpic/';
-const GSM={
-  'iPhone 16 Pro Max':'apple-iphone-16-pro-max',
-  'iPhone 16 Pro':    'apple-iphone-16-pro',
-  'iPhone 16 Plus':   'apple-iphone-16-plus',
-  'iPhone 16':        'apple-iphone-16',
-  'iPhone 15 Pro Max':'apple-iphone-15-pro-max',
-  'iPhone 15 Pro':    'apple-iphone-15-pro',
-  'iPhone 15':        'apple-iphone-15',
-  'iPhone 14 Pro Max':'apple-iphone-14-pro-max',
-  'iPhone 14 Pro':    'apple-iphone-14-pro',
-  'iPhone 14':        'apple-iphone-14',
-  'iPhone 13 Pro Max':'apple-iphone-13-pro-max',
-  'iPhone 13 Pro':    'apple-iphone-13-pro',
-  'iPhone 13':        'apple-iphone-13',
-  'iPhone 12 Pro Max':'apple-iphone-12-pro-max',
-  'iPhone 12 Pro':    'apple-iphone-12-pro',
-  'iPhone 12':        'apple-iphone-12',
-  'iPhone 11 Pro Max':'apple-iphone-11-pro-max',
-  'iPhone 11 Pro':    'apple-iphone-11-pro',
-  'iPhone 11':        'apple-iphone-11',
-  'iPhone XS Max':    'apple-iphone-xs-max',
-  'iPhone XR':        'apple-iphone-xr',
+const _A='https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/';
+const _Q='?wid=800&hei=800&fmt=jpeg&qlt=90';
+function _i(id){ return _A+id+_Q; }
+const PHONE_IMAGES_DB={
+  'iPhone 16 Pro Max': [_i('iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium'),   _i('iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium'), _i('iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium')],
+  'iPhone 16 Pro':     [_i('iphone-16-pro-finish-select-202409-6-3inch-blacktitanium'),       _i('iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium'),     _i('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium')],
+  'iPhone 16 Plus':    [_i('iphone-16-plus-finish-select-202409-6-7inch-black'),              _i('iphone-16-plus-finish-select-202409-6-7inch-white'),              _i('iphone-16-plus-finish-select-202409-6-7inch-ultramarine')],
+  'iPhone 16':         [_i('iphone-16-finish-select-202409-6-1inch-black'),                   _i('iphone-16-finish-select-202409-6-1inch-teal'),                    _i('iphone-16-finish-select-202409-6-1inch-ultramarine')],
+  'iPhone 15 Pro Max': [_i('iphone-15-pro-max-finish-select-202309-6-7inch-blacktitanium'),   _i('iphone-15-pro-max-finish-select-202309-6-7inch-naturaltitanium'), _i('iphone-15-pro-max-finish-select-202309-6-7inch-bluetitanium')],
+  'iPhone 15 Pro':     [_i('iphone-15-pro-finish-select-202309-6-1inch-blacktitanium'),       _i('iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium'),     _i('iphone-15-pro-finish-select-202309-6-1inch-bluetitanium')],
+  'iPhone 15':         [_i('iphone-15-finish-select-202309-6-1inch-black'),                   _i('iphone-15-finish-select-202309-6-1inch-blue'),                    _i('iphone-15-finish-select-202309-6-1inch-pink')],
+  'iPhone 14 Pro Max': [_i('iphone-14-pro-max-finish-select-202209-6-7inch-deeppurple'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-spaceblack'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-gold')],
+  'iPhone 14 Pro':     [_i('iphone-14-pro-finish-select-202209-6-1inch-deeppurple'),          _i('iphone-14-pro-finish-select-202209-6-1inch-spaceblack'),          _i('iphone-14-pro-finish-select-202209-6-1inch-gold')],
+  'iPhone 14':         [_i('iphone-14-finish-select-202209-6-1inch-midnight'),                _i('iphone-14-finish-select-202209-6-1inch-blue'),                    _i('iphone-14-finish-select-202209-6-1inch-purple')],
+  'iPhone 13 Pro Max': [_i('iphone-13-pro-max-finish-select-202109-6-7inch-graphite'),        _i('iphone-13-pro-max-finish-select-202109-6-7inch-sierrablue'),      _i('iphone-13-pro-max-finish-select-202109-6-7inch-silver')],
+  'iPhone 13 Pro':     [_i('iphone-13-pro-finish-select-202109-6-1inch-graphite'),            _i('iphone-13-pro-finish-select-202109-6-1inch-sierrablue'),          _i('iphone-13-pro-finish-select-202109-6-1inch-silver')],
+  'iPhone 13':         [_i('iphone-13-finish-select-202109-6-1inch-midnight'),                _i('iphone-13-finish-select-202109-6-1inch-starlight'),               _i('iphone-13-finish-select-202109-6-1inch-blue')],
+  'iPhone 12 Pro Max': [_i('iphone-12-pro-max-finish-select-202010-6-7inch-pacificblue'),     _i('iphone-12-pro-max-finish-select-202010-6-7inch-graphite'),        _i('iphone-12-pro-max-finish-select-202010-6-7inch-silver')],
+  'iPhone 12 Pro':     [_i('iphone-12-pro-finish-select-202010-6-1inch-pacificblue'),         _i('iphone-12-pro-finish-select-202010-6-1inch-graphite'),            _i('iphone-12-pro-finish-select-202010-6-1inch-silver')],
+  'iPhone 12':         [_i('iphone-12-finish-select-202010-6-1inch-black'),                   _i('iphone-12-finish-select-202010-6-1inch-blue'),                    _i('iphone-12-finish-select-202010-6-1inch-white')],
+  'iPhone 11 Pro Max': [_i('iphone-11-pro-max-finish-select-201909-6-5inch-spacegray'),       _i('iphone-11-pro-max-finish-select-201909-6-5inch-silver'),          _i('iphone-11-pro-max-finish-select-201909-6-5inch-gold')],
+  'iPhone 11 Pro':     [_i('iphone-11-pro-finish-select-201909-5-8inch-spacegray'),           _i('iphone-11-pro-finish-select-201909-5-8inch-silver'),              _i('iphone-11-pro-finish-select-201909-5-8inch-gold')],
+  'iPhone 11':         [_i('iphone-11-finish-select-201909-6-1inch-black'),                   _i('iphone-11-finish-select-201909-6-1inch-white'),                   _i('iphone-11-finish-select-201909-6-1inch-purple')],
+  'iPhone XS Max':     [_i('iphone-xs-max-finish-select-201809-6-5inch-spacegray'),           _i('iphone-xs-max-finish-select-201809-6-5inch-silver'),              _i('iphone-xs-max-finish-select-201809-6-5inch-gold')],
+  'iPhone XR':         [_i('iphone-xr-finish-select-201809-6-1inch-black'),                   _i('iphone-xr-finish-select-201809-6-1inch-white'),                   _i('iphone-xr-finish-select-201809-6-1inch-blue')],
 };
-function gsmUrl(m){ return GSM[m]?_G+GSM[m]+'.jpg':''; }
 
 let CATALOG_IMAGES = {};
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
-function firstImg(model){ return CATALOG_IMAGES[model+'|clean']||gsmUrl(model)||''; }
+function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 
 /* SVG phone silhouette — last-resort fallback when all image URLs fail */
 const PHONE_SVG='data:image/svg+xml,'+encodeURIComponent(
@@ -519,28 +519,30 @@ const PHONE_SVG='data:image/svg+xml,'+encodeURIComponent(
   '</svg>'
 );
 
-/* If primary image fails: try GSMArena, then SVG silhouette */
+/* Cascade through remaining Apple CDN colorways, then → PHONE_SVG */
 function imgFallback(img){
   img.onerror=null;
   const model=img.dataset.model||img.alt||'';
-  const gsm=gsmUrl(model);
-  if(gsm&&img.src!==gsm){
-    img.onerror=()=>{ img.onerror=null; img.src=PHONE_SVG; };
-    img.src=gsm;
+  const srcs=PHONE_IMAGES_DB[model]||[];
+  const cur=img.getAttribute('src');
+  const i=srcs.indexOf(cur);
+  if(i>=0&&i<srcs.length-1){
+    img.onerror=()=>imgFallback(img);
+    img.src=srcs[i+1];
   } else {
     img.src=PHONE_SVG;
   }
 }
 
-/* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → GSMArena */
+/* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → Apple CDN colorways */
 function slidesFor(model,condKey){
   const up=CATALOG_IMAGES[model+'|'+condKey];
   const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
+  const db=PHONE_IMAGES_DB[model]||[];
   const out=[];
   if(up) out.push(up);
   own.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
-  const gsm=gsmUrl(model);
-  if(gsm&&!out.includes(gsm)) out.push(gsm);
+  db.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
   return out;
 }
 function slideHTML(url,model,idx){
@@ -550,7 +552,7 @@ function thumbHTML(url,model,i,on){
   return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" onerror="imgFallback(this)"></button>`;
 }
 function cardVisual(model,condKey){
-  const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||gsmUrl(model);
+  const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
   if(!src) return `<span style="font-size:32px;opacity:.4">📱</span>`;
   return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="imgFallback(this)">`;
 }
