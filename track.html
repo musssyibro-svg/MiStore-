@@ -9,12 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#08080B; --bg2:#0D0D11; --card:#141419; --card2:#1A1A20;
-    --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
-    --ink:#F5F5F8; --muted:#9A9AA5; --faint:#6A6A74;
-    --red:#FF3442; --red-soft:rgba(255,52,66,.12);
-    --green:#37D08A; --green-soft:rgba(55,208,138,.13); --amber:#F5B23E;
-    --shadow:0 22px 60px rgba(0,0,0,.6); --r:18px;
+    --bg:#F5F5F7; --bg2:#FFFFFF; --card:#FFFFFF; --card2:#F2F2F6;
+    --line:rgba(0,0,0,.07); --line2:rgba(0,0,0,.12);
+    --ink:#1D1D1F; --muted:#6E6E73; --faint:#9A9AA1;
+    --red:#FF3B30; --red-soft:rgba(255,59,48,.10);
+    --green:#1F9D5B; --green-soft:rgba(31,157,91,.12); --amber:#B96A00;
+    --shadow:0 1px 2px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.08); --r:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;overflow-x:hidden;}
@@ -25,7 +25,7 @@
   a{color:inherit;text-decoration:none;}
   .wrap{max-width:620px;margin:0 auto;padding:0 18px;}
 
-  header{position:sticky;top:0;z-index:20;background:rgba(8,8,11,.72);backdrop-filter:saturate(160%) blur(16px);border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.82);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
   .nav{max-width:620px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .logo{font-weight:800;font-size:22px;letter-spacing:-.04em;}
   .logo .dash{color:var(--red);}
@@ -39,7 +39,7 @@
   .searchcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:22px;box-shadow:var(--shadow);}
   .searchcard label{font-size:12.5px;font-weight:700;color:var(--ink);}
   .ipt{display:flex;gap:10px;margin-top:10px;}
-  .ipt input{flex:1;border:1.5px solid var(--line);background:var(--bg2);border-radius:12px;padding:14px 15px;font-size:16px;color:var(--ink);outline:none;}
+  .ipt input{flex:1;border:1.5px solid var(--line);background:var(--bg2);border-radius:12px;padding:14px 15px;font-size:16px;color:var(--ink);outline:none;box-shadow:inset 0 1px 3px rgba(0,0,0,.04);}
   .ipt input::placeholder{color:var(--faint);}
   .ipt input:focus{border-color:var(--line2);}
   .ipt button{border:none;background:var(--red);color:#fff;border-radius:12px;padding:0 22px;font-weight:800;font-size:15px;box-shadow:0 10px 26px rgba(255,52,66,.32);white-space:nowrap;}
@@ -65,7 +65,7 @@
   .tnode:last-child .rail{display:none;}
   .tnode.done .rail{background:var(--green);}
   .tdot{width:28px;height:28px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;z-index:1;border:2px solid var(--line2);background:var(--card2);color:var(--faint);}
-  .tnode.done .tdot{background:var(--green);border-color:var(--green);color:#06150e;}
+  .tnode.done .tdot{background:var(--green);border-color:var(--green);color:#fff;}
   .tnode.current .tdot{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 0 5px var(--red-soft);}
   .tbody{flex:1;padding-top:3px;}
   .tname{font-weight:700;font-size:15px;letter-spacing:-.01em;}
