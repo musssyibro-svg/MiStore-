@@ -260,7 +260,7 @@
 
   <div class="trust">
     <span class="titem">🎁 Free case with every phone</span>
-    <span class="titem">🚚 Shipping ₦18,000 · 10–15 days</span>
+    <span class="titem">🚚 Free shipping · 10–15 days</span>
     <span class="titem">⚡ Express 7–10 days · +₦10,000</span>
     <span class="titem">✅ Condition explained before you pay</span>
   </div>
@@ -349,7 +349,7 @@ const BANKS = [
   { bank:"Opay", number:"8130164763", name:"Mus'ab Ibrahim Abdullahi" },
   { bank:"UBA",  number:"2227127889", name:"Mus'ab Ibrahim Abdullahi" }
 ];
-const SHIPPING_FEE  = 18000;
+const SHIPPING_FEE  = 0;
 const EXPRESS_FEE   = 10000;
 function perPhoneDiscount(qty){
   if(qty>=20) return 14000;
@@ -666,7 +666,7 @@ function renderProduct(){
     <div class="stepper"><button data-q="-1" aria-label="Less">−</button><span class="q">${sel.qty}</span><button data-q="1" aria-label="More">+</button></div>
     <div class="pricebig"><span class="pl">${sel.qty>1?sel.qty+' × '+fmtFull(unit):'Price'}</span><span class="pv">${fmtFull(unit*sel.qty)}</span></div>
     <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to cart':'Out of stock'}</button>
-    <div class="freebie">🎁 Free case included · Shipping ₦18,000 · Express delivery +₦10,000</div>`;
+    <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>`;
 
   let gi=0; const N=slides.length;
   const track=$('gTrack'),dots=$('gDots'),thumbs=$('gThumbs'),idx=$('gIdx');
@@ -739,7 +739,7 @@ function renderCart(){
     <div class="subs">
       <div class="subline"><span>Subtotal (${totalQty()} phone${totalQty()>1?'s':''})</span><span class="mono">${fmtFull(subtotal())}</span></div>
       ${discountTotal()>0?`<div class="subline"><span>Bulk discount (₦${discountPer().toLocaleString()} off each)</span><span class="g mono">−${fmtFull(discountTotal())}</span></div>`:''}
-      <div class="subline"><span>Shipping ${express?'(Express)':''}</span><span class="mono">${fmtFull(SHIPPING_FEE+(express?EXPRESS_FEE:0))}</span></div>
+      <div class="subline"><span>Shipping${express?' (Express)':''}</span><span class="mono">${express?fmtFull(EXPRESS_FEE):'Free'}</span></div>
       <div class="subline"><span>Free case</span><span class="g">Included 🎁</span></div>
       <div class="tot"><span class="tl">Total</span><span class="tv">${fmtFull(grandTotal())}</span></div>
     </div>
@@ -764,7 +764,7 @@ function renderCheckout(){
     <div class="field"><label>Email (optional)</label><input id="kEmail" value="${esc(cust.email)}" inputmode="email" autocomplete="email"></div>
     <div class="subs">
       <div class="subline"><span>${totalQty()} phone${totalQty()>1?'s':''}${discountTotal()>0?' · bulk discount applied':''}</span><span class="mono">${fmtFull(subtotal()-discountTotal())}</span></div>
-      <div class="subline"><span>Shipping ${express?'(Express)':''}</span><span class="mono">${fmtFull(SHIPPING_FEE+(express?EXPRESS_FEE:0))}</span></div>
+      <div class="subline"><span>Shipping${express?' (Express)':''}</span><span class="mono">${express?fmtFull(EXPRESS_FEE):'Free'}</span></div>
       <div class="tot"><span class="tl">Total to pay</span><span class="tv">${fmtFull(grandTotal())}</span></div>
     </div>
     <div class="bank"><div class="bh">Pay to</div>
