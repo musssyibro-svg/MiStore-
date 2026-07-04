@@ -663,38 +663,83 @@ const REVIEWS = [
 ];
 
 /* ============================================================
-   Images — Apple CDN finish-select renders: clean front+back
-   composites on white, 3 color variants per model = 3 slides.
-   Admin uploads (Supabase) always take priority.
-   Extra slides: add URLs to PHONE_IMAGES[model] array.
+   Built-in premium phone renders — generated as inline SVG right
+   inside the page. They ALWAYS load (no external server), so every
+   card and gallery slot is filled instantly on ANY network, and
+   nothing ever shows a broken/flat placeholder.
+   • Back-of-phone view with metallic body gradient, per-model camera
+     island (triple/dual/single), Apple logo and a glass sheen.
+   • 3 real colourways per model = a working swipe gallery.
+   • Admin-uploaded real photos (Supabase) still take priority when
+     present — set SHOW_ADMIN_PHOTOS=true after uploading good photos.
    ============================================================ */
-const _A='https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/';
-/* png-alpha = transparent background, so phones float on any surface */
-const _Q='?wid=800&hei=800&fmt=png-alpha';
-function _i(id){ return _A+id+_Q; }
-const PHONE_IMAGES_DB={
-  'iPhone 16 Pro Max': [_i('iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium'),   _i('iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium'), _i('iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium')],
-  'iPhone 16 Pro':     [_i('iphone-16-pro-finish-select-202409-6-3inch-blacktitanium'),       _i('iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium'),     _i('iphone-16-pro-finish-select-202409-6-3inch-deserttitanium')],
-  'iPhone 16 Plus':    [_i('iphone-16-plus-finish-select-202409-6-7inch-black'),              _i('iphone-16-plus-finish-select-202409-6-7inch-white'),              _i('iphone-16-plus-finish-select-202409-6-7inch-ultramarine')],
-  'iPhone 16':         [_i('iphone-16-finish-select-202409-6-1inch-black'),                   _i('iphone-16-finish-select-202409-6-1inch-teal'),                    _i('iphone-16-finish-select-202409-6-1inch-ultramarine')],
-  'iPhone 15 Pro Max': [_i('iphone-15-pro-max-finish-select-202309-6-7inch-blacktitanium'),   _i('iphone-15-pro-max-finish-select-202309-6-7inch-naturaltitanium'), _i('iphone-15-pro-max-finish-select-202309-6-7inch-bluetitanium')],
-  'iPhone 15 Pro':     [_i('iphone-15-pro-finish-select-202309-6-1inch-blacktitanium'),       _i('iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium'),     _i('iphone-15-pro-finish-select-202309-6-1inch-bluetitanium')],
-  'iPhone 15':         [_i('iphone-15-finish-select-202309-6-1inch-black'),                   _i('iphone-15-finish-select-202309-6-1inch-blue'),                    _i('iphone-15-finish-select-202309-6-1inch-pink')],
-  'iPhone 14 Pro Max': [_i('iphone-14-pro-max-finish-select-202209-6-7inch-deeppurple'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-spaceblack'),      _i('iphone-14-pro-max-finish-select-202209-6-7inch-gold')],
-  'iPhone 14 Pro':     [_i('iphone-14-pro-finish-select-202209-6-1inch-deeppurple'),          _i('iphone-14-pro-finish-select-202209-6-1inch-spaceblack'),          _i('iphone-14-pro-finish-select-202209-6-1inch-gold')],
-  'iPhone 14':         [_i('iphone-14-finish-select-202209-6-1inch-midnight'),                _i('iphone-14-finish-select-202209-6-1inch-blue'),                    _i('iphone-14-finish-select-202209-6-1inch-purple')],
-  'iPhone 13 Pro Max': [_i('iphone-13-pro-max-finish-select-202109-6-7inch-graphite'),        _i('iphone-13-pro-max-finish-select-202109-6-7inch-sierrablue'),      _i('iphone-13-pro-max-finish-select-202109-6-7inch-silver')],
-  'iPhone 13 Pro':     [_i('iphone-13-pro-finish-select-202109-6-1inch-graphite'),            _i('iphone-13-pro-finish-select-202109-6-1inch-sierrablue'),          _i('iphone-13-pro-finish-select-202109-6-1inch-silver')],
-  'iPhone 13':         [_i('iphone-13-finish-select-202109-6-1inch-midnight'),                _i('iphone-13-finish-select-202109-6-1inch-starlight'),               _i('iphone-13-finish-select-202109-6-1inch-blue')],
-  'iPhone 12 Pro Max': [_i('iphone-12-pro-max-finish-select-202010-6-7inch-pacificblue'),     _i('iphone-12-pro-max-finish-select-202010-6-7inch-graphite'),        _i('iphone-12-pro-max-finish-select-202010-6-7inch-silver')],
-  'iPhone 12 Pro':     [_i('iphone-12-pro-finish-select-202010-6-1inch-pacificblue'),         _i('iphone-12-pro-finish-select-202010-6-1inch-graphite'),            _i('iphone-12-pro-finish-select-202010-6-1inch-silver')],
-  'iPhone 12':         [_i('iphone-12-finish-select-202010-6-1inch-black'),                   _i('iphone-12-finish-select-202010-6-1inch-blue'),                    _i('iphone-12-finish-select-202010-6-1inch-white')],
-  'iPhone 11 Pro Max': [_i('iphone-11-pro-max-finish-select-201909-6-5inch-spacegray'),       _i('iphone-11-pro-max-finish-select-201909-6-5inch-silver'),          _i('iphone-11-pro-max-finish-select-201909-6-5inch-gold')],
-  'iPhone 11 Pro':     [_i('iphone-11-pro-finish-select-201909-5-8inch-spacegray'),           _i('iphone-11-pro-finish-select-201909-5-8inch-silver'),              _i('iphone-11-pro-finish-select-201909-5-8inch-gold')],
-  'iPhone 11':         [_i('iphone-11-finish-select-201909-6-1inch-black'),                   _i('iphone-11-finish-select-201909-6-1inch-white'),                   _i('iphone-11-finish-select-201909-6-1inch-purple')],
-  'iPhone XS Max':     [_i('iphone-xs-max-finish-select-201809-6-5inch-spacegray'),           _i('iphone-xs-max-finish-select-201809-6-5inch-silver'),              _i('iphone-xs-max-finish-select-201809-6-5inch-gold')],
-  'iPhone XR':         [_i('iphone-xr-finish-select-201809-6-1inch-black'),                   _i('iphone-xr-finish-select-201809-6-1inch-white'),                   _i('iphone-xr-finish-select-201809-6-1inch-blue')],
+function _shade(h,p){ h=h.replace('#',''); const n=parseInt(h,16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255; const t=p<0?0:255,a=Math.abs(p); r=Math.round(r+(t-r)*a); g=Math.round(g+(t-g)*a); b=Math.round(b+(t-b)*a); return `rgb(${r},${g},${b})`; }
+function _lum(h){ h=h.replace('#',''); const n=parseInt(h,16); return (((n>>16)&255)*0.299+((n>>8)&255)*0.587+(n&255)*0.114)/255; }
+const _APPLE_PATH='M17.05 12.04c-.03-3.02 2.47-4.47 2.58-4.54-1.41-2.06-3.6-2.34-4.38-2.37-1.86-.19-3.63 1.1-4.57 1.1-.94 0-2.4-1.07-3.95-1.04-2.03.03-3.9 1.18-4.94 3-2.11 3.66-.54 9.08 1.51 12.05 1 1.45 2.2 3.08 3.75 3.02 1.51-.06 2.08-.97 3.9-.97 1.82 0 2.33.97 3.92.94 1.62-.03 2.64-1.48 3.63-2.94 1.14-1.68 1.61-3.31 1.64-3.39-.04-.02-3.15-1.21-3.18-4.8zM14.13 4.36c.83-1.01 1.39-2.41 1.24-3.81-1.2.05-2.65.8-3.51 1.81-.77.89-1.44 2.31-1.26 3.68 1.34.1 2.7-.68 3.53-1.68z';
+function _lens(cx,cy,r,hex){ return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${_shade(hex,-0.34)}"/><circle cx="${cx}" cy="${cy}" r="${r-3.5}" fill="#0c0e13"/><circle cx="${cx}" cy="${cy}" r="${r-7}" fill="#05070b"/><ellipse cx="${cx-r*0.32}" cy="${cy-r*0.34}" rx="${r*0.34}" ry="${r*0.22}" fill="#8fb0d6" opacity="0.55"/>`; }
+function _island(layout,hex){
+  const dk=_shade(hex,-0.07), st=_shade(hex,-0.2);
+  if(layout==='triple'){
+    return `<rect x="116" y="50" width="98" height="98" rx="30" fill="${dk}" stroke="${st}" stroke-width="1.5"/>`
+      +_lens(148,82,16,hex)+_lens(148,118,16,hex)+_lens(186,100,16,hex)
+      +`<circle cx="186" cy="74" r="6" fill="#f2efe0"/><circle cx="186" cy="74" r="6" fill="none" stroke="${st}" stroke-width="1"/><circle cx="150" cy="100" r="4.5" fill="#1a1c22"/>`;
+  }
+  if(layout==='dual'){
+    return `<rect x="118" y="50" width="86" height="86" rx="27" fill="${dk}" stroke="${st}" stroke-width="1.5"/>`
+      +_lens(147,80,16,hex)+_lens(176,109,16,hex)
+      +`<circle cx="176" cy="80" r="5.5" fill="#f2efe0"/><circle cx="176" cy="80" r="5.5" fill="none" stroke="${st}" stroke-width="1"/>`;
+  }
+  if(layout==='dualv'){
+    return `<rect x="126" y="48" width="46" height="98" rx="23" fill="${dk}" stroke="${st}" stroke-width="1.5"/>`
+      +_lens(149,76,16,hex)+_lens(149,118,16,hex)
+      +`<circle cx="149" cy="97" r="5" fill="#f2efe0"/>`;
+  }
+  /* single (XR) */
+  return `<rect x="126" y="52" width="54" height="54" rx="18" fill="${dk}" stroke="${st}" stroke-width="1.5"/>`
+    +_lens(153,79,17,hex)
+    +`<circle cx="153" cy="124" r="5.5" fill="#f2efe0"/><circle cx="153" cy="124" r="5.5" fill="none" stroke="${st}" stroke-width="1"/>`;
+}
+function phoneRender(hex,layout){
+  const logo=_lum(hex)<0.5?'rgba(255,255,255,.9)':'rgba(0,0,0,.42)';
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480">`
+    +`<defs>`
+    +`<linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="${_shade(hex,0.17)}"/><stop offset="0.5" stop-color="${hex}"/><stop offset="1" stop-color="${_shade(hex,-0.2)}"/></linearGradient>`
+    +`<linearGradient id="sh" x1="0" y1="0" x2="1" y2="1.1"><stop offset="0" stop-color="#fff" stop-opacity="0.16"/><stop offset="0.42" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0.05"/></linearGradient>`
+    +`</defs>`
+    +`<rect x="96" y="28" width="168" height="424" rx="46" fill="url(#bg)"/>`
+    +`<rect x="96" y="28" width="168" height="424" rx="46" fill="url(#sh)"/>`
+    +`<rect x="99.5" y="31.5" width="161" height="417" rx="42.5" fill="none" stroke="${_shade(hex,0.24)}" stroke-opacity="0.55" stroke-width="1.5"/>`
+    +_island(layout,hex)
+    +`<g transform="translate(157,232) scale(1.16)" fill="${logo}"><path d="${_APPLE_PATH}"/></g>`
+    +`</svg>`;
+  return 'data:image/svg+xml,'+encodeURIComponent(svg);
+}
+/* per-model camera layout + 3 real colourways */
+const MODEL_META={
+  'iPhone 16 Pro Max':{layout:'triple',colors:[['Black Titanium','#3b3b3d'],['Natural Titanium','#b9b2a7'],['Desert Titanium','#bda588']]},
+  'iPhone 16 Pro':    {layout:'triple',colors:[['Black Titanium','#3b3b3d'],['Natural Titanium','#b9b2a7'],['Desert Titanium','#bda588']]},
+  'iPhone 16 Plus':   {layout:'dual',  colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Ultramarine','#5b6ee0']]},
+  'iPhone 16':        {layout:'dual',  colors:[['Black','#1c1c1e'],['Teal','#a6c8c4'],['Ultramarine','#5b6ee0']]},
+  'iPhone 15 Pro Max':{layout:'triple',colors:[['Black Titanium','#3b3b3d'],['Natural Titanium','#b9b2a7'],['Blue Titanium','#4d5765']]},
+  'iPhone 15 Pro':    {layout:'triple',colors:[['Black Titanium','#3b3b3d'],['Natural Titanium','#b9b2a7'],['Blue Titanium','#4d5765']]},
+  'iPhone 15':        {layout:'dual',  colors:[['Black','#2a2a2c'],['Blue','#b6c6d6'],['Pink','#eec9ce']]},
+  'iPhone 14 Pro Max':{layout:'triple',colors:[['Deep Purple','#55506a'],['Space Black','#2f2d2b'],['Gold','#efe0c0']]},
+  'iPhone 14 Pro':    {layout:'triple',colors:[['Deep Purple','#55506a'],['Space Black','#2f2d2b'],['Gold','#efe0c0']]},
+  'iPhone 14':        {layout:'dual',  colors:[['Midnight','#24262c'],['Blue','#a6bad0'],['Purple','#ddd3ea']]},
+  'iPhone 13 Pro Max':{layout:'triple',colors:[['Graphite','#52504b'],['Sierra Blue','#a6c1da'],['Silver','#ebebe4']]},
+  'iPhone 13 Pro':    {layout:'triple',colors:[['Graphite','#52504b'],['Sierra Blue','#a6c1da'],['Silver','#ebebe4']]},
+  'iPhone 13':        {layout:'dual',  colors:[['Midnight','#24262c'],['Starlight','#efe8dc'],['Blue','#4a6a97']]},
+  'iPhone 12 Pro Max':{layout:'triple',colors:[['Pacific Blue','#2c4a5c'],['Graphite','#514f4b'],['Silver','#ebebe4']]},
+  'iPhone 12 Pro':    {layout:'triple',colors:[['Pacific Blue','#2c4a5c'],['Graphite','#514f4b'],['Silver','#ebebe4']]},
+  'iPhone 12':        {layout:'dual',  colors:[['Black','#2a2a2c'],['Blue','#2c4c7e'],['White','#f2f1ec']]},
+  'iPhone 11 Pro Max':{layout:'triple',colors:[['Space Gray','#4c4944'],['Silver','#e1e2dc'],['Gold','#f3e7cd']]},
+  'iPhone 11 Pro':    {layout:'triple',colors:[['Space Gray','#4c4944'],['Silver','#e1e2dc'],['Gold','#f3e7cd']]},
+  'iPhone 11':        {layout:'dual',  colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Purple','#d3cbe0']]},
+  'iPhone XS Max':    {layout:'dualv', colors:[['Space Gray','#4c4944'],['Silver','#e1e2dc'],['Gold','#f3e7cd']]},
+  'iPhone XR':        {layout:'single',colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Blue','#a6c3d8']]}
 };
+const PHONE_IMAGES_DB={};
+Object.keys(MODEL_META).forEach(m=>{ const mt=MODEL_META[m]; PHONE_IMAGES_DB[m]=mt.colors.map(c=>phoneRender(c[1],mt.layout)); });
 
 /* Owner setting: set to true to show photos uploaded via admin.html again */
 const SHOW_ADMIN_PHOTOS = false;
@@ -712,32 +757,24 @@ function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
      trusted source and always load.
    ============================================================ */
 
-/* Gallery slide failed: remove it and its thumbnail entirely */
+/* A real photo (admin upload) failed to load → swap in the built-in
+   render for that model. Built-in renders never fail, so this is final. */
+function _renderFor(model,idx){ const s=PHONE_IMAGES_DB[model]||[]; return s[idx]||s[0]||''; }
 function slideFail(img){
   img.onerror=null;
-  const sid=img.dataset.sid;
-  const slide=img.closest('.gslide'); if(slide) slide.remove();
-  const th=document.querySelector(`.gth[data-sid="${sid}"]`); if(th) th.remove();
-  if(typeof window._galRefresh==='function') window._galRefresh();
+  const model=img.dataset.model||''; const sid=+img.dataset.sid||0;
+  img.src=_renderFor(model,sid);
+  const th=document.querySelector(`.gth[data-sid="${img.dataset.sid}"] img`); if(th){ th.onerror=null; th.src=_renderFor(model,sid); }
 }
-/* Thumbnail failed on its own: remove it + its slide */
 function thumbFail(img){
   img.onerror=null;
-  const sid=img.dataset.sid;
-  const th=img.closest('.gth'); if(th) th.remove();
-  const slide=document.querySelector(`.gslide[data-sid="${sid}"] , .gslide img[data-sid="${sid}"]`);
-  if(slide){ const s=slide.classList&&slide.classList.contains('gslide')?slide:slide.closest('.gslide'); if(s) s.remove(); }
-  if(typeof window._galRefresh==='function') window._galRefresh();
+  const model=img.dataset.model||''; const sid=+img.dataset.sid||0;
+  img.src=_renderFor(model,sid);
 }
-/* Card image failed: try remaining Apple colorways, else clean tile */
 function cardFail(img){
   img.onerror=null;
   const model=img.dataset.model||'';
-  const srcs=PHONE_IMAGES_DB[model]||[];
-  const i=srcs.indexOf(img.getAttribute('src'));
-  if(i>=0&&i<srcs.length-1){ img.onerror=()=>cardFail(img); img.src=srcs[i+1]; return; }
-  const ph=img.parentElement;
-  if(ph) ph.innerHTML='<span style="font-size:34px;opacity:.3">📱</span>';
+  img.src=_renderFor(model,0);
 }
 
 /* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → Apple CDN colorways */
@@ -1142,41 +1179,24 @@ updateBars();
 
 /* ========== CINEMA HERO ========== */
 (function(){
-  const heroColors=[
-    ['iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium',   'Black Titanium'],
-    ['iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium', 'Natural Titanium'],
-    ['iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium',  'Desert Titanium'],
-  ];
-  let colorIdx=0, activeSlot=0;
+  const HERO_MODEL='iPhone 16 Pro Max';
+  const heroNames=(MODEL_META[HERO_MODEL]||{colors:[]}).colors.map(c=>c[0]);
+  const heroSlides=PHONE_IMAGES_DB[HERO_MODEL]||[];
+  let colorIdx=0, activeSlot=0, heroAdmin=false;
   const img0=$('himg0'), img1=$('himg1'), shine=$('heroShine');
   const ctPrice=$('ctPrice'), ctSpec=$('ctSpec'), ctCta=$('ctCta');
   const wrap=$('heroImgWrap');
 
-  /* verify each colorway before ever showing it — no broken image boxes */
-  const okColors=[]; let heroReady=false, heroAdmin=false;
-  if(wrap) wrap.style.visibility='hidden';
-  heroColors.forEach((hc,i)=>{
-    const im=new Image();
-    im.onload=()=>{
-      okColors.push(i); okColors.sort((a,b)=>a-b);
-      if(!heroReady&&!heroAdmin){
-        heroReady=true; colorIdx=i;
-        if(img0) img0.src=im.src;
-        if(wrap) wrap.style.visibility='visible';
-        if(ctSpec) ctSpec.textContent=heroColors[i][1];
-      }
-    };
-    im.src=_A+hc[0]+_Q;
-  });
-  /* if Apple CDN never loads and no admin rescue arrived, hide the phone — text-only hero */
-  setTimeout(()=>{ if(!heroReady&&!heroAdmin&&wrap) wrap.style.display='none'; },7000);
+  /* built-in renders always load — show the phone immediately */
+  if(img0&&heroSlides[0]) img0.src=heroSlides[0];
+  if(ctSpec) ctSpec.textContent=heroNames[0]||'';
+  if(wrap) wrap.style.visibility='visible';
 
-  /* rescue hook: loadLive() calls this with the admin-uploaded photo */
+  /* rescue hook: loadLive() swaps in an admin-uploaded photo if present */
   window._heroAdminRescue=url=>{
-    if(heroReady||heroAdmin||!url) return;
+    if(heroAdmin||!url) return;
     heroAdmin=true;
-    if(img0) img0.src=url;
-    if(wrap){ wrap.style.display=''; wrap.style.visibility='visible'; }
+    if(img0){ img0.onerror=()=>{ img0.onerror=null; img0.src=heroSlides[0]; }; img0.src=url; }
     if(ctSpec) ctSpec.textContent='';
   };
 
@@ -1188,17 +1208,16 @@ updateBars();
   }
   setHeroPrice();
 
-  /* colour crossfade every 4s — only across colorways that verified OK */
+  /* colour crossfade every 4s across the built-in colourways */
   function morphColor(){
-    if(heroAdmin||okColors.length<2){ setTimeout(morphColor,4000); return; }
-    const pos=okColors.indexOf(colorIdx);
-    colorIdx=okColors[(pos+1)%okColors.length];
+    if(heroAdmin||heroSlides.length<2){ setTimeout(morphColor,4000); return; }
+    colorIdx=(colorIdx+1)%heroSlides.length;
     const next=activeSlot===0?img1:img0;
     const curr=activeSlot===0?img0:img1;
     if(!next||!curr) return;
-    next.src=_A+heroColors[colorIdx][0]+_Q;
+    next.src=heroSlides[colorIdx];
     /* fade spec text */
-    if(ctSpec){ ctSpec.style.opacity='0'; setTimeout(()=>{ ctSpec.textContent=heroColors[colorIdx][1]; ctSpec.style.opacity='1'; },330); }
+    if(ctSpec){ ctSpec.style.opacity='0'; setTimeout(()=>{ ctSpec.textContent=heroNames[colorIdx]||''; ctSpec.style.opacity='1'; },330); }
     if(window.gsap&&!window._gsapFailed){
       gsap.to(next,{opacity:1,duration:.85,ease:'power2.inOut'});
       gsap.to(curr,{opacity:0,duration:.85});
