@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F5F7">
-<title>MiPhones — Premium iPhones, delivered across Nigeria</title>
+<title>MiStore — Premium devices, delivered across Nigeria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -352,7 +352,7 @@
       <div id="heroShine"></div>
     </div>
     <div id="cinemaText">
-      <div class="ct-badge">Featured this week</div>
+      <div class="ct-badge">MiStore · Featured this week</div>
       <h2 class="ct-name">iPhone 16 Pro Max</h2>
       <div class="ct-spec" id="ctSpec">Black Titanium</div>
       <div class="ct-price" id="ctPrice"></div>
@@ -454,7 +454,7 @@
         onerror="window._gsapFailed=true"></script>
 <script>
 /* ============================================================
-   MiPhones storefront
+   MiStore storefront
    • Prices load live from Supabase catalog_prices, fallback to
      baked catalog below.
    • Photos: admin-uploaded via product_images / catalog-photos
@@ -463,7 +463,7 @@
    ============================================================ */
 
 /* ===== BUSINESS SETTINGS ===== */
-const BRAND        = "MiPhones";
+const BRAND        = "MiStore";
 const WHATSAPP     = "2348130164763";
 const CONTACT_PHONE = "+234 813 016 4763";
 const CONTACT_EMAIL = "Musssyibro@gmail.com";
@@ -631,30 +631,40 @@ let CATALOG_IMAGES = {};
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
 function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 
-/* SVG phone silhouette — last-resort fallback when all image URLs fail */
-const PHONE_SVG='data:image/svg+xml,'+encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'+
-  '<rect width="200" height="280" fill="#f5f5f7"/>'+
-  '<rect x="62" y="28" width="76" height="140" rx="16" fill="#e0e0e8" stroke="#ccc" stroke-width="1.5"/>'+
-  '<rect x="74" y="42" width="52" height="94" rx="6" fill="#d0d0dc"/>'+
-  '<circle cx="100" cy="156" r="8" fill="#d8d8e0"/>'+
-  '<rect x="83" y="20" width="34" height="5" rx="2.5" fill="#d0d0d8"/>'+
-  '</svg>'
-);
+/* ============================================================
+   Image failure policy: NEVER show fake gray phones.
+   • Gallery slide fails to load → slide + thumbnail are removed.
+   • Card image fails → try next Apple colorway → subtle 📱 tile.
+   • Admin uploads (Supabase) always come first — they are the
+     trusted source and always load.
+   ============================================================ */
 
-/* Cascade through remaining Apple CDN colorways, then → PHONE_SVG */
-function imgFallback(img){
+/* Gallery slide failed: remove it and its thumbnail entirely */
+function slideFail(img){
   img.onerror=null;
-  const model=img.dataset.model||img.alt||'';
+  const sid=img.dataset.sid;
+  const slide=img.closest('.gslide'); if(slide) slide.remove();
+  const th=document.querySelector(`.gth[data-sid="${sid}"]`); if(th) th.remove();
+  if(typeof window._galRefresh==='function') window._galRefresh();
+}
+/* Thumbnail failed on its own: remove it + its slide */
+function thumbFail(img){
+  img.onerror=null;
+  const sid=img.dataset.sid;
+  const th=img.closest('.gth'); if(th) th.remove();
+  const slide=document.querySelector(`.gslide[data-sid="${sid}"] , .gslide img[data-sid="${sid}"]`);
+  if(slide){ const s=slide.classList&&slide.classList.contains('gslide')?slide:slide.closest('.gslide'); if(s) s.remove(); }
+  if(typeof window._galRefresh==='function') window._galRefresh();
+}
+/* Card image failed: try remaining Apple colorways, else clean tile */
+function cardFail(img){
+  img.onerror=null;
+  const model=img.dataset.model||'';
   const srcs=PHONE_IMAGES_DB[model]||[];
-  const cur=img.getAttribute('src');
-  const i=srcs.indexOf(cur);
-  if(i>=0&&i<srcs.length-1){
-    img.onerror=()=>imgFallback(img);
-    img.src=srcs[i+1];
-  } else {
-    img.src=PHONE_SVG;
-  }
+  const i=srcs.indexOf(img.getAttribute('src'));
+  if(i>=0&&i<srcs.length-1){ img.onerror=()=>cardFail(img); img.src=srcs[i+1]; return; }
+  const ph=img.parentElement;
+  if(ph) ph.innerHTML='<span style="font-size:34px;opacity:.3">📱</span>';
 }
 
 /* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → Apple CDN colorways */
@@ -669,15 +679,15 @@ function slidesFor(model,condKey){
   return out;
 }
 function slideHTML(url,model,idx){
-  return `<div class="gslide"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="imgFallback(this)"></div>`;
+  return `<div class="gslide" data-sid="${idx}"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" data-sid="${idx}" onerror="slideFail(this)"></div>`;
 }
 function thumbHTML(url,model,i,on){
-  return `<button class="gth ${on?'on':''}" data-gth="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" onerror="imgFallback(this)"></button>`;
+  return `<button class="gth ${on?'on':''}" data-gth="${i}" data-sid="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" data-sid="${i}" onerror="thumbFail(this)"></button>`;
 }
 function cardVisual(model,condKey){
   const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
-  if(!src) return `<span style="font-size:32px;opacity:.4">📱</span>`;
-  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="imgFallback(this)">`;
+  if(!src) return `<span style="font-size:32px;opacity:.3">📱</span>`;
+  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
 }
 
 /* ============================================================
@@ -704,7 +714,7 @@ async function loadLive(){
       Object.keys(next).forEach(cd=>Object.keys(next[cd]).forEach(m=>next[cd][m].sort((a,b)=>Number(a[0])-Number(b[0]))));
       CAT=next; liveLoaded=true;
     }
-    renderGrid(); renderHotDeal();
+    renderTabs(); renderGrid(); renderHotDeal();
   }catch(e){}
 }
 
@@ -736,7 +746,11 @@ function modelsForCond(){
 }
 
 function renderTabs(){
-  $('condTabs').innerHTML=CONDITIONS.map(c=>`<button class="ctab ${c.key===cond?'on':''}" data-cond="${c.key}">${esc(c.name)}</button>`).join('');
+  /* only show conditions that actually have phones — no dead "coming soon" tabs */
+  const avail=CONDITIONS.filter(c=>CATALOG_MODELS.some(m=>variantsOf(m,c.key).length));
+  if(avail.length&&!avail.some(c=>c.key===cond)) cond=avail[0].key;
+  $('condTabs').style.display=avail.length>1?'':'none';
+  $('condTabs').innerHTML=avail.map(c=>`<button class="ctab ${c.key===cond?'on':''}" data-cond="${c.key}">${esc(c.name)}</button>`).join('');
   $('condTabs').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{ cond=b.dataset.cond; renderTabs(); renderGrid(); });
   $('condBlurb').innerHTML=condDef(cond).long+' <span style="color:var(--faint)">· Free case included with every phone.</span>';
 }
@@ -745,7 +759,7 @@ function renderGrid(){
   if(!list.length){ $('grid').innerHTML=`<div class="comingsoon"><div class="big">📦</div>No phones in this condition right now — check another tab or <a href="https://wa.me/${WHATSAPP}" style="color:var(--red);font-weight:700">message us</a>.</div>`; return; }
   $('grid').innerHTML=list.map(x=>`
     <article class="pcard" data-open="${esc(x.model)}">
-      <div class="phero"><span class="condchip">${esc(condDef(cond).short)}</span>${cardVisual(x.model,cond)}</div>
+      <div class="phero">${cardVisual(x.model,cond)}</div>
       <div class="pinfo">
         <div class="pname">${esc(x.model)}</div>
         <div class="pmem">${x.mems.join('GB · ')}GB</div>
@@ -793,26 +807,36 @@ function renderProduct(){
     <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to cart':'Out of stock'}</button>
     <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>`;
 
-  let gi=0; const N=slides.length;
+  /* gallery reads the live DOM so slides can be removed (failed images) at any time */
+  let gi=0;
   const track=$('gTrack'),dots=$('gDots'),thumbs=$('gThumbs'),idx=$('gIdx');
-  /* hide gallery chrome when only one image is available */
-  if(N<=1){
-    $('gPrev').style.display='none'; $('gNext').style.display='none';
-    idx.style.display='none'; dots.style.display='none';
-    thumbs.style.display='none';
-    $('prodBody').querySelector('.gnote').style.display='none';
-  }
+  const liveN=()=>track.querySelectorAll('.gslide').length;
   function go(i){
-    gi=(i+N)%N;
+    const N=liveN(); if(!N) return;
+    gi=((i%N)+N)%N;
     track.style.transform=`translateX(-${gi*100}%)`;
     idx.textContent=(gi+1)+'/'+N;
     dots.querySelectorAll('.d').forEach((d,k)=>d.classList.toggle('on',k===gi));
     thumbs.querySelectorAll('.gth').forEach((t,k)=>t.classList.toggle('on',k===gi));
   }
+  function chrome(){
+    const N=liveN(); const one=N<=1;
+    const gw=track.closest('.gwrap'); if(gw) gw.style.display=N?'':'none';
+    $('gPrev').style.display=one?'none':'';
+    $('gNext').style.display=one?'none':'';
+    idx.style.display=one?'none':'';
+    dots.style.display=one?'none':'flex';
+    thumbs.style.display=one?'none':'flex';
+    const note=$('prodBody').querySelector('.gnote'); if(note) note.style.display=one?'none':'';
+    dots.innerHTML=Array.from({length:N},(_,k)=>`<button class="d ${k===gi?'on':''}" data-gd="${k}" aria-label="Go to ${k+1}"></button>`).join('');
+    dots.querySelectorAll('[data-gd]').forEach(d=>d.onclick=e=>{ e.stopPropagation(); go(Number(d.dataset.gd)); });
+    thumbs.querySelectorAll('.gth').forEach((t,k)=>{ t.onclick=()=>go(k); });
+  }
+  window._galRefresh=()=>{ gi=0; chrome(); go(0); };
+  window._galNext=()=>{ if(liveN()>1) go(gi+1); };
+  chrome();
   $('gPrev').onclick=e=>{ e.stopPropagation(); go(gi-1); };
   $('gNext').onclick=e=>{ e.stopPropagation(); go(gi+1); };
-  dots.querySelectorAll('[data-gd]').forEach(d=>d.onclick=e=>{ e.stopPropagation(); go(Number(d.dataset.gd)); });
-  thumbs.querySelectorAll('[data-gth]').forEach(t=>t.onclick=()=>go(Number(t.dataset.gth)));
   let sx=0,mx=0,dragging=false;
   track.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; mx=sx; dragging=true; },{passive:true});
   track.addEventListener('touchmove', e=>{ if(dragging) mx=e.touches[0].clientX; },{passive:true});
@@ -849,7 +873,7 @@ function renderCart(){
   $('cartBody').innerHTML=
     cart.map((it,i)=>`
       <div class="citem">
-        <div class="cthumb">${firstImg(it.model)?`<img loading="lazy" src="${esc(firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;">`:''}</div>
+        <div class="cthumb">${(CATALOG_IMAGES[it.model+'|'+it.cond]||firstImg(it.model))?`<img loading="lazy" src="${esc(CATALOG_IMAGES[it.model+'|'+it.cond]||firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`:''}</div>
         <div class="cmainx">
           <div class="cn">${esc(it.model)} · ${it.mem}GB</div>
           <div class="cm">${esc(it.condName)}${it.color!=='No preference'?' · '+esc(it.color):''}</div>
@@ -972,7 +996,7 @@ function renderHotDeal(){
 
 /* ---------- chrome ---------- */
 function bootChrome(){
-  $('logo').innerHTML='Mi<span class="dash">Phones</span>';
+  $('logo').innerHTML='Mi<span class="dash">Store</span>';
   $('ftBrand').textContent=BRAND; $('ftBrandCol').textContent=BRAND; $('ftYear').textContent=new Date().getFullYear();
   $('ftPhone').textContent='📞 '+CONTACT_PHONE; $('ftPhone').href='tel:'+CONTACT_PHONE.replace(/\s/g,'');
   $('ftEmail').textContent='✉ '+CONTACT_EMAIL; $('ftEmail').href='mailto:'+CONTACT_EMAIL;
@@ -999,10 +1023,35 @@ updateBars();
   let colorIdx=0, activeSlot=0;
   const img0=$('himg0'), img1=$('himg1'), shine=$('heroShine');
   const ctPrice=$('ctPrice'), ctSpec=$('ctSpec'), ctCta=$('ctCta');
+  const wrap=$('heroImgWrap');
 
-  /* set initial images */
-  if(img0) img0.src=_A+heroColors[0][0]+_Q;
-  if(img1) img1.src=_A+heroColors[1][0]+_Q; /* preload next */
+  /* verify each colorway before ever showing it — no broken image boxes */
+  const okColors=[]; let heroReady=false, heroAdmin=false;
+  if(wrap) wrap.style.visibility='hidden';
+  heroColors.forEach((hc,i)=>{
+    const im=new Image();
+    im.onload=()=>{
+      okColors.push(i); okColors.sort((a,b)=>a-b);
+      if(!heroReady&&!heroAdmin){
+        heroReady=true; colorIdx=i;
+        if(img0) img0.src=im.src;
+        if(wrap) wrap.style.visibility='visible';
+        if(ctSpec) ctSpec.textContent=heroColors[i][1];
+      }
+    };
+    im.src=_A+hc[0]+_Q;
+  });
+  /* if Apple CDN never loads and no admin rescue arrived, hide the phone — text-only hero */
+  setTimeout(()=>{ if(!heroReady&&!heroAdmin&&wrap) wrap.style.display='none'; },7000);
+
+  /* rescue hook: loadLive() calls this with the admin-uploaded photo */
+  window._heroAdminRescue=url=>{
+    if(heroReady||heroAdmin||!url) return;
+    heroAdmin=true;
+    if(img0) img0.src=url;
+    if(wrap){ wrap.style.display=''; wrap.style.visibility='visible'; }
+    if(ctSpec) ctSpec.textContent='';
+  };
 
   /* price from catalog */
   function setHeroPrice(){
@@ -1012,9 +1061,11 @@ updateBars();
   }
   setHeroPrice();
 
-  /* colour crossfade every 4s */
+  /* colour crossfade every 4s — only across colorways that verified OK */
   function morphColor(){
-    colorIdx=(colorIdx+1)%heroColors.length;
+    if(heroAdmin||okColors.length<2){ setTimeout(morphColor,4000); return; }
+    const pos=okColors.indexOf(colorIdx);
+    colorIdx=okColors[(pos+1)%okColors.length];
     const next=activeSlot===0?img1:img0;
     const curr=activeSlot===0?img0:img1;
     if(!next||!curr) return;
@@ -1128,23 +1179,15 @@ let _galTmr=null;
 new MutationObserver(()=>{
   if(_galTmr){ clearInterval(_galTmr); _galTmr=null; }
   const track=$('gTrack'); if(!track) return;
-  const slides=track.querySelectorAll('.gslide'); const N=slides.length; if(N<=1) return;
-  let gi=0, live=true;
-  function advGal(){
-    if(!live||!prodSheet.classList.contains('show')) return;
-    gi=(gi+1)%N;
-    track.style.transform=`translateX(-${gi*100}%)`;
-    const idx=$('gIdx'),dots=$('gDots'),thumbs=$('gThumbs');
-    if(idx) idx.textContent=(gi+1)+'/'+N;
-    if(dots) dots.querySelectorAll('.d').forEach((d,k)=>d.classList.toggle('on',k===gi));
-    if(thumbs) thumbs.querySelectorAll('.gth').forEach((t,k)=>t.classList.toggle('on',k===gi));
-  }
-  _galTmr=setInterval(advGal,3600);
+  _galTmr=setInterval(()=>{
+    if(!prodSheet.classList.contains('show')) return;
+    if(typeof window._galNext==='function') window._galNext();
+  },3600);
   /* pause on any user interaction */
-  ['touchstart','click'].forEach(ev=>track.addEventListener(ev,()=>{ live=false; clearInterval(_galTmr); _galTmr=null; },{once:true,passive:true}));
+  ['touchstart','click'].forEach(ev=>track.addEventListener(ev,()=>{ clearInterval(_galTmr); _galTmr=null; },{once:true,passive:true}));
 })  .observe($('prodBody'),{childList:true});
 
-/* ========== LIVE PRICE REFRESH FOR CINEMA HERO ========== */
+/* ========== LIVE REFRESH FOR CINEMA HERO ========== */
 const _origLoadLive=loadLive;
 loadLive=async function(){
   await _origLoadLive.apply(this,arguments);
@@ -1153,6 +1196,10 @@ loadLive=async function(){
   const v=vs.find(x=>x[0]==='256')||vs[0];
   const cp=$('ctPrice');
   if(v&&cp) cp.textContent='from '+fmtFull(v[1]);
+  /* if Apple CDN is unreachable for this visitor, rescue the hero with the
+     admin-uploaded photo of the featured phone (any condition) */
+  const key=Object.keys(CATALOG_IMAGES).find(k=>k.startsWith('iPhone 16 Pro Max|'));
+  if(key&&typeof window._heroAdminRescue==='function') window._heroAdminRescue(CATALOG_IMAGES[key]);
 };
 
 (function waitSb(tries){
