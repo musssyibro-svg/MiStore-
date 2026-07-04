@@ -218,6 +218,103 @@
   .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:90;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:88vw;text-align:center;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+  /* ========== CINEMA HERO ========== */
+  #cinemaHero{
+    position:relative;min-height:100vh;
+    background:linear-gradient(168deg,#0C0C10 0%,#11111A 55%,#0A0A0E 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  #cinemaHero::before{content:'';position:absolute;top:12%;left:-8%;width:500px;height:500px;
+    background:radial-gradient(circle,rgba(255,59,48,.065) 0%,transparent 68%);border-radius:50%;pointer-events:none;}
+  #cinemaHero::after{content:'';position:absolute;bottom:8%;right:-6%;width:380px;height:380px;
+    background:radial-gradient(circle,rgba(90,140,255,.055) 0%,transparent 68%);border-radius:50%;pointer-events:none;}
+  #cinemaInner{
+    display:flex;flex-direction:column;align-items:center;gap:32px;
+    padding:0 24px;max-width:520px;width:100%;z-index:2;
+  }
+  #heroImgWrap{position:relative;width:250px;height:316px;flex:0 0 auto;}
+  #heroImgWrap .himg{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+    filter:drop-shadow(0 40px 80px rgba(0,0,0,.8)) drop-shadow(0 8px 22px rgba(0,0,0,.45));
+  }
+  #heroShine{
+    position:absolute;inset:0;
+    background:linear-gradient(108deg,transparent 22%,rgba(255,255,255,.22) 50%,transparent 78%);
+    pointer-events:none;transform:translateX(-150%);z-index:1;
+  }
+  #cinemaText{text-align:center;color:#fff;z-index:2;}
+  .ct-badge{
+    display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.14);border-radius:999px;
+    padding:5px 13px;margin-bottom:14px;
+  }
+  .ct-name{font-size:clamp(24px,5.5vw,34px);font-weight:800;letter-spacing:-.04em;margin:0 0 8px;color:#fff;line-height:1.1;}
+  .ct-spec{font-size:13px;color:rgba(255,255,255,.42);margin-bottom:11px;min-height:18px;transition:opacity .35s;}
+  .ct-price{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:22px;}
+  .ct-cta{
+    background:#fff;color:#0A0A0E;border:none;border-radius:999px;padding:13px 30px;
+    font-weight:700;font-size:14.5px;cursor:pointer;
+    transition:transform .15s,box-shadow .15s;box-shadow:0 8px 28px rgba(255,255,255,.12);
+  }
+  .ct-cta:hover{transform:scale(1.04);box-shadow:0 16px 44px rgba(255,255,255,.2);}
+  #cinemaHint{
+    position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+    font-size:11.5px;color:rgba(255,255,255,.28);font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    animation:cinemaHintBob 2.2s ease-in-out infinite;z-index:2;
+  }
+  @keyframes cinemaHintBob{
+    0%,100%{transform:translateX(-50%) translateY(0);}
+    50%{transform:translateX(-50%) translateY(7px);}
+  }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes phoneFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-11px);}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes shimmerGlow{0%,100%{background-position:200% center;}50%{background-position:-200% center;}}
+  @keyframes pulseRed{0%,100%{box-shadow:0 12px 28px rgba(255,59,48,.28);}50%{box-shadow:0 22px 52px rgba(255,59,48,.46),0 0 0 7px rgba(255,59,48,.09);}}
+  @keyframes trustIn{from{opacity:0;transform:translateY(14px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+  /* hero ambient glow */
+  .hero{background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(255,59,48,.055) 0%,transparent 68%);}
+
+  /* hero entrance stagger */
+  .hero .eyebrow{
+    background:linear-gradient(105deg,rgba(255,59,48,.10) 0%,rgba(255,59,48,.22) 45%,rgba(255,59,48,.10) 65%,rgba(255,59,48,.10) 100%);
+    background-size:200% auto;
+    animation:fadeUp .65s .05s ease both,shimmerGlow 3.2s 1.4s ease-in-out infinite;
+  }
+  .hero h1{animation:fadeUp .7s .15s ease both;}
+  .hero p{animation:fadeUp .7s .25s ease both;}
+  .heroctas{animation:fadeUp .7s .35s ease both;}
+  .hotdeal{animation:fadeUp .6s .5s ease both;}
+
+  /* trust strip stagger */
+  .titem{opacity:0;animation:trustIn .5s ease both;}
+  .titem:nth-child(1){animation-delay:.55s;}
+  .titem:nth-child(2){animation-delay:.72s;}
+  .titem:nth-child(3){animation-delay:.89s;}
+  .titem:nth-child(4){animation-delay:1.06s;}
+
+  /* product cards: hidden until IntersectionObserver reveals them */
+  .pcard{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease,box-shadow .22s ease;}
+  .pcard.vis{opacity:1;transform:translateY(0);}
+  .pcard:hover{box-shadow:0 28px 70px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.07);}
+
+  /* phone image float — activated once card enters view */
+  .phero img.real{animation:phoneFloat 4s ease-in-out infinite paused;will-change:transform;}
+  .pcard.vis .phero img.real{animation-play-state:running;}
+
+  /* gallery image float */
+  .gslide img{animation:phoneFloat 5.5s .3s ease-in-out infinite;will-change:transform;}
+
+  /* add-to-cart button heartbeat */
+  .addbtn:not(:disabled){animation:pulseRed 2.8s ease-in-out infinite;}
+
+  /* how-it-works steps + reviews: scroll reveal */
+  .step,.rev{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease;}
+  .step.vis,.rev.vis{opacity:1;transform:translateY(0);}
+
   @media (max-width:640px){ .navlinks{display:none;} }
   @media (max-width:500px){
     .grid{grid-template-columns:repeat(2,1fr);gap:12px;}
@@ -226,7 +323,10 @@
     .field input{font-size:16px;}
   }
   @media (max-width:360px){ .grid{grid-template-columns:1fr 1fr;gap:9px;} .pinfo{padding:11px 11px 12px;} }
-  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important;} }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important;}
+    .titem,.pcard,.step,.rev{opacity:1!important;transform:none!important;}
+  }
 </style>
 </head>
 <body>
@@ -242,6 +342,25 @@
     <button class="cartbtn" id="openCart">🛒 Cart <span class="n" id="cartN"></span></button>
   </div>
 </header>
+
+<!-- ===== cinema hero ===== -->
+<section id="cinemaHero">
+  <div id="cinemaInner">
+    <div id="heroImgWrap">
+      <img class="himg" id="himg0" alt="iPhone 16 Pro Max">
+      <img class="himg" id="himg1" alt="iPhone 16 Pro Max" style="opacity:0;">
+      <div id="heroShine"></div>
+    </div>
+    <div id="cinemaText">
+      <div class="ct-badge">Featured this week</div>
+      <h2 class="ct-name">iPhone 16 Pro Max</h2>
+      <div class="ct-spec" id="ctSpec">Black Titanium</div>
+      <div class="ct-price" id="ctPrice"></div>
+      <button class="ct-cta" id="ctCta">Shop this phone →</button>
+    </div>
+  </div>
+  <div id="cinemaHint">Scroll ↓</div>
+</section>
 
 <div class="wrap">
 
@@ -329,6 +448,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
         onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s);"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"
+        onerror="window._gsapFailed=true"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
+        onerror="window._gsapFailed=true"></script>
 <script>
 /* ============================================================
    MiPhones storefront
@@ -865,6 +988,173 @@ renderTabs();
 renderGrid();
 renderHotDeal();
 updateBars();
+
+/* ========== CINEMA HERO ========== */
+(function(){
+  const heroColors=[
+    ['iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium',   'Black Titanium'],
+    ['iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium', 'Natural Titanium'],
+    ['iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium',  'Desert Titanium'],
+  ];
+  let colorIdx=0, activeSlot=0;
+  const img0=$('himg0'), img1=$('himg1'), shine=$('heroShine');
+  const ctPrice=$('ctPrice'), ctSpec=$('ctSpec'), ctCta=$('ctCta');
+
+  /* set initial images */
+  if(img0) img0.src=_A+heroColors[0][0]+_Q;
+  if(img1) img1.src=_A+heroColors[1][0]+_Q; /* preload next */
+
+  /* price from catalog */
+  function setHeroPrice(){
+    const vs=variantsOf('iPhone 16 Pro Max','clean');
+    const v=vs.find(x=>x[0]==='256')||vs[0];
+    if(v&&ctPrice) ctPrice.textContent='from '+fmtFull(v[1]);
+  }
+  setHeroPrice();
+
+  /* colour crossfade every 4s */
+  function morphColor(){
+    colorIdx=(colorIdx+1)%heroColors.length;
+    const next=activeSlot===0?img1:img0;
+    const curr=activeSlot===0?img0:img1;
+    if(!next||!curr) return;
+    next.src=_A+heroColors[colorIdx][0]+_Q;
+    /* fade spec text */
+    if(ctSpec){ ctSpec.style.opacity='0'; setTimeout(()=>{ ctSpec.textContent=heroColors[colorIdx][1]; ctSpec.style.opacity='1'; },330); }
+    if(window.gsap&&!window._gsapFailed){
+      gsap.to(next,{opacity:1,duration:.85,ease:'power2.inOut'});
+      gsap.to(curr,{opacity:0,duration:.85});
+    } else {
+      next.style.transition='opacity .85s'; curr.style.transition='opacity .85s';
+      next.style.opacity='1'; curr.style.opacity='0';
+    }
+    activeSlot=1-activeSlot;
+    setTimeout(morphColor,4000);
+  }
+  setTimeout(morphColor,4000);
+
+  /* light reflection sweep */
+  function runShine(){
+    if(!shine) return;
+    if(window.gsap&&!window._gsapFailed){
+      gsap.fromTo(shine,{x:'-150%'},{x:'200%',duration:.72,ease:'power1.inOut',
+        onComplete:()=>setTimeout(runShine,4400)});
+    } else {
+      shine.style.transition='transform .72s ease';
+      shine.style.transform='translateX(200%)';
+      setTimeout(()=>{ shine.style.transition='none'; shine.style.transform='translateX(-150%)';
+        setTimeout(runShine,4400); },820);
+    }
+  }
+  setTimeout(runShine,1400);
+
+  /* CTA: scroll to phones then open product detail */
+  if(ctCta) ctCta.onclick=()=>{
+    document.getElementById('phones').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>openProduct('iPhone 16 Pro Max'),700);
+  };
+
+  /* GSAP entrance + scroll parallax */
+  if(window.gsap&&window.ScrollTrigger&&!window._gsapFailed){
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.set('#heroImgWrap',{opacity:0,scale:.8,y:36});
+    gsap.set('.ct-badge,.ct-name,.ct-spec,.ct-price,.ct-cta',{opacity:0,y:22});
+    gsap.set('#cinemaHint',{opacity:0});
+
+    /* entrance — plays immediately on page load */
+    gsap.timeline({delay:.2})
+      .to('#heroImgWrap',{opacity:1,scale:1,y:0,duration:.95,ease:'power3.out'})
+      .to('.ct-badge',{opacity:1,y:0,duration:.45,ease:'power2.out'},'<.4')
+      .to('.ct-name', {opacity:1,y:0,duration:.5, ease:'power2.out'},'<.12')
+      .to('.ct-spec', {opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
+      .to('.ct-price',{opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
+      .to('.ct-cta',  {opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
+      .to('#cinemaHint',{opacity:1,duration:.5},'<.2');
+
+    /* scroll-pinned parallax: phone drifts up, text fades as user scrolls away */
+    gsap.timeline({scrollTrigger:{
+      trigger:'#cinemaHero',start:'top top',end:'+=520',pin:true,scrub:1.3,
+    }})
+      .to('#heroImgWrap',{y:-60,scale:1.1,duration:1})
+      .to('#cinemaText', {y:-22,opacity:.35,duration:1},'<.35')
+      .to('#cinemaHint', {opacity:0,duration:.25},'<');
+  }
+})();
+
+/* ========== SCROLL-ENTRANCE OBSERVER ========== */
+const _io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const el=e.target;
+    const d=parseInt(el.dataset.ioDelay||0);
+    setTimeout(()=>{ el.classList.add('vis'); el.style.transitionDelay=''; },d);
+    _io.unobserve(el);
+  });
+},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+
+function observeEntrances(){
+  document.querySelectorAll('.pcard:not(.vis)').forEach((el,i)=>{
+    if(el._iow) return; el._iow=true;
+    el.style.transitionDelay=(Math.min(i%6,5)*62)+'ms';
+    el.dataset.ioDelay=0; _io.observe(el);
+  });
+  document.querySelectorAll('.step:not(.vis),.rev:not(.vis)').forEach((el,i)=>{
+    if(el._iow) return; el._iow=true;
+    el.style.transitionDelay=(i*85)+'ms'; el.dataset.ioDelay=0; _io.observe(el);
+  });
+}
+new MutationObserver(observeEntrances).observe($('grid'),{childList:true});
+observeEntrances();
+
+/* ========== 3-D CARD TILT (pointer devices only) ========== */
+if(window.matchMedia('(hover:hover)').matches){
+  let _tc=null;
+  $('grid').addEventListener('mousemove',e=>{
+    const card=e.target.closest('.pcard');
+    if(!card){ if(_tc){_tc.style.transform='';_tc.style.boxShadow='';_tc=null;} return; }
+    if(_tc&&_tc!==card){_tc.style.transform='';_tc.style.boxShadow='';}
+    _tc=card;
+    if(!card.classList.contains('vis')) return;
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(700px) rotateX(${y*-10}deg) rotateY(${x*10}deg) translateY(-7px) scale(1.025)`;
+    card.style.boxShadow=`0 32px 72px rgba(0,0,0,.16),${x*-10}px ${y*-8}px 24px rgba(0,0,0,.07)`;
+  });
+  $('grid').addEventListener('mouseleave',()=>{ if(_tc){_tc.style.transform='';_tc.style.boxShadow='';_tc=null;} });
+}
+
+/* ========== GALLERY AUTO-ADVANCE ========== */
+let _galTmr=null;
+new MutationObserver(()=>{
+  if(_galTmr){ clearInterval(_galTmr); _galTmr=null; }
+  const track=$('gTrack'); if(!track) return;
+  const slides=track.querySelectorAll('.gslide'); const N=slides.length; if(N<=1) return;
+  let gi=0, live=true;
+  function advGal(){
+    if(!live||!prodSheet.classList.contains('show')) return;
+    gi=(gi+1)%N;
+    track.style.transform=`translateX(-${gi*100}%)`;
+    const idx=$('gIdx'),dots=$('gDots'),thumbs=$('gThumbs');
+    if(idx) idx.textContent=(gi+1)+'/'+N;
+    if(dots) dots.querySelectorAll('.d').forEach((d,k)=>d.classList.toggle('on',k===gi));
+    if(thumbs) thumbs.querySelectorAll('.gth').forEach((t,k)=>t.classList.toggle('on',k===gi));
+  }
+  _galTmr=setInterval(advGal,3600);
+  /* pause on any user interaction */
+  ['touchstart','click'].forEach(ev=>track.addEventListener(ev,()=>{ live=false; clearInterval(_galTmr); _galTmr=null; },{once:true,passive:true}));
+})  .observe($('prodBody'),{childList:true});
+
+/* ========== LIVE PRICE REFRESH FOR CINEMA HERO ========== */
+const _origLoadLive=loadLive;
+loadLive=async function(){
+  await _origLoadLive.apply(this,arguments);
+  /* re-sync hero price after live catalog arrives */
+  const vs=variantsOf('iPhone 16 Pro Max','clean');
+  const v=vs.find(x=>x[0]==='256')||vs[0];
+  const cp=$('ctPrice');
+  if(v&&cp) cp.textContent='from '+fmtFull(v[1]);
+};
+
 (function waitSb(tries){
   if(window.supabase){ loadLive(); }
   else if(tries>0){ setTimeout(()=>waitSb(tries-1),150); }
