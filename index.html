@@ -74,7 +74,7 @@
   .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .15s;}
   .pcard:active{transform:scale(.985);}
   .phero{position:relative;aspect-ratio:1/1.15;background:linear-gradient(180deg,#FBFBFD,#F0F0F4);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .phero img{width:100%;height:100%;object-fit:contain;padding:8px;background:#fff;}
+  .phero img{width:100%;height:100%;object-fit:contain;padding:16px;filter:drop-shadow(0 14px 22px rgba(0,0,0,.16));}
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -124,11 +124,11 @@
   .xbtn{border:none;background:var(--line);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
   .sbody{padding:16px 20px 0;max-width:640px;margin:0 auto;width:100%;}
 
-  /* ---------- gallery ---------- */
-  .gwrap{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);}
+  /* ---------- gallery — free-floating phone, no box ---------- */
+  .gwrap{position:relative;overflow:hidden;background:transparent;}
   .gtrack{display:flex;transition:transform .3s cubic-bezier(.3,.7,.3,1);touch-action:pan-y;}
-  .gslide{flex:0 0 100%;aspect-ratio:3/4;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;}
-  .gslide img{width:100%;height:100%;object-fit:contain;padding:10px;}
+  .gslide{flex:0 0 100%;aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;background:transparent;}
+  .gslide img{width:100%;height:100%;object-fit:contain;padding:14px;filter:drop-shadow(0 22px 34px rgba(0,0,0,.18));}
   .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
   .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
   .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
@@ -136,48 +136,54 @@
   .gdots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;z-index:3;}
   .gdots .d{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);border:none;padding:0;}
   .gdots .d.on{background:#fff;}
-  .gthumbs{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-  .gthumbs::-webkit-scrollbar{display:none;}
-  .gth{flex:0 0 auto;width:56px;height:70px;border-radius:12px;overflow:hidden;border:2px solid transparent;background:#fff;display:flex;align-items:center;justify-content:center;opacity:.65;padding:0;}
-  .gth.on{border-color:var(--red);opacity:1;}
-  .gth img{width:100%;height:100%;object-fit:contain;padding:3px;}
-  .gnote{font-size:11.5px;color:var(--faint);margin-top:8px;text-align:center;}
+  /* thumbnails / counter / note hidden — clean single-image look like the original design */
+  .gthumbs{display:none!important;}
+  .gth{display:none!important;}
+  .gnote{display:none!important;}
+  .gidx{display:none!important;}
+  /* arrows only on devices with a mouse */
+  @media (hover:none){ .gbtn{display:none!important;} }
+
+  /* ---------- section headings inside product sheet ---------- */
+  .shdr{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:20px 0 11px;}
+  .shdr .sn{font-size:12px;font-weight:600;color:var(--faint);letter-spacing:0;}
 
   /* ---------- choose condition selector ---------- */
-  .condsel{display:flex;flex-direction:column;gap:10px;}
-  .copt{display:flex;align-items:center;gap:13px;background:var(--card);border:1.5px solid var(--line2);border-radius:16px;padding:15px;cursor:pointer;text-align:left;width:100%;transition:border-color .18s,box-shadow .18s,transform .12s;}
+  .condsel{display:flex;flex-direction:column;gap:11px;}
+  .copt{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line2);border-radius:18px;padding:17px 16px;cursor:pointer;text-align:left;width:100%;transition:border-color .18s,background .18s,transform .12s;}
   .copt:active{transform:scale(.985);}
-  .copt.on{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);}
-  .copt .rad{width:22px;height:22px;border-radius:50%;border:2px solid var(--line2);flex:0 0 auto;position:relative;transition:border-color .18s;}
+  .copt.on{border-color:var(--red);background:#FFF5F4;}
+  .copt .rad{width:25px;height:25px;border-radius:50%;border:2px solid var(--line2);flex:0 0 auto;position:relative;transition:border-color .18s;background:#fff;}
   .copt.on .rad{border-color:var(--red);}
   .copt.on .rad::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--red);}
   .copt .cinf{flex:1;min-width:0;}
-  .copt .cnm{display:block;font-weight:800;font-size:15px;letter-spacing:-.01em;}
-  .copt .cds{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
+  .copt .cnm{display:block;font-weight:800;font-size:16px;letter-spacing:-.01em;}
+  .copt .cds{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;}
   .copt .cpr{text-align:right;flex:0 0 auto;}
-  .copt .cpv{display:block;font-weight:800;font-size:16.5px;letter-spacing:-.02em;}
-  .copt .csv{display:block;font-size:12px;color:var(--green);font-weight:700;margin-top:2px;}
+  .copt .cpv{display:block;font-weight:800;font-size:17.5px;letter-spacing:-.02em;}
+  .copt .csv{display:block;font-size:12.5px;color:var(--green);font-weight:700;margin-top:3px;}
 
   /* ---------- product sheet controls ---------- */
   .ptitle{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:16px 0 2px;}
   .psub{font-size:13px;color:var(--muted);}
-  .pcond{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:13px 0;line-height:1.5;}
+  .pcond{font-size:13.5px;color:var(--muted);background:#EFEFF3;border:none;border-radius:16px;padding:15px 16px;margin:15px 0 2px;line-height:1.55;}
   .pcond b{color:var(--ink);}
   .flabel{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:15px 0 8px;}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:7px;color:var(--ink);}
-  .chip .cp{font-size:11px;color:var(--muted);font-weight:600;}
-  .chip.on{border-color:var(--ink);background:var(--ink);color:#fff;}
-  .chip.on .cp{color:rgba(255,255,255,.75);}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;gap:7px;color:var(--ink);transition:border-color .15s,background .15s,color .15s;}
+  .chip .cp{font-size:11.5px;color:var(--muted);font-weight:600;}
+  .chip.on{border-color:var(--red);background:#FFF5F4;color:var(--red);}
+  .chip.on .cp{color:var(--red);opacity:.75;}
   .chip:disabled{opacity:.42;text-decoration:line-through;cursor:not-allowed;}
   .chip.sm{padding:8px 12px;font-size:12.5px;}
   .sw{width:13px;height:13px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block;}
   .stepper{display:inline-flex;align-items:center;gap:0;border:1.5px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--card);}
   .stepper button{width:44px;height:44px;border:none;background:transparent;font-size:19px;font-weight:700;}
   .stepper .q{min-width:44px;text-align:center;font-weight:800;font-size:16px;}
-  .pricebig{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:18px 0 4px;}
-  .pricebig .pl{font-size:13px;color:var(--muted);}
-  .pricebig .pv{font-size:26px;font-weight:800;letter-spacing:-.03em;}
+  .pricebig{display:block;margin:22px 0 4px;}
+  .pricebig .pv{font-size:36px;font-weight:800;letter-spacing:-.045em;line-height:1;}
+  .pricebig .pnote{font-size:13.5px;color:var(--muted);font-weight:500;margin-left:9px;}
+  .pricebig .pqty{font-size:13px;color:var(--muted);margin-top:6px;font-weight:600;}
   .addbtn{width:100%;border:none;background:var(--red);color:#fff;border-radius:15px;padding:16px;font-weight:800;font-size:16px;margin-top:10px;box-shadow:0 12px 28px rgba(255,59,48,.28);}
   .addbtn:disabled{opacity:.45;box-shadow:none;}
   .freebie{text-align:center;font-size:12.5px;color:var(--green);font-weight:600;margin-top:11px;}
@@ -634,7 +640,8 @@ const REVIEWS = [
    Extra slides: add URLs to PHONE_IMAGES[model] array.
    ============================================================ */
 const _A='https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/';
-const _Q='?wid=800&hei=800&fmt=jpeg&qlt=90';
+/* png-alpha = transparent background, so phones float on any surface */
+const _Q='?wid=800&hei=800&fmt=png-alpha';
 function _i(id){ return _A+id+_Q; }
 const PHONE_IMAGES_DB={
   'iPhone 16 Pro Max': [_i('iphone-16-pro-max-finish-select-202409-6-9inch-blacktitanium'),   _i('iphone-16-pro-max-finish-select-202409-6-9inch-naturaltitanium'), _i('iphone-16-pro-max-finish-select-202409-6-9inch-deserttitanium')],
@@ -854,17 +861,20 @@ function renderProduct(){
     <div class="gnote">Tap thumbnail to switch colour · Swipe or use arrows to browse</div>
     <div class="ptitle">${esc(sel.model)}</div>
     <div class="psub">${esc(c.name)} · free case included</div>
-    <div class="flabel">Choose condition</div>
+    <div class="shdr">Choose condition</div>
     <div class="condsel">${condOptsHTML()}</div>
     <div class="pcond">${c.long}</div>
-    <div class="flabel">Storage</div>
-    <div class="chips">${vs.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}" ${v[2]===false?'disabled':''}>${v[0]}GB <span class="cp">${fmtK(v[1])}</span></button>`).join('')}</div>
-    <div class="flabel">Colour preference <span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--faint)">(we confirm availability on WhatsApp)</span></div>
+    <div class="shdr">Storage</div>
+    <div class="chips">${vs.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}" ${v[2]===false?'disabled':''}>${v[0]}GB</button>`).join('')}</div>
+    <div class="shdr">Colour preference <span class="sn">(we confirm availability on WhatsApp)</span></div>
     <div class="chips">${COLORS.map(col=>`<button class="chip sm ${col===sel.color?'on':''}" data-color="${encodeURIComponent(col)}">${swatch(col)}${esc(col)}</button>`).join('')}</div>
-    <div class="flabel">Quantity <span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--faint)">(3+ save ₦7k each · 5+ save ₦11k · 10+ save ₦12.5k · 20+ save ₦14k)</span></div>
+    <div class="shdr">Quantity <span class="sn">(3+ save ₦7k each · 5+ save ₦11k · 10+ save ₦12.5k · 20+ save ₦14k)</span></div>
     <div class="stepper"><button data-q="-1" aria-label="Less">−</button><span class="q">${sel.qty}</span><button data-q="1" aria-label="More">+</button></div>
-    <div class="pricebig"><span class="pl">${sel.qty>1?sel.qty+' × '+fmtFull(unit):'Price'}</span><span class="pv">${fmtFull(unit*sel.qty)}</span></div>
-    <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to cart':'Out of stock'}</button>
+    <div class="pricebig">
+      <span class="pv">${fmtFull(unit*sel.qty)}</span><span class="pnote">incl. free shipping</span>
+      ${sel.qty>1?`<div class="pqty">${sel.qty} × ${fmtFull(unit)}</div>`:''}
+    </div>
+    <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to order — '+fmtFull(unit*sel.qty):'Out of stock'}</button>
     <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>`;
 
   /* gallery reads the live DOM so slides can be removed (failed images) at any time */
