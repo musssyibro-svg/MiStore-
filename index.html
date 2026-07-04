@@ -143,6 +143,21 @@
   .gth img{width:100%;height:100%;object-fit:contain;padding:3px;}
   .gnote{font-size:11.5px;color:var(--faint);margin-top:8px;text-align:center;}
 
+  /* ---------- choose condition selector ---------- */
+  .condsel{display:flex;flex-direction:column;gap:10px;}
+  .copt{display:flex;align-items:center;gap:13px;background:var(--card);border:1.5px solid var(--line2);border-radius:16px;padding:15px;cursor:pointer;text-align:left;width:100%;transition:border-color .18s,box-shadow .18s,transform .12s;}
+  .copt:active{transform:scale(.985);}
+  .copt.on{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);}
+  .copt .rad{width:22px;height:22px;border-radius:50%;border:2px solid var(--line2);flex:0 0 auto;position:relative;transition:border-color .18s;}
+  .copt.on .rad{border-color:var(--red);}
+  .copt.on .rad::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--red);}
+  .copt .cinf{flex:1;min-width:0;}
+  .copt .cnm{display:block;font-weight:800;font-size:15px;letter-spacing:-.01em;}
+  .copt .cds{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
+  .copt .cpr{text-align:right;flex:0 0 auto;}
+  .copt .cpv{display:block;font-weight:800;font-size:16.5px;letter-spacing:-.02em;}
+  .copt .csv{display:block;font-size:12px;color:var(--green);font-weight:700;margin-top:2px;}
+
   /* ---------- product sheet controls ---------- */
   .ptitle{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:16px 0 2px;}
   .psub{font-size:13px;color:var(--muted);}
@@ -296,10 +311,28 @@
   .titem:nth-child(3){animation-delay:.89s;}
   .titem:nth-child(4){animation-delay:1.06s;}
 
+  /* cinema hero entrance — pure CSS, works with or without GSAP */
+  #heroImgWrap{animation:fadeUp 1s .15s cubic-bezier(.22,.9,.3,1) backwards;}
+  .ct-badge{animation:fadeUp .6s .55s ease backwards;}
+  .ct-name{animation:fadeUp .6s .68s ease backwards;}
+  .ct-spec{animation:fadeUp .6s .78s ease backwards;}
+  .ct-price{animation:fadeUp .6s .86s ease backwards;}
+  .ct-cta{animation:fadeUp .6s .96s ease backwards;}
+  #heroImgWrap .himg{animation:phoneFloat 5s 1.3s ease-in-out infinite;}
+
   /* product cards: hidden until IntersectionObserver reveals them */
-  .pcard{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease,box-shadow .22s ease;}
-  .pcard.vis{opacity:1;transform:translateY(0);}
+  .pcard{opacity:0;transform:translateY(36px) scale(.96);transition:opacity .65s cubic-bezier(.22,.9,.32,1),transform .65s cubic-bezier(.22,.9,.32,1),box-shadow .22s ease;}
+  .pcard.vis{opacity:1;transform:translateY(0) scale(1);}
   .pcard:hover{box-shadow:0 28px 70px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.07);}
+
+  /* sheet content slides up as the sheet opens */
+  .sheet.show .sbody{animation:fadeUp .5s .08s cubic-bezier(.22,.9,.3,1) backwards;}
+  /* condition cards cascade in when the product sheet renders */
+  .condsel .copt{animation:fadeUp .45s ease backwards;}
+  .condsel .copt:nth-child(1){animation-delay:.05s;}
+  .condsel .copt:nth-child(2){animation-delay:.12s;}
+  .condsel .copt:nth-child(3){animation-delay:.19s;}
+  .condsel .copt:nth-child(4){animation-delay:.26s;}
 
   /* phone image float — activated once card enters view */
   .phero img.real{animation:phoneFloat 4s ease-in-out infinite paused;will-change:transform;}
@@ -580,10 +613,10 @@ const CATALOG_MODELS = [
   'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max'
 ];
 const CONDITIONS = [
-  { key:'clean',   name:'Clean (London used)', short:'Original parts',   long:'<b>Clean (London used).</b> Original screen and battery. Excellent cosmetic condition — our premium grade.' },
-  { key:'screen',  name:'Screen display',      short:'Replaced screen',  long:'<b>Screen display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
-  { key:'battery', name:'Battery display',     short:'Replaced battery', long:'<b>Battery display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
-  { key:'double',  name:'Double display',      short:'Screen + battery', long:'<b>Double display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
+  { key:'clean',   name:'Clean (London Used)', short:'Original parts',   pick:'Original screen & battery · like new',  long:'<b>Clean (London Used).</b> Original screen and battery, clean body, premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone.' },
+  { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
+  { key:'battery', name:'Battery Display',     short:'Replaced battery', pick:'Battery professionally replaced',       long:'<b>Battery Display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
+  { key:'double',  name:'Double Display',      short:'Screen + battery', pick:'Screen & battery replaced',             long:'<b>Double Display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
 ];
 const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
 
@@ -627,7 +660,11 @@ const PHONE_IMAGES_DB={
   'iPhone XR':         [_i('iphone-xr-finish-select-201809-6-1inch-black'),                   _i('iphone-xr-finish-select-201809-6-1inch-white'),                   _i('iphone-xr-finish-select-201809-6-1inch-blue')],
 };
 
+/* Owner setting: set to true to show photos uploaded via admin.html again */
+const SHOW_ADMIN_PHOTOS = false;
+
 let CATALOG_IMAGES = {};
+function adminImg(model,condKey){ return SHOW_ADMIN_PHOTOS?CATALOG_IMAGES[model+'|'+condKey]:''; }
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
 function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 
@@ -669,7 +706,7 @@ function cardFail(img){
 
 /* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → Apple CDN colorways */
 function slidesFor(model,condKey){
-  const up=CATALOG_IMAGES[model+'|'+condKey];
+  const up=adminImg(model,condKey);
   const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
   const db=PHONE_IMAGES_DB[model]||[];
   const out=[];
@@ -685,7 +722,7 @@ function thumbHTML(url,model,i,on){
   return `<button class="gth ${on?'on':''}" data-gth="${i}" data-sid="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" data-sid="${i}" onerror="thumbFail(this)"></button>`;
 }
 function cardVisual(model,condKey){
-  const src=CATALOG_IMAGES[model+'|'+condKey]||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
+  const src=adminImg(model,condKey)||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
   if(!src) return `<span style="font-size:32px;opacity:.3">📱</span>`;
   return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
 }
@@ -771,6 +808,27 @@ function renderGrid(){
 }
 
 /* ---------- product sheet + swipeable gallery ---------- */
+/* "Choose condition" selector — every condition selectable inside the
+   product page, with price + green "Save ₦xxx" vs the Clean price */
+function condPickPrice(model,k,mem){
+  const p=priceFor(model,k,mem); if(p) return p;
+  const vs=variantsOf(model,k);
+  const live=vs.filter(v=>v[2]!==false); const pool=live.length?live:vs;
+  return pool.length?Math.min(...pool.map(v=>v[1])):0;
+}
+function condOptsHTML(){
+  const avail=CONDITIONS.filter(cd=>variantsOf(sel.model,cd.key).length);
+  const baseP=condPickPrice(sel.model,'clean',sel.mem);
+  return avail.map(cd=>{
+    const p=condPickPrice(sel.model,cd.key,sel.mem);
+    const save=(cd.key!=='clean'&&baseP&&p&&baseP>p)?baseP-p:0;
+    return `<button class="copt ${cd.key===sel.cond?'on':''}" data-pcond="${cd.key}">
+      <span class="rad"></span>
+      <span class="cinf"><span class="cnm">${esc(cd.name)}</span><span class="cds">${esc(cd.pick)}</span></span>
+      <span class="cpr"><span class="cpv">${fmtK(p)}</span>${save?`<span class="csv">Save ${fmtK(save)}</span>`:''}</span>
+    </button>`;
+  }).join('');
+}
 function openProduct(model){
   const vs=variantsOf(model,cond); if(!vs.length) return;
   const firstLive=vs.find(v=>v[2]!==false)||vs[0];
@@ -796,6 +854,8 @@ function renderProduct(){
     <div class="gnote">Tap thumbnail to switch colour · Swipe or use arrows to browse</div>
     <div class="ptitle">${esc(sel.model)}</div>
     <div class="psub">${esc(c.name)} · free case included</div>
+    <div class="flabel">Choose condition</div>
+    <div class="condsel">${condOptsHTML()}</div>
     <div class="pcond">${c.long}</div>
     <div class="flabel">Storage</div>
     <div class="chips">${vs.map(v=>`<button class="chip ${v[0]===sel.mem?'on':''}" data-mem="${v[0]}" ${v[2]===false?'disabled':''}>${v[0]}GB <span class="cp">${fmtK(v[1])}</span></button>`).join('')}</div>
@@ -842,6 +902,12 @@ function renderProduct(){
   track.addEventListener('touchmove', e=>{ if(dragging) mx=e.touches[0].clientX; },{passive:true});
   track.addEventListener('touchend', ()=>{ if(!dragging) return; dragging=false; const d=mx-sx; if(Math.abs(d)>55){ d<0?go(gi+1):go(gi-1); } });
 
+  $('prodBody').querySelectorAll('[data-pcond]').forEach(b=>b.onclick=()=>{
+    sel.cond=b.dataset.pcond;
+    const nvs=variantsOf(sel.model,sel.cond);
+    if(!nvs.some(v=>v[0]===sel.mem)){ const fl=nvs.find(v=>v[2]!==false)||nvs[0]; if(fl) sel.mem=fl[0]; }
+    renderProduct();
+  });
   $('prodBody').querySelectorAll('[data-mem]').forEach(b=>b.onclick=()=>{ sel.mem=b.dataset.mem; renderProduct(); });
   $('prodBody').querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{ sel.color=decodeURIComponent(b.dataset.color); renderProduct(); });
   $('prodBody').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ sel.qty=Math.max(1,Math.min(50,sel.qty+Number(b.dataset.q))); renderProduct(); });
@@ -873,7 +939,7 @@ function renderCart(){
   $('cartBody').innerHTML=
     cart.map((it,i)=>`
       <div class="citem">
-        <div class="cthumb">${(CATALOG_IMAGES[it.model+'|'+it.cond]||firstImg(it.model))?`<img loading="lazy" src="${esc(CATALOG_IMAGES[it.model+'|'+it.cond]||firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`:''}</div>
+        <div class="cthumb">${(adminImg(it.model,it.cond)||firstImg(it.model))?`<img loading="lazy" src="${esc(adminImg(it.model,it.cond)||firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`:''}</div>
         <div class="cmainx">
           <div class="cn">${esc(it.model)} · ${it.mem}GB</div>
           <div class="cm">${esc(it.condName)}${it.color!=='No preference'?' · '+esc(it.color):''}</div>
@@ -1105,23 +1171,9 @@ updateBars();
     setTimeout(()=>openProduct('iPhone 16 Pro Max'),700);
   };
 
-  /* GSAP entrance + scroll parallax */
+  /* GSAP scroll parallax — pure enhancement; entrance is CSS so it always plays */
   if(window.gsap&&window.ScrollTrigger&&!window._gsapFailed){
     gsap.registerPlugin(ScrollTrigger);
-    gsap.set('#heroImgWrap',{opacity:0,scale:.8,y:36});
-    gsap.set('.ct-badge,.ct-name,.ct-spec,.ct-price,.ct-cta',{opacity:0,y:22});
-    gsap.set('#cinemaHint',{opacity:0});
-
-    /* entrance — plays immediately on page load */
-    gsap.timeline({delay:.2})
-      .to('#heroImgWrap',{opacity:1,scale:1,y:0,duration:.95,ease:'power3.out'})
-      .to('.ct-badge',{opacity:1,y:0,duration:.45,ease:'power2.out'},'<.4')
-      .to('.ct-name', {opacity:1,y:0,duration:.5, ease:'power2.out'},'<.12')
-      .to('.ct-spec', {opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
-      .to('.ct-price',{opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
-      .to('.ct-cta',  {opacity:1,y:0,duration:.4, ease:'power2.out'},'<.1')
-      .to('#cinemaHint',{opacity:1,duration:.5},'<.2');
-
     /* scroll-pinned parallax: phone drifts up, text fades as user scrolls away */
     gsap.timeline({scrollTrigger:{
       trigger:'#cinemaHero',start:'top top',end:'+=520',pin:true,scrub:1.3,
@@ -1197,9 +1249,11 @@ loadLive=async function(){
   const cp=$('ctPrice');
   if(v&&cp) cp.textContent='from '+fmtFull(v[1]);
   /* if Apple CDN is unreachable for this visitor, rescue the hero with the
-     admin-uploaded photo of the featured phone (any condition) */
-  const key=Object.keys(CATALOG_IMAGES).find(k=>k.startsWith('iPhone 16 Pro Max|'));
-  if(key&&typeof window._heroAdminRescue==='function') window._heroAdminRescue(CATALOG_IMAGES[key]);
+     admin-uploaded photo of the featured phone (only if owner allows) */
+  if(SHOW_ADMIN_PHOTOS){
+    const key=Object.keys(CATALOG_IMAGES).find(k=>k.startsWith('iPhone 16 Pro Max|'));
+    if(key&&typeof window._heroAdminRescue==='function') window._heroAdminRescue(CATALOG_IMAGES[key]);
+  }
 };
 
 (function waitSb(tries){
