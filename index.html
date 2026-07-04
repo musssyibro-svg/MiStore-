@@ -61,6 +61,20 @@
   .sechead h2{font-size:24px;letter-spacing:-.03em;margin:0;font-weight:800;}
   .sechead p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
 
+  /* ---------- category tabs ---------- */
+  .cattabs{display:flex;gap:9px;overflow-x:auto;padding:4px 0 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:2px;}
+  .cattabs::-webkit-scrollbar{display:none;}
+  .cattab{flex:0 0 auto;border:1px solid var(--line2);background:var(--card);color:var(--muted);border-radius:999px;padding:11px 18px;font-weight:700;font-size:14px;white-space:nowrap;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px;transition:background .18s,color .18s,border-color .18s;}
+  .cattab .ci{font-size:15px;}
+  .cattab.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .cattab .soon{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--red-soft);color:var(--red);padding:2px 6px;border-radius:6px;}
+  .cattab.on .soon{background:rgba(255,255,255,.2);color:#fff;}
+  .catempty{grid-column:1/-1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:52px 22px;box-shadow:var(--shadow);}
+  .catempty .cbig{font-size:46px;margin-bottom:12px;}
+  .catempty h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
+  .catempty p{color:var(--muted);font-size:14px;margin:0 auto;max-width:34ch;line-height:1.5;}
+  .catempty .cwa{display:inline-block;margin-top:16px;background:var(--ink);color:#fff;border-radius:999px;padding:12px 22px;font-weight:700;font-size:14px;}
+
   /* ---------- condition tabs ---------- */
   .condtabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   .condtabs::-webkit-scrollbar{display:none;}
@@ -73,8 +87,11 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;}
   .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .15s;}
   .pcard:active{transform:scale(.985);}
-  .phero{position:relative;aspect-ratio:1/1.15;background:linear-gradient(180deg,#FBFBFD,#F0F0F4);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .phero img{width:100%;height:100%;object-fit:contain;padding:16px;filter:drop-shadow(0 14px 22px rgba(0,0,0,.16));}
+  /* premium display stage: soft spotlight + floor reflection so the phone
+     sits in a luxury display case instead of floating like a paper cutout */
+  .phero{position:relative;aspect-ratio:1/1.15;background:radial-gradient(115% 80% at 50% 22%,#FFFFFF 0%,#F4F4F8 55%,#E9E9F0 100%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:14px;}
+  .phero::after{content:"";position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:66%;height:16px;background:radial-gradient(ellipse at center,rgba(0,0,0,.16),transparent 72%);filter:blur(3px);z-index:1;}
+  .phero img{width:88%;height:82%;object-fit:contain;object-position:center bottom;z-index:2;filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 62%,rgba(0,0,0,.14));}
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -124,11 +141,12 @@
   .xbtn{border:none;background:var(--line);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;line-height:1;}
   .sbody{padding:16px 20px 0;max-width:640px;margin:0 auto;width:100%;}
 
-  /* ---------- gallery — free-floating phone, no box ---------- */
-  .gwrap{position:relative;overflow:hidden;background:transparent;}
+  /* ---------- gallery — phone on a premium display stage ---------- */
+  .gwrap{position:relative;overflow:hidden;border-radius:24px;background:radial-gradient(120% 78% at 50% 24%,#FFFFFF 0%,#F3F3F8 58%,#E8E8EF 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);}
   .gtrack{display:flex;transition:transform .3s cubic-bezier(.3,.7,.3,1);touch-action:pan-y;}
-  .gslide{flex:0 0 100%;aspect-ratio:1/1;position:relative;display:flex;align-items:center;justify-content:center;background:transparent;}
-  .gslide img{width:100%;height:100%;object-fit:contain;padding:14px;filter:drop-shadow(0 22px 34px rgba(0,0,0,.18));}
+  .gslide{flex:0 0 100%;aspect-ratio:1/1;position:relative;display:flex;align-items:flex-end;justify-content:center;background:transparent;padding-bottom:22px;}
+  .gslide::after{content:"";position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:60%;height:20px;background:radial-gradient(ellipse at center,rgba(0,0,0,.17),transparent 72%);filter:blur(4px);}
+  .gslide img{width:82%;height:84%;object-fit:contain;object-position:center bottom;position:relative;z-index:2;filter:drop-shadow(0 24px 30px rgba(0,0,0,.24));-webkit-box-reflect:below 2px linear-gradient(transparent 58%,rgba(0,0,0,.16));}
   .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
   .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
   .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
@@ -425,8 +443,9 @@
 
   <section id="phones">
     <div class="sechead">
-      <div><h2>iPhones</h2><p>Pick a condition, then tap any phone to see it from every angle.</p></div>
+      <div><h2 id="catHead">iPhones</h2><p id="catSub">Pick a condition, then tap any phone to see it from every angle.</p></div>
     </div>
+    <div class="cattabs" id="catTabs"></div>
     <div class="condtabs" id="condTabs"></div>
     <div class="condblurb" id="condBlurb"></div>
     <div class="grid" id="grid"></div>
@@ -626,6 +645,16 @@ const CONDITIONS = [
 ];
 const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
 
+/* MiStore is a full electronics store — iPhones today, more coming.
+   Set ready:true (and wire products) when a category is stocked. */
+const CATEGORIES = [
+  { key:'iphones', name:'iPhones',        icon:'📱', ready:true,  sub:'Pick a condition, then tap any phone to see it from every angle.' },
+  { key:'samsung', name:'Samsung',        icon:'📲', ready:false, sub:'Premium Samsung Galaxy phones — landing soon at MiStore.' },
+  { key:'xiaomi',  name:'Xiaomi',         icon:'📶', ready:false, sub:'Xiaomi & Redmi devices — landing soon at MiStore.' },
+  { key:'bikes',   name:'Electric Bikes', icon:'🛵', ready:false, sub:'Electric bikes for getting around Nigeria — coming soon.' },
+  { key:'gadgets', name:'Gadgets',        icon:'🎧', ready:false, sub:'Watches, buds, chargers & accessories — coming soon.' }
+];
+
 const REVIEWS = [
   { text:"Phone arrived clean and exactly as described. Smooth process.", name:"A. from Kano", stars:5 },
   { text:"Good price and the free case was a nice touch. Will buy again.", name:"Verified buyer", stars:5 },
@@ -771,6 +800,7 @@ function fmtK(n){ return n>=1000000?('₦'+n.toLocaleString()):('₦'+Math.floor
 function fmtFull(n){ return '₦'+Math.round(n).toLocaleString(); }
 function condDef(k){ return CONDITIONS.find(c=>c.key===k)||CONDITIONS[0]; }
 
+let category='iphones';
 let cond='clean';
 let sel=null;
 let cart=[];
@@ -789,7 +819,21 @@ function modelsForCond(){
   });
 }
 
+function catDef(k){ return CATEGORIES.find(c=>c.key===k)||CATEGORIES[0]; }
+function renderCategories(){
+  $('catTabs').innerHTML=CATEGORIES.map(c=>
+    `<button class="cattab ${c.key===category?'on':''}" data-cat="${c.key}"><span class="ci">${c.icon}</span>${esc(c.name)}${c.ready?'':'<span class="soon">Soon</span>'}</button>`
+  ).join('');
+  $('catTabs').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ category=b.dataset.cat; renderCategories(); renderTabs(); renderGrid(); document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'}); });
+  const c=catDef(category);
+  $('catHead').textContent=c.name;
+  $('catSub').textContent=c.sub;
+}
 function renderTabs(){
+  const ready=catDef(category).ready;
+  /* condition tabs + blurb only apply to iPhones (they have conditions) */
+  if(!ready){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; return; }
+  $('condBlurb').style.display='';
   /* only show conditions that actually have phones — no dead "coming soon" tabs */
   const avail=CONDITIONS.filter(c=>CATALOG_MODELS.some(m=>variantsOf(m,c.key).length));
   if(avail.length&&!avail.some(c=>c.key===cond)) cond=avail[0].key;
@@ -799,6 +843,12 @@ function renderTabs(){
   $('condBlurb').innerHTML=condDef(cond).long+' <span style="color:var(--faint)">· Free case included with every phone.</span>';
 }
 function renderGrid(){
+  /* coming-soon categories show an elegant panel instead of products */
+  if(!catDef(category).ready){
+    const c=catDef(category);
+    $('grid').innerHTML=`<div class="catempty"><div class="cbig">${c.icon}</div><h3>${esc(c.name)} — coming soon</h3><p>${esc(c.sub)} Want to be first to know when they drop? Message us on WhatsApp.</p><a class="cwa" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hi MiStore, please notify me when '+c.name+' are available.')}" target="_blank" rel="noopener">Notify me on WhatsApp</a></div>`;
+    return;
+  }
   const list=modelsForCond();
   if(!list.length){ $('grid').innerHTML=`<div class="comingsoon"><div class="big">📦</div>No phones in this condition right now — check another tab or <a href="https://wa.me/${WHATSAPP}" style="color:var(--red);font-weight:700">message us</a>.</div>`; return; }
   $('grid').innerHTML=list.map(x=>`
@@ -1084,6 +1134,7 @@ function bootChrome(){
 /* ---------- boot ---------- */
 buildFallbackCAT();
 bootChrome();
+renderCategories();
 renderTabs();
 renderGrid();
 renderHotDeal();
