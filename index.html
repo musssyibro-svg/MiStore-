@@ -91,7 +91,11 @@
      sits in a luxury display case instead of floating like a paper cutout */
   .phero{position:relative;aspect-ratio:1/1.15;background:radial-gradient(115% 80% at 50% 22%,#FFFFFF 0%,#F4F4F8 55%,#E9E9F0 100%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:14px;}
   .phero::after{content:"";position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:66%;height:16px;background:radial-gradient(ellipse at center,rgba(0,0,0,.16),transparent 72%);filter:blur(3px);z-index:1;}
-  .phero img{width:88%;height:82%;object-fit:contain;object-position:center bottom;z-index:2;filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 62%,rgba(0,0,0,.14));}
+  .phero img.render{width:88%;height:82%;object-fit:contain;object-position:center bottom;z-index:2;filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 62%,rgba(0,0,0,.14));}
+  /* real studio photos already have their own background + shadow → show flush */
+  .phero img.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;padding:0;}
+  .phero:has(img.photo){background:#ECECEC;padding-bottom:0;}
+  .phero:has(img.photo)::after{display:none;}
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -145,8 +149,12 @@
   .gwrap{position:relative;overflow:hidden;border-radius:24px;background:radial-gradient(120% 78% at 50% 24%,#FFFFFF 0%,#F3F3F8 58%,#E8E8EF 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.7);}
   .gtrack{display:flex;transition:transform .3s cubic-bezier(.3,.7,.3,1);touch-action:pan-y;}
   .gslide{flex:0 0 100%;aspect-ratio:1/1;position:relative;display:flex;align-items:flex-end;justify-content:center;background:transparent;padding-bottom:22px;}
-  .gslide::after{content:"";position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:60%;height:20px;background:radial-gradient(ellipse at center,rgba(0,0,0,.17),transparent 72%);filter:blur(4px);}
-  .gslide img{width:82%;height:84%;object-fit:contain;object-position:center bottom;position:relative;z-index:2;filter:drop-shadow(0 24px 30px rgba(0,0,0,.24));-webkit-box-reflect:below 2px linear-gradient(transparent 58%,rgba(0,0,0,.16));}
+  .gslide.render::after{content:"";position:absolute;left:50%;bottom:20px;transform:translateX(-50%);width:60%;height:20px;background:radial-gradient(ellipse at center,rgba(0,0,0,.17),transparent 72%);filter:blur(4px);}
+  .gslide img.render{width:82%;height:84%;object-fit:contain;object-position:center bottom;position:relative;z-index:2;filter:drop-shadow(0 24px 30px rgba(0,0,0,.24));-webkit-box-reflect:below 2px linear-gradient(transparent 58%,rgba(0,0,0,.16));}
+  /* real studio photos → show flush, no stage */
+  .gslide.photo{align-items:center;padding-bottom:0;}
+  .gslide img.photo{width:100%;height:100%;object-fit:contain;position:relative;z-index:2;}
+  .gwrap:has(img.photo){background:#ECECEC;}
   .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
   .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
   .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
@@ -359,11 +367,11 @@
   .condsel .copt:nth-child(4){animation-delay:.26s;}
 
   /* phone image float — activated once card enters view */
-  .phero img.real{animation:phoneFloat 4s ease-in-out infinite paused;will-change:transform;}
-  .pcard.vis .phero img.real{animation-play-state:running;}
+  .phero img.render{animation:phoneFloat 4s ease-in-out infinite paused;will-change:transform;}
+  .pcard.vis .phero img.render{animation-play-state:running;}
 
-  /* gallery image float */
-  .gslide img{animation:phoneFloat 5.5s .3s ease-in-out infinite;will-change:transform;}
+  /* gallery image float (renders only; real photos sit still) */
+  .gslide img.render{animation:phoneFloat 5.5s .3s ease-in-out infinite;will-change:transform;}
 
   /* add-to-cart button heartbeat */
   .addbtn:not(:disabled){animation:pulseRed 2.8s ease-in-out infinite;}
@@ -747,6 +755,43 @@ const SHOW_ADMIN_PHOTOS = false;
 let CATALOG_IMAGES = {};
 function adminImg(model,condKey){ return SHOW_ADMIN_PHOTOS?CATALOG_IMAGES[model+'|'+condKey]:''; }
 function catalogPhotoUrl(path){ return path?`${SUPABASE_URL}/storage/v1/object/public/${CATALOG_PHOTO_BUCKET}/${path}`:''; }
+
+/* ===== Real studio photos (bundled in the repo, served by GitHub Pages —
+   these ALWAYS load once you add the files to /assets/phones/). The map
+   is loaded live from /assets/manifest.json: model name → {front,back,combo}.
+   Priority per phone: admin upload → real studio photo → built-in render. ===== */
+let REAL_PHOTOS = {};        /* "iPhone 13": {front,back,combo} */
+let REAL_OK = {};            /* model → true once its real photo is confirmed loadable */
+function realReady(model){ return REAL_OK[model]===true; }
+function realPhotos(model){ return realReady(model)?(REAL_PHOTOS[model]||null):null; }
+function realSlides(model){ if(!realReady(model)) return []; const r=REAL_PHOTOS[model]; if(!r) return []; return [r.front,r.back,r.combo].filter(Boolean); }
+function isRender(url){ return typeof url==='string' && url.slice(0,18)==='data:image/svg+xml'; }
+function loadManifest(){
+  fetch('assets/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(m=>{
+    if(!m||!Array.isArray(m.phones)) return;
+    const next={};
+    m.phones.forEach(p=>{ if(p.name) next[p.name]={front:p.front||'',back:p.back||'',combo:p.combo||''}; });
+    REAL_PHOTOS=next;
+    verifyRealPhotos();   /* render-first; upgrade each card as its photo confirms */
+  }).catch(()=>{});
+}
+/* Preload each phone's real photo. Cards keep showing the instant built-in
+   render until a real photo is CONFIRMED loadable, then swap in smoothly —
+   so a missing/late file never flashes a broken image. */
+function verifyRealPhotos(){
+  Object.keys(REAL_PHOTOS).forEach(model=>{
+    const rp=REAL_PHOTOS[model]; const test=rp.front||rp.combo||rp.back; if(!test) return;
+    const im=new Image();
+    im.onload=()=>{ REAL_OK[model]=true; patchCard(model); };
+    im.onerror=()=>{ REAL_OK[model]=false; };
+    im.src=test;
+  });
+}
+function patchCard(model){
+  const card=document.querySelector(`.pcard[data-open="${(window.CSS&&CSS.escape)?CSS.escape(model):model}"]`);
+  if(!card) return; const ph=card.querySelector('.phero'); if(!ph) return;
+  ph.innerHTML=cardVisual(model,cond);
+}
 function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 
 /* ============================================================
@@ -760,10 +805,11 @@ function firstImg(model){ return (PHONE_IMAGES_DB[model]||[])[0]||''; }
 /* A real photo (admin upload) failed to load → swap in the built-in
    render for that model. Built-in renders never fail, so this is final. */
 function _renderFor(model,idx){ const s=PHONE_IMAGES_DB[model]||[]; return s[idx]||s[0]||''; }
+function _toRender(img){ img.classList.remove('photo'); img.classList.add('render'); const sl=img.closest('.gslide'); if(sl){ sl.classList.remove('photo'); sl.classList.add('render'); } }
 function slideFail(img){
   img.onerror=null;
   const model=img.dataset.model||''; const sid=+img.dataset.sid||0;
-  img.src=_renderFor(model,sid);
+  img.src=_renderFor(model,sid); _toRender(img);
   const th=document.querySelector(`.gth[data-sid="${img.dataset.sid}"] img`); if(th){ th.onerror=null; th.src=_renderFor(model,sid); }
 }
 function thumbFail(img){
@@ -774,30 +820,39 @@ function thumbFail(img){
 function cardFail(img){
   img.onerror=null;
   const model=img.dataset.model||'';
-  img.src=_renderFor(model,0);
+  img.src=_renderFor(model,0); _toRender(img);
 }
 
-/* Returns slide URLs: Supabase upload → PHONE_IMAGES extras → Apple CDN colorways */
+/* Gallery slide URLs: admin upload → real studio photos (front/back/combo)
+   → built-in renders. Real photos are tried first; if a file is missing it
+   falls back to the built-in render for that slot, so it's never broken. */
 function slidesFor(model,condKey){
   const up=adminImg(model,condKey);
   const own=Array.isArray(PHONE_IMAGES[model])?PHONE_IMAGES[model]:[];
+  const real=realSlides(model);
   const db=PHONE_IMAGES_DB[model]||[];
   const out=[];
   if(up) out.push(up);
   own.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
-  db.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
-  return out;
+  real.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
+  /* only pad with built-in renders when there are NO real photos yet */
+  if(!real.length) db.forEach(u=>{ if(u&&!out.includes(u)) out.push(u); });
+  return out.length?out:db;
 }
+/* real studio photos carry their own studio background → show them flush;
+   built-in renders are transparent → give them the display stage */
+function imgClass(url){ return isRender(url)?'render':'photo'; }
 function slideHTML(url,model,idx){
-  return `<div class="gslide" data-sid="${idx}"><img loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" data-sid="${idx}" onerror="slideFail(this)"></div>`;
+  return `<div class="gslide ${imgClass(url)}" data-sid="${idx}"><img class="${imgClass(url)}" loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" data-sid="${idx}" onerror="slideFail(this)"></div>`;
 }
 function thumbHTML(url,model,i,on){
   return `<button class="gth ${on?'on':''}" data-gth="${i}" data-sid="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" data-sid="${i}" onerror="thumbFail(this)"></button>`;
 }
 function cardVisual(model,condKey){
-  const src=adminImg(model,condKey)||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
+  const rp=realPhotos(model);
+  const src=adminImg(model,condKey)||(rp&&(rp.front||rp.combo))||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
   if(!src) return `<span style="font-size:32px;opacity:.3">📱</span>`;
-  return `<img class="real" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
+  return `<img class="real ${imgClass(src)}" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
 }
 
 /* ============================================================
@@ -1176,6 +1231,7 @@ renderTabs();
 renderGrid();
 renderHotDeal();
 updateBars();
+loadManifest();   /* swap in real studio photos once /assets/manifest.json loads */
 
 /* ========== CINEMA HERO ========== */
 (function(){
@@ -1191,6 +1247,10 @@ updateBars();
   if(img0&&heroSlides[0]) img0.src=heroSlides[0];
   if(ctSpec) ctSpec.textContent=heroNames[0]||'';
   if(wrap) wrap.style.visibility='visible';
+
+  /* hero keeps the clean transparent render (looks best on the dark hero);
+     the real studio photos power the light catalog + product pages */
+  window._heroRefresh=()=>{};
 
   /* rescue hook: loadLive() swaps in an admin-uploaded photo if present */
   window._heroAdminRescue=url=>{
