@@ -586,7 +586,11 @@ const RAW_CATALOG = {"apple":{
     "iPhone 16":          [["128",703600],["256",766000]],
     "iPhone 16 Plus":     [["128",828400],["256",932400]],
     "iPhone 16 Pro":      [["128",870000],["256",974000]],
-    "iPhone 16 Pro Max":  [["256",1098800],["512",1182000]]
+    "iPhone 16 Pro Max":  [["256",1098800],["512",1182000]],
+    "iPhone 17":          [["256",1019600],["512",1186000]],
+    "iPhone 17 Air":      [["256",998800]],
+    "iPhone 17 Pro":      [["256",1550000],["512",1654000]],
+    "iPhone 17 Pro Max":  [["256",1810000],["512",1882800]]
   },
   "battery":{
     "iPhone XR":          [["64",176440],["128",180600]],
@@ -647,7 +651,8 @@ const CATALOG_MODELS = [
   'iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max',
   'iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max',
   'iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max',
-  'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max'
+  'iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
+  'iPhone 17','iPhone 17 Air','iPhone 17 Pro','iPhone 17 Pro Max'
 ];
 const CONDITIONS = [
   { key:'clean',   name:'Clean (London Used)', short:'Original parts',   pick:'Original screen & battery · like new',  long:'<b>Clean (London Used).</b> Original screen and battery, clean body, premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone.' },
@@ -748,7 +753,11 @@ const MODEL_META={
   'iPhone 11 Pro':    {layout:'triple',colors:[['Space Gray','#4c4944'],['Silver','#e1e2dc'],['Gold','#f3e7cd']]},
   'iPhone 11':        {layout:'dual',  colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Purple','#d3cbe0']]},
   'iPhone XS Max':    {layout:'dualv', colors:[['Space Gray','#4c4944'],['Silver','#e1e2dc'],['Gold','#f3e7cd']]},
-  'iPhone XR':        {layout:'single',colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Blue','#a6c3d8']]}
+  'iPhone XR':        {layout:'single',colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Blue','#a6c3d8']]},
+  'iPhone 17':        {layout:'dual',  colors:[['Black','#1c1c1e'],['White','#f2f1ec'],['Mist Blue','#a9c3d8']]},
+  'iPhone 17 Air':    {layout:'single',colors:[['Space Black','#2f2d2b'],['Cloud White','#f2f1ec'],['Sky Blue','#a9c3d8']]},
+  'iPhone 17 Pro':    {layout:'triple',colors:[['Deep Blue','#2c4a5c'],['Silver','#ebebe4'],['Cosmic Orange','#d8823a']]},
+  'iPhone 17 Pro Max':{layout:'triple',colors:[['Deep Blue','#2c4a5c'],['Silver','#ebebe4'],['Cosmic Orange','#d8823a']]}
 };
 const PHONE_IMAGES_DB={};
 Object.keys(MODEL_META).forEach(m=>{ const mt=MODEL_META[m]; PHONE_IMAGES_DB[m]=mt.colors.map(c=>phoneRender(c[1],mt.layout)); });
