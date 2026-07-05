@@ -1,0 +1,174 @@
+{
+  "hero": "assets/models/hero-phone.glb",
+  "count": 24,
+  "phones": [
+    {
+      "id": "iphone-Xr",
+      "name": "iPhone XR",
+      "front": "assets/phones/iphone-Xrfront.webp.png",
+      "back": "assets/phones/iphone-Xrback.webp.png",
+      "combo": "assets/phones/iphone-Xr-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-11",
+      "name": "iPhone 11",
+      "front": "assets/phones/iphone-11front.webp.jpg",
+      "back": "assets/phones/iphone-11back.webp.jpg",
+      "combo": "assets/phones/iphone-11-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-11-pro",
+      "name": "iPhone 11 Pro",
+      "front": "assets/phones/iphone-11-profront.webp.jpg",
+      "back": "assets/phones/iphone-11-proback.webp.jpg",
+      "combo": "assets/phones/iphone-11-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-11-pro-max",
+      "name": "iPhone 11 Pro Max",
+      "front": "assets/phones/iphone-11-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-11-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-11-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-12",
+      "name": "iPhone 12",
+      "front": "assets/phones/iphone-12front.webp.jpg",
+      "back": "assets/phones/iphone-12back.webp.jpg",
+      "combo": "assets/phones/iphone-12-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-12-pro",
+      "name": "iPhone 12 Pro",
+      "front": "assets/phones/iphone-12-profront.webp.jpg",
+      "back": "assets/phones/iphone-12-proback.webp.jpg",
+      "combo": "assets/phones/iphone-12-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-12-pro-max",
+      "name": "iPhone 12 Pro Max",
+      "front": "assets/phones/iphone-12-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-12-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-12-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-13",
+      "name": "iPhone 13",
+      "front": "assets/phones/iphone-13front.webp.jpg",
+      "back": "assets/phones/iphone-13back.webp.jpg",
+      "combo": "assets/phones/iphone-13-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-13-pro",
+      "name": "iPhone 13 Pro",
+      "front": "assets/phones/iphone-13-profront.webp.jpg",
+      "back": "assets/phones/iphone-13-proback.webp.jpg",
+      "combo": "assets/phones/iphone-13-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-13-pro-max",
+      "name": "iPhone 13 Pro Max",
+      "front": "assets/phones/iphone-13-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-13-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-13-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-14",
+      "name": "iPhone 14",
+      "front": "assets/phones/iphone-14front.webp.jpg",
+      "back": "assets/phones/iphone-14back.webp.jpg",
+      "combo": "assets/phones/iphone-14-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-14-pro",
+      "name": "iPhone 14 Pro",
+      "front": "assets/phones/iphone-14-profront.webp.jpg",
+      "back": "assets/phones/iphone-14-proback.webp.jpg",
+      "combo": "assets/phones/iphone-14-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-14-pro-max",
+      "name": "iPhone 14 Pro Max",
+      "front": "assets/phones/iphone-14-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-14-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-14-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-15",
+      "name": "iPhone 15",
+      "front": "assets/phones/iphone-15front.webp.jpg",
+      "back": "assets/phones/iphone-15back.webp.jpg",
+      "combo": "assets/phones/iphone-15-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-15-pro",
+      "name": "iPhone 15 Pro",
+      "front": "assets/phones/iphone-15-profront.webp.jpg",
+      "back": "assets/phones/iphone-15-proback.webp.jpg",
+      "combo": "assets/phones/iphone-15-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-15-pro-max",
+      "name": "iPhone 15 Pro Max",
+      "front": "assets/phones/iphone-15-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-15-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-15-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-16",
+      "name": "iPhone 16",
+      "front": "assets/phones/iphone-16front.webp.jpg",
+      "back": "assets/phones/iphone-16back.webp.jpg",
+      "combo": "assets/phones/iphone-16-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-16-plus",
+      "name": "iPhone 16 Plus",
+      "front": "assets/phones/iphone-16-plusfront.webp.jpg",
+      "back": "assets/phones/iphone-16-plusback.webp.jpg",
+      "combo": "assets/phones/iphone-16-plus-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-16-pro",
+      "name": "iPhone 16 Pro",
+      "front": "assets/phones/iphone-16-profront.webp.jpg",
+      "back": "assets/phones/iphone-16-proback.webp.jpg",
+      "combo": "assets/phones/iphone-16-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-16-pro-max",
+      "name": "iPhone 16 Pro Max",
+      "front": "assets/phones/iphone-16-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-16-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-16-pro-max-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-17",
+      "name": "iPhone 17",
+      "front": "assets/phones/iphone-17front.webp.jpg",
+      "back": "assets/phones/iphone-17back.webp.jpg",
+      "combo": "assets/phones/iphone-17-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-17-air",
+      "name": "iPhone 17 Air",
+      "front": "assets/phones/iphone-17-airfront.webp.jpg",
+      "back": "assets/phones/iphone-17-airback.webp.jpg",
+      "combo": "assets/phones/iphone-17-air-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-17-pro",
+      "name": "iPhone 17 Pro",
+      "front": "assets/phones/iphone-17-profront.webp.jpg",
+      "back": "assets/phones/iphone-17-proback.webp.jpg",
+      "combo": "assets/phones/iphone-17-pro-combo.webp.PNG"
+    },
+    {
+      "id": "iphone-17-pro-max",
+      "name": "iPhone 17 Pro Max",
+      "front": "assets/phones/iphone-17-pro-maxfront.webp.jpg",
+      "back": "assets/phones/iphone-17-pro-maxback.webp.jpg",
+      "combo": "assets/phones/iphone-17-pro-max-combo.webp.PNG"
+    }
+  ]
+}
