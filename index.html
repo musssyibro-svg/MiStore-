@@ -89,14 +89,17 @@
   .pcard:active{transform:scale(.985);}
   /* premium display stage: soft spotlight + floor reflection so the phone
      sits in a luxury display case instead of floating like a paper cutout */
-  .phero{position:relative;aspect-ratio:1/1.15;background:radial-gradient(115% 80% at 50% 22%,#FFFFFF 0%,#F4F4F8 55%,#E9E9F0 100%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:14px;}
+  /* taller card = phone-shaped, so the whole phone fills it with only a
+     thin seamless margin — no "A4 paper" look */
+  .phero{position:relative;aspect-ratio:1/1.42;background:radial-gradient(115% 80% at 50% 22%,#FFFFFF 0%,#F4F4F8 55%,#E9E9F0 100%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:14px;}
   .phero::after{content:"";position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:66%;height:16px;background:radial-gradient(ellipse at center,rgba(0,0,0,.16),transparent 72%);filter:blur(3px);z-index:1;}
   .phero img.render{width:88%;height:82%;object-fit:contain;object-position:center bottom;z-index:2;filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 62%,rgba(0,0,0,.14));}
-  /* real studio photos already have their own gray studio background →
-     show the whole phone (contain) on a matching backdrop, no crop */
-  .phero img.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;padding:0;}
+  /* real studio photos: whole phone always visible (contain); the tall card
+     means the phone fills the height with only a thin seamless side margin */
+  .phero img.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;padding:0;transition:transform .45s cubic-bezier(.2,.8,.2,1);}
   .phero:has(img.photo){background:#ECECEC;padding-bottom:0;}
   .phero:has(img.photo)::after{display:none;}
+  @media (hover:hover){ .pcard:hover .phero img.photo{transform:scale(1.06);} }
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -419,7 +422,7 @@
     </div>
     <div id="cinemaText">
       <div class="ct-badge">MiStore · Featured this week</div>
-      <h2 class="ct-name">iPhone 16 Pro Max</h2>
+      <h2 class="ct-name">iPhone 17 Pro Max</h2>
       <div class="ct-spec" id="ctSpec">Black Titanium</div>
       <div class="ct-price" id="ctPrice"></div>
       <button class="ct-cta" id="ctCta">Shop this phone →</button>
@@ -519,6 +522,8 @@
         onerror="window._gsapFailed=true"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
         onerror="window._gsapFailed=true"></script>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
+        onerror="window._mvFailed=true"></script>
 <script>
 /* ============================================================
    MiStore storefront
@@ -544,6 +549,12 @@ const EXPRESS_FEE   = 10000;
 /* true  = prices come from the code catalog below (Supabase only supplies
            live in-stock status). Set false to manage prices in admin/Supabase. */
 const USE_CODE_PRICES = true;
+/* true = try to show the interactive 3D phone in the hero (loads a ~2.3MB
+   model from an external library; auto-falls back to the flat render if the
+   library is blocked, the connection is slow, or data-saver is on). */
+const ENABLE_3D_HERO = true;
+/* the phone featured in the big hero (name, price, render/photo, 3D model) */
+const HERO_MODEL = 'iPhone 17 Pro Max';
 function perPhoneDiscount(qty){
   if(qty>=20) return 14000;
   if(qty>=10) return 12500;
@@ -1255,7 +1266,6 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
 
 /* ========== CINEMA HERO ========== */
 (function(){
-  const HERO_MODEL='iPhone 16 Pro Max';
   const heroNames=(MODEL_META[HERO_MODEL]||{colors:[]}).colors.map(c=>c[0]);
   const heroSlides=PHONE_IMAGES_DB[HERO_MODEL]||[];
   let colorIdx=0, activeSlot=0, heroAdmin=false;
@@ -1282,7 +1292,7 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
 
   /* price from catalog */
   function setHeroPrice(){
-    const vs=variantsOf('iPhone 16 Pro Max','clean');
+    const vs=variantsOf(HERO_MODEL,'clean');
     const v=vs.find(x=>x[0]==='256')||vs[0];
     if(v&&ctPrice) ctPrice.textContent='from '+fmtFull(v[1]);
   }
@@ -1328,7 +1338,7 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
   /* CTA: scroll to phones then open product detail */
   if(ctCta) ctCta.onclick=()=>{
     document.getElementById('phones').scrollIntoView({behavior:'smooth'});
-    setTimeout(()=>openProduct('iPhone 16 Pro Max'),700);
+    setTimeout(()=>openProduct(HERO_MODEL),700);
   };
 
   /* GSAP scroll parallax — pure enhancement; entrance is CSS so it always plays */
@@ -1342,6 +1352,42 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
       .to('#cinemaText', {y:-22,opacity:.35,duration:1},'<.35')
       .to('#cinemaHint', {opacity:0,duration:.25},'<');
   }
+
+  /* ---- optional interactive 3D phone (fail-safe: render stays until the
+     model actually loads; any failure keeps the flat render) ---- */
+  (function mount3D(){
+    if(!ENABLE_3D_HERO||!wrap) return;
+    const conn=navigator.connection||{};
+    if(conn.saveData) return;                                  /* respect data-saver */
+    if(conn.effectiveType&&/(^|-)2g$/.test(conn.effectiveType)) return; /* skip on 2G */
+    let done=false, tries=0;
+    (function poll(){
+      if(done) return;
+      if(window._mvFailed) return;                             /* library blocked → keep render */
+      if(window.customElements&&customElements.get('model-viewer')){
+        done=true;
+        const mv=document.createElement('model-viewer');
+        mv.setAttribute('src','assets/models/hero-phone.glb');
+        mv.setAttribute('camera-controls','');
+        mv.setAttribute('auto-rotate','');
+        mv.setAttribute('rotation-per-second','20deg');
+        mv.setAttribute('interaction-prompt','none');
+        mv.setAttribute('disable-zoom','');
+        mv.setAttribute('shadow-intensity','0.9');
+        mv.setAttribute('exposure','1.05');
+        mv.setAttribute('loading','eager');
+        mv.style.cssText='position:absolute;inset:0;width:100%;height:100%;background:transparent;--poster-color:transparent;opacity:0;transition:opacity .6s;z-index:3;';
+        let ok=false;
+        mv.addEventListener('load',()=>{ ok=true; mv.style.opacity='1';
+          ['himg0','himg1','heroShine'].forEach(id=>{ const el=$(id); if(el) el.style.display='none'; }); });
+        mv.addEventListener('error',()=>{ mv.remove(); });
+        wrap.appendChild(mv);
+        setTimeout(()=>{ if(!ok) mv.remove(); },10000);         /* stuck? drop it, keep render */
+        return;
+      }
+      if(tries++<40) setTimeout(poll,300);
+    })();
+  })();
 })();
 
 /* ========== SCROLL-ENTRANCE OBSERVER ========== */
@@ -1404,14 +1450,13 @@ const _origLoadLive=loadLive;
 loadLive=async function(){
   await _origLoadLive.apply(this,arguments);
   /* re-sync hero price after live catalog arrives */
-  const vs=variantsOf('iPhone 16 Pro Max','clean');
+  const vs=variantsOf(HERO_MODEL,'clean');
   const v=vs.find(x=>x[0]==='256')||vs[0];
   const cp=$('ctPrice');
   if(v&&cp) cp.textContent='from '+fmtFull(v[1]);
-  /* if Apple CDN is unreachable for this visitor, rescue the hero with the
-     admin-uploaded photo of the featured phone (only if owner allows) */
+  /* if the featured render is unreachable, rescue with an admin photo (opt-in) */
   if(SHOW_ADMIN_PHOTOS){
-    const key=Object.keys(CATALOG_IMAGES).find(k=>k.startsWith('iPhone 16 Pro Max|'));
+    const key=Object.keys(CATALOG_IMAGES).find(k=>k.startsWith(HERO_MODEL+'|'));
     if(key&&typeof window._heroAdminRescue==='function') window._heroAdminRescue(CATALOG_IMAGES[key]);
   }
 };
