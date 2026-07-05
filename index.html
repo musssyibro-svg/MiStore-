@@ -541,6 +541,9 @@ const BANKS = [
 ];
 const SHIPPING_FEE  = 0;
 const EXPRESS_FEE   = 10000;
+/* true  = prices come from the code catalog below (Supabase only supplies
+           live in-stock status). Set false to manage prices in admin/Supabase. */
+const USE_CODE_PRICES = true;
 function perPhoneDiscount(qty){
   if(qty>=20) return 14000;
   if(qty>=10) return 12500;
@@ -564,76 +567,76 @@ const PHONE_IMAGES = {};
 /* Prices = supplier RMB × 208 + ₦17,000 profit per phone (1-2 unit rate) */
 const RAW_CATALOG = {"apple":{
   "clean":{
-    "iPhone XR":         [["64",163000],["128",173000]],
-    "iPhone 11":         [["64",215000],["128",225000]],
-    "iPhone 11 Pro":     [["64",235000],["256",256000]],
-    "iPhone 11 Pro Max": [["64",246000],["256",277000]],
-    "iPhone 12":         [["64",225000],["128",246000]],
-    "iPhone 12 Pro":     [["128",308000],["256",339000]],
-    "iPhone 12 Pro Max": [["128",360000],["256",391000]],
-    "iPhone 13":         [["128",339000],["256",346000]],
-    "iPhone 13 Pro":     [["128",454000],["256",475000]],
-    "iPhone 13 Pro Max": [["128",495000],["256",547000]],
-    "iPhone 14":         [["128",381000],["256",412000]],
-    "iPhone 14 Pro":     [["128",547000],["256",579000]],
-    "iPhone 14 Pro Max": [["128",579000],["256",631000]],
-    "iPhone 15":         [["128",495000],["256",547000]],
-    "iPhone 15 Pro":     [["128",641000],["256",683000]],
-    "iPhone 15 Pro Max": [["256",828000],["512",870000]],
-    "iPhone 16":         [["128",693000],["256",766000]],
-    "iPhone 16 Plus":    [["128",828000],["256",932000]],
-    "iPhone 16 Pro":     [["128",891000],["256",1015000]],
-    "iPhone 16 Pro Max": [["256",1140000],["512",1203000]]
+    "iPhone XR":          [["64",170200],["128",180600]],
+    "iPhone 11":          [["64",222200],["128",236760]],
+    "iPhone 11 Pro":      [["64",253400],["256",274200]],
+    "iPhone 11 Pro Max":  [["64",263800],["256",295000]],
+    "iPhone 12":          [["64",232600],["128",263800]],
+    "iPhone 12 Pro":      [["128",326200],["256",357400]],
+    "iPhone 12 Pro Max":  [["128",378200],["256",409400]],
+    "iPhone 13":          [["128",347000],["256",357400]],
+    "iPhone 13 Pro":      [["128",451000],["256",471800]],
+    "iPhone 13 Pro Max":  [["128",513400],["256",586200]],
+    "iPhone 14":          [["128",388600],["256",430200]],
+    "iPhone 14 Pro":      [["128",565400],["256",607000]],
+    "iPhone 14 Pro Max":  [["128",607000],["256",659000]],
+    "iPhone 15":          [["128",537200],["256",589200]],
+    "iPhone 15 Pro":      [["128",682800],["256",724400]],
+    "iPhone 15 Pro Max":  [["256",849200],["512",932400]],
+    "iPhone 16":          [["128",703600],["256",766000]],
+    "iPhone 16 Plus":     [["128",828400],["256",932400]],
+    "iPhone 16 Pro":      [["128",870000],["256",974000]],
+    "iPhone 16 Pro Max":  [["256",1098800],["512",1182000]]
   },
   "battery":{
-    "iPhone XR":         [["64",158000],["128",163000]],
-    "iPhone XS Max":     [["64",138000],["256",148000]],
-    "iPhone 11":         [["64",177000],["128",188000]],
-    "iPhone 11 Pro":     [["64",204000],["256",225000]],
-    "iPhone 11 Pro Max": [["64",215000],["256",246000]],
-    "iPhone 12":         [["64",204000],["128",225000]],
-    "iPhone 12 Pro":     [["128",256000],["256",277000]],
-    "iPhone 12 Pro Max": [["128",298000],["256",319000]],
-    "iPhone 13":         [["128",308000],["256",319000]],
-    "iPhone 13 Pro":     [["128",402000],["256",423000]],
-    "iPhone 13 Pro Max": [["128",443000],["256",464000]],
-    "iPhone 14 Pro":     [["128",495000],["256",516000]],
-    "iPhone 14 Pro Max": [["128",527000],["256",558000]],
-    "iPhone 15 Pro Max": [["256",703000],["512",766000]]
+    "iPhone XR":          [["64",176440],["128",180600]],
+    "iPhone XS Max":      [["64",155640],["256",166040]],
+    "iPhone 11":          [["64",195160],["128",205560]],
+    "iPhone 11 Pro":      [["64",222200],["256",243000]],
+    "iPhone 11 Pro Max":  [["64",232600],["256",263800]],
+    "iPhone 12":          [["64",222200],["128",243000]],
+    "iPhone 12 Pro":      [["128",274200],["256",295000]],
+    "iPhone 12 Pro Max":  [["128",315800],["256",336600]],
+    "iPhone 13":          [["128",326200],["256",336600]],
+    "iPhone 13 Pro":      [["128",419800],["256",440600]],
+    "iPhone 13 Pro Max":  [["128",461400],["256",482200]],
+    "iPhone 14 Pro":      [["128",513400],["256",534200]],
+    "iPhone 14 Pro Max":  [["128",544600],["256",575800]],
+    "iPhone 15 Pro Max":  [["256",724400],["512",786800]]
   },
   "screen":{
-    "iPhone 11":         [["64",177000],["128",188000]],
-    "iPhone 11 Pro":     [["64",183000],["256",204000]],
-    "iPhone 11 Pro Max": [["64",204000],["256",225000]],
-    "iPhone 12":         [["64",183000],["128",194000]],
-    "iPhone 12 Pro":     [["128",246000],["256",256000]],
-    "iPhone 12 Pro Max": [["128",267000],["256",287000]],
-    "iPhone 13":         [["128",277000],["256",287000]],
-    "iPhone 13 Pro":     [["128",371000],["256",391000]],
-    "iPhone 13 Pro Max": [["128",391000],["256",412000]],
-    "iPhone 14":         [["128",298000],["256",319000]],
-    "iPhone 14 Pro":     [["128",412000],["256",433000]],
-    "iPhone 14 Pro Max": [["128",443000],["256",485000]],
-    "iPhone 15":         [["128",381000],["256",402000]],
-    "iPhone 15 Pro":     [["128",495000],["256",547000]],
-    "iPhone 15 Pro Max": [["256",620000],["512",662000]]
+    "iPhone 11":          [["64",195160],["128",205560]],
+    "iPhone 11 Pro":      [["64",201400],["256",222200]],
+    "iPhone 11 Pro Max":  [["64",222200],["256",243000]],
+    "iPhone 12":          [["64",201400],["128",211800]],
+    "iPhone 12 Pro":      [["128",263800],["256",274200]],
+    "iPhone 12 Pro Max":  [["128",284600],["256",305400]],
+    "iPhone 13":          [["128",295000],["256",305400]],
+    "iPhone 13 Pro":      [["128",388600],["256",409400]],
+    "iPhone 13 Pro Max":  [["128",409400],["256",430200]],
+    "iPhone 14":          [["128",315800],["256",336600]],
+    "iPhone 14 Pro":      [["128",430200],["256",451000]],
+    "iPhone 14 Pro Max":  [["128",461400],["256",503000]],
+    "iPhone 15":          [["128",402000],["256",422800]],
+    "iPhone 15 Pro":      [["128",516400],["256",568400]],
+    "iPhone 15 Pro Max":  [["256",641200],["512",682800]]
   },
   "double":{
-    "iPhone 11":         [["64",169000],["128",177000]],
-    "iPhone 11 Pro":     [["64",173000],["256",194000]],
-    "iPhone 11 Pro Max": [["64",190000],["256",210000]],
-    "iPhone 12":         [["64",177000],["128",183000]],
-    "iPhone 12 Pro":     [["128",225000],["256",235000]],
-    "iPhone 12 Pro Max": [["128",256000],["256",267000]],
-    "iPhone 13":         [["128",256000],["256",267000]],
-    "iPhone 13 Pro":     [["128",350000],["256",371000]],
-    "iPhone 13 Pro Max": [["128",371000],["256",391000]],
-    "iPhone 14":         [["128",277000],["256",298000]],
-    "iPhone 14 Pro":     [["128",391000],["256",412000]],
-    "iPhone 14 Pro Max": [["128",423000],["256",454000]],
-    "iPhone 15":         [["128",371000],["256",391000]],
-    "iPhone 15 Pro":     [["128",454000],["256",506000]],
-    "iPhone 15 Pro Max": [["256",558000],["512",579000]]
+    "iPhone 11":          [["64",186840],["128",195160]],
+    "iPhone 11 Pro":      [["64",191000],["256",211800]],
+    "iPhone 11 Pro Max":  [["64",207640],["256",228440]],
+    "iPhone 12":          [["64",195160],["128",201400]],
+    "iPhone 12 Pro":      [["128",243000],["256",253400]],
+    "iPhone 12 Pro Max":  [["128",274200],["256",284600]],
+    "iPhone 13":          [["128",274200],["256",284600]],
+    "iPhone 13 Pro":      [["128",367800],["256",388600]],
+    "iPhone 13 Pro Max":  [["128",388600],["256",409400]],
+    "iPhone 14":          [["128",295000],["256",315800]],
+    "iPhone 14 Pro":      [["128",409400],["256",430200]],
+    "iPhone 14 Pro Max":  [["128",440600],["256",471800]],
+    "iPhone 15":          [["128",391600],["256",412400]],
+    "iPhone 15 Pro":      [["128",474800],["256",526800]],
+    "iPhone 15 Pro Max":  [["256",578800],["512",599600]]
   }
 }};
 
@@ -875,10 +878,17 @@ async function loadLive(){
     ]);
     if(Array.isArray(imgs)&&imgs.length){ CATALOG_IMAGES={}; imgs.forEach(r=>{ if(r.model&&r.condition&&r.image_path) CATALOG_IMAGES[r.model+'|'+r.condition]=catalogPhotoUrl(r.image_path); }); }
     if(Array.isArray(prices)&&prices.length){
-      const next={};
-      prices.forEach(r=>{ (next[r.condition]=next[r.condition]||{}); (next[r.condition][r.model]=next[r.condition][r.model]||[]).push([String(r.storage),Number(r.price)||0,r.in_stock!==false]); });
-      Object.keys(next).forEach(cd=>Object.keys(next[cd]).forEach(m=>next[cd][m].sort((a,b)=>Number(a[0])-Number(b[0]))));
-      CAT=next; liveLoaded=true;
+      if(USE_CODE_PRICES){
+        /* prices come from the code catalog above; only apply the live
+           in_stock flags from Supabase so admin can mark sold-out items */
+        prices.forEach(r=>{ const arr=(CAT[r.condition]||{})[r.model]; if(!arr) return; const v=arr.find(x=>String(x[0])===String(r.storage)); if(v) v[2]=(r.in_stock!==false); });
+        liveLoaded=true;
+      } else {
+        const next={};
+        prices.forEach(r=>{ (next[r.condition]=next[r.condition]||{}); (next[r.condition][r.model]=next[r.condition][r.model]||[]).push([String(r.storage),Number(r.price)||0,r.in_stock!==false]); });
+        Object.keys(next).forEach(cd=>Object.keys(next[cd]).forEach(m=>next[cd][m].sort((a,b)=>Number(a[0])-Number(b[0]))));
+        CAT=next; liveLoaded=true;
+      }
     }
     renderTabs(); renderGrid(); renderHotDeal();
   }catch(e){}
