@@ -9,7 +9,8 @@
       "back": "assets/phones/iphone-Xrback.webp.png",
       "combo": "assets/phones/iphone-Xr-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-Xr-front.webp",
-      "cutBack": "assets/cutouts/iphone-Xr-back.webp"
+      "cutBack": "assets/cutouts/iphone-Xr-back.webp",
+      "lineup": "assets/lineups/iphone-Xr.webp"
     },
     {
       "id": "iphone-11",
@@ -18,7 +19,8 @@
       "back": "assets/phones/iphone-11back.webp.jpg",
       "combo": "assets/phones/iphone-11-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-11-front.webp",
-      "cutBack": "assets/cutouts/iphone-11-back.webp"
+      "cutBack": "assets/cutouts/iphone-11-back.webp",
+      "lineup": "assets/lineups/iphone-11.webp"
     },
     {
       "id": "iphone-11-pro",
@@ -27,7 +29,8 @@
       "back": "assets/phones/iphone-11-proback.webp.jpg",
       "combo": "assets/phones/iphone-11-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-11-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-11-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-11-pro-back.webp",
+      "lineup": "assets/lineups/iphone-11-pro.webp"
     },
     {
       "id": "iphone-11-pro-max",
@@ -36,7 +39,8 @@
       "back": "assets/phones/iphone-11-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-11-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-11-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-11-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-11-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-11-pro-max.webp"
     },
     {
       "id": "iphone-12",
@@ -45,7 +49,8 @@
       "back": "assets/phones/iphone-12back.webp.jpg",
       "combo": "assets/phones/iphone-12-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-12-front.webp",
-      "cutBack": "assets/cutouts/iphone-12-back.webp"
+      "cutBack": "assets/cutouts/iphone-12-back.webp",
+      "lineup": "assets/lineups/iphone-12.webp"
     },
     {
       "id": "iphone-12-pro",
@@ -54,7 +59,8 @@
       "back": "assets/phones/iphone-12-proback.webp.jpg",
       "combo": "assets/phones/iphone-12-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-12-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-12-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-12-pro-back.webp",
+      "lineup": "assets/lineups/iphone-12-pro.webp"
     },
     {
       "id": "iphone-12-pro-max",
@@ -63,7 +69,8 @@
       "back": "assets/phones/iphone-12-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-12-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-12-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-12-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-12-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-12-pro-max.webp"
     },
     {
       "id": "iphone-13",
@@ -72,7 +79,8 @@
       "back": "assets/phones/iphone-13back.webp.jpg",
       "combo": "assets/phones/iphone-13-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-13-front.webp",
-      "cutBack": "assets/cutouts/iphone-13-back.webp"
+      "cutBack": "assets/cutouts/iphone-13-back.webp",
+      "lineup": "assets/lineups/iphone-13.webp"
     },
     {
       "id": "iphone-13-pro",
@@ -81,7 +89,8 @@
       "back": "assets/phones/iphone-13-proback.webp.jpg",
       "combo": "assets/phones/iphone-13-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-13-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-13-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-13-pro-back.webp",
+      "lineup": "assets/lineups/iphone-13-pro.webp"
     },
     {
       "id": "iphone-13-pro-max",
@@ -90,7 +99,8 @@
       "back": "assets/phones/iphone-13-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-13-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-13-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-13-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-13-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-13-pro-max.webp"
     },
     {
       "id": "iphone-14",
@@ -99,7 +109,8 @@
       "back": "assets/phones/iphone-14back.webp.jpg",
       "combo": "assets/phones/iphone-14-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-14-front.webp",
-      "cutBack": "assets/cutouts/iphone-14-back.webp"
+      "cutBack": "assets/cutouts/iphone-14-back.webp",
+      "lineup": "assets/lineups/iphone-14.webp"
     },
     {
       "id": "iphone-14-pro",
@@ -108,7 +119,8 @@
       "back": "assets/phones/iphone-14-proback.webp.jpg",
       "combo": "assets/phones/iphone-14-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-14-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-14-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-14-pro-back.webp",
+      "lineup": "assets/lineups/iphone-14-pro.webp"
     },
     {
       "id": "iphone-14-pro-max",
@@ -117,7 +129,8 @@
       "back": "assets/phones/iphone-14-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-14-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-14-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-14-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-14-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-14-pro-max.webp"
     },
     {
       "id": "iphone-15",
@@ -126,7 +139,8 @@
       "back": "assets/phones/iphone-15back.webp.jpg",
       "combo": "assets/phones/iphone-15-combo.webp.jpg",
       "cutFront": "",
-      "cutBack": ""
+      "cutBack": "",
+      "lineup": "assets/lineups/iphone-15.webp"
     },
     {
       "id": "iphone-15-pro",
@@ -135,7 +149,8 @@
       "back": "assets/phones/iphone-15-proback.webp.jpg",
       "combo": "assets/phones/iphone-15-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-15-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-15-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-15-pro-back.webp",
+      "lineup": "assets/lineups/iphone-15-pro.webp"
     },
     {
       "id": "iphone-15-pro-max",
@@ -144,7 +159,8 @@
       "back": "assets/phones/iphone-15-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-15-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-15-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-15-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-15-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-15-pro-max.webp"
     },
     {
       "id": "iphone-16",
@@ -153,7 +169,8 @@
       "back": "assets/phones/iphone-16back.webp.jpg",
       "combo": "assets/phones/iphone-16-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-16-front.webp",
-      "cutBack": "assets/cutouts/iphone-16-back.webp"
+      "cutBack": "assets/cutouts/iphone-16-back.webp",
+      "lineup": "assets/lineups/iphone-16.webp"
     },
     {
       "id": "iphone-16-plus",
@@ -162,7 +179,8 @@
       "back": "assets/phones/iphone-16-plusback.webp.jpg",
       "combo": "assets/phones/iphone-16-plus-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-16-plus-front.webp",
-      "cutBack": "assets/cutouts/iphone-16-plus-back.webp"
+      "cutBack": "assets/cutouts/iphone-16-plus-back.webp",
+      "lineup": "assets/lineups/iphone-16-plus.webp"
     },
     {
       "id": "iphone-16-pro",
@@ -171,7 +189,8 @@
       "back": "assets/phones/iphone-16-proback.webp.jpg",
       "combo": "assets/phones/iphone-16-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-16-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-16-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-16-pro-back.webp",
+      "lineup": "assets/lineups/iphone-16-pro.webp"
     },
     {
       "id": "iphone-16-pro-max",
@@ -180,7 +199,8 @@
       "back": "assets/phones/iphone-16-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-16-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-16-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-16-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-16-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-16-pro-max.webp"
     },
     {
       "id": "iphone-17",
@@ -189,7 +209,8 @@
       "back": "assets/phones/iphone-17back.webp.jpg",
       "combo": "assets/phones/iphone-17-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-front.webp",
-      "cutBack": "assets/cutouts/iphone-17-back.webp"
+      "cutBack": "assets/cutouts/iphone-17-back.webp",
+      "lineup": ""
     },
     {
       "id": "iphone-17-air",
@@ -198,7 +219,8 @@
       "back": "assets/phones/iphone-17-airback.webp.jpg",
       "combo": "assets/phones/iphone-17-air-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-air-front.webp",
-      "cutBack": "assets/cutouts/iphone-17-air-back.webp"
+      "cutBack": "assets/cutouts/iphone-17-air-back.webp",
+      "lineup": ""
     },
     {
       "id": "iphone-17-pro",
@@ -207,7 +229,8 @@
       "back": "assets/phones/iphone-17-proback.webp.jpg",
       "combo": "assets/phones/iphone-17-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-pro-front.webp",
-      "cutBack": "assets/cutouts/iphone-17-pro-back.webp"
+      "cutBack": "assets/cutouts/iphone-17-pro-back.webp",
+      "lineup": ""
     },
     {
       "id": "iphone-17-pro-max",
@@ -216,7 +239,8 @@
       "back": "assets/phones/iphone-17-pro-maxback.webp.jpg",
       "combo": "assets/phones/iphone-17-pro-max-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-pro-max-front.webp",
-      "cutBack": "assets/cutouts/iphone-17-pro-max-back.webp"
+      "cutBack": "assets/cutouts/iphone-17-pro-max-back.webp",
+      "lineup": "assets/lineups/iphone-17-pro-max.webp"
     }
   ],
   "version": 2
