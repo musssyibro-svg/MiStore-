@@ -175,14 +175,21 @@
   .gslide.photo{align-items:center;padding-bottom:0;}
   .gslide img.photo{width:100%;height:100%;object-fit:contain;position:relative;z-index:2;}
   .gwrap:has(img.photo){background:#ECECEC;}
-  /* creative closing slide: the two cutouts angled on a light spotlight
-     stage with a soft brand-red halo */
-  .gslide.showcase{align-items:center;padding-bottom:0;background:radial-gradient(90% 75% at 50% 40%,#FFFFFF 0%,#F1F1F5 52%,#E4E4EB 100%);}
-  .gslide.showcase::before{content:"";position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:72%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,59,48,.10) 0%,transparent 62%);}
+  /* depth slide: STRAIGHT pair — back upper-left, front in front offset to
+     the lower-right (Apple pair-shot composition). No rotation, ever. */
+  .gslide.showcase{align-items:center;padding-bottom:0;background:radial-gradient(95% 80% at 50% 34%,#FFFFFF 0%,#F0F0F4 55%,#E6E6EC 100%);}
   .shstage{position:relative;width:100%;height:100%;}
-  .shstage img{position:absolute;top:50%;height:76%;width:auto;transform-origin:center;}
-  .shstage .shb{left:31%;transform:translate(-50%,-50%) rotate(-7deg);z-index:1;filter:drop-shadow(0 18px 26px rgba(0,0,0,.16));}
-  .shstage .shf{left:69%;transform:translate(-50%,-50%) rotate(7deg);z-index:2;filter:drop-shadow(0 18px 26px rgba(0,0,0,.18));}
+  .shstage img{position:absolute;width:auto;transform:translateX(-50%);}
+  .shstage .shb{left:36%;top:5%;height:78%;z-index:1;}
+  .shstage .shf{left:62%;top:17%;height:78%;z-index:2;filter:drop-shadow(-14px 16px 22px rgba(0,0,0,.22));}
+  /* slow premium drift on the pair while the slide is showing */
+  .gslide.showcase.cur .shb{animation:pairDriftB 7s ease-in-out infinite alternate;}
+  .gslide.showcase.cur .shf{animation:pairDriftF 7s ease-in-out infinite alternate;}
+  @keyframes pairDriftB{from{transform:translateX(-50%) translateY(0);}to{transform:translateX(-50%) translateY(-1.6%);}}
+  @keyframes pairDriftF{from{transform:translateX(-50%) translateY(0);}to{transform:translateX(-50%) translateY(1.4%);}}
+  /* Ken Burns: the active photo slide breathes — a slow premium zoom */
+  .gslide.photo.cur img.photo{animation:kenburns 8s ease-in-out infinite alternate;}
+  @keyframes kenburns{from{transform:scale(1);}to{transform:scale(1.045);}}
   .gcap{position:absolute;left:12px;bottom:12px;font-size:11px;font-weight:700;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);z-index:2;}
   .gbtn{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:17px;z-index:3;display:flex;align-items:center;justify-content:center;color:var(--ink);}
   .gbtn.prev{left:10px;} .gbtn.next{right:10px;}
@@ -309,18 +316,24 @@
     padding:0 24px;max-width:520px;width:100%;z-index:2;
   }
   #heroImgWrap{position:relative;width:250px;height:316px;flex:0 0 auto;}
-  /* huge glowing wordmark BEHIND the phone/3D — Apple keynote style */
+  /* huge glowing wordmark BEHIND the phone/3D — Apple keynote style.
+     Glow = two blurred copies (GPU filter blur renders smooth, unlike the
+     blocky large-radius text-shadow on some phones). */
   #heroGlow{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     z-index:1;pointer-events:none;user-select:none;
-    font-weight:800;font-size:min(190px,44vw);line-height:1;letter-spacing:.01em;
+    font-weight:800;font-size:min(120px,26vw);line-height:1;letter-spacing:.01em;
     color:#FFF7E8;white-space:nowrap;
-    text-shadow:0 0 14px rgba(255,241,214,.95),0 0 42px rgba(255,215,150,.8),0 0 95px rgba(255,186,110,.55),0 0 160px rgba(255,160,80,.35);
     animation:glowPulse 4.5s ease-in-out infinite;
   }
+  #heroGlow::before,#heroGlow::after{
+    content:attr(data-t);position:absolute;left:0;top:0;z-index:-1;
+  }
+  #heroGlow::before{color:#FFE3B4;filter:blur(14px);opacity:.95;}
+  #heroGlow::after{color:#FFB870;filter:blur(46px);opacity:.8;}
   @keyframes glowPulse{
-    0%,100%{opacity:.82;}
-    50%{opacity:1;text-shadow:0 0 18px rgba(255,243,220,1),0 0 55px rgba(255,220,160,.9),0 0 120px rgba(255,190,115,.65),0 0 190px rgba(255,165,85,.42);}
+    0%,100%{opacity:.85;}
+    50%{opacity:1;}
   }
   #heroImgWrap .himg{
     position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;
@@ -453,7 +466,7 @@
 <section id="cinemaHero">
   <div id="cinemaInner">
     <div id="heroImgWrap">
-      <div id="heroGlow" aria-hidden="true">PRO</div>
+      <div id="heroGlow" aria-hidden="true" data-t="PRO MAX">PRO MAX</div>
       <img class="himg" id="himg0" alt="iPhone 17 Pro Max">
       <img class="himg" id="himg1" alt="iPhone 17 Pro Max" style="opacity:0;">
       <div id="heroShine"></div>
@@ -836,7 +849,7 @@ function loadManifest(){
   fetch('assets/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(m=>{
     if(!m||!Array.isArray(m.phones)) return;
     const next={};
-    m.phones.forEach(p=>{ if(p.name) next[p.name]={front:p.front||'',back:p.back||'',combo:p.combo||'',cutFront:p.cutFront||'',cutBack:p.cutBack||''}; });
+    m.phones.forEach(p=>{ if(p.name) next[p.name]={front:p.front||'',back:p.back||'',combo:p.combo||'',cutFront:p.cutFront||'',cutBack:p.cutBack||'',lineup:p.lineup||''}; });
     REAL_PHOTOS=next;
     verifyRealPhotos();   /* render-first; upgrade each card as its photo confirms */
   }).catch(()=>{});
@@ -924,9 +937,10 @@ function imgClass(url){ return isRender(url)?'render':'photo'; }
 function slideHTML(url,model,idx){
   return `<div class="gslide ${imgClass(url)}" data-sid="${idx}"><img class="${imgClass(url)}" loading="${idx===0?'eager':'lazy'}" src="${esc(url)}" alt="${esc(model)}" data-model="${esc(model)}" data-sid="${idx}" onerror="slideFail(this)"></div>`;
 }
-/* creative closing slide: both transparent cutouts angled toward each other
-   on a light spotlight stage (light bg keeps any leftover cutout shadow
-   invisible — no smudge like on dark backgrounds) */
+/* depth slide: STRAIGHT upright pair — the front sits in front of the back,
+   offset toward the lower-right so the back's colour stays visible.
+   Both dead-straight, never angled. Cutouts are pixel-trimmed (no shadow
+   remnants left in the files). */
 function showcaseSlideHTML(model,idx){
   const rp=REAL_PHOTOS[model];
   return `<div class="gslide showcase" data-sid="${idx}">
@@ -936,13 +950,26 @@ function showcaseSlideHTML(model,idx){
     </div>
   </div>`;
 }
-/* track blocks: combo → front → creative cutout showcase (when cutouts are
-   verified); otherwise plain image slides */
+/* official colours slide (sliced from the owner's lineup sheet) */
+function lineupSlideHTML(model,idx){
+  const rp=REAL_PHOTOS[model];
+  return `<div class="gslide photo lineup" data-sid="${idx}"><img class="photo" data-kind="lineup" loading="lazy" src="${esc(rp.lineup)}" alt="${esc(model)} colours" data-model="${esc(model)}" data-sid="${idx}" onerror="lineupFail(this)"></div>`;
+}
+function lineupFail(img){
+  img.onerror=null;
+  const sl=img.closest('.gslide'); if(sl) sl.remove();
+  if(typeof window._galRefresh==='function') window._galRefresh();
+}
+/* track blocks: composed pair → front → straight depth pair → all colours */
 function slideBlocksFor(model,condKey,urls){
   const up=adminImg(model,condKey);
   const rp=REAL_PHOTOS[model];
-  if(!up&&rp&&realReady(model)&&cutsReady(model)&&rp.combo&&rp.front){
-    return [slideHTML(rp.combo,model,0),slideHTML(rp.front,model,1),showcaseSlideHTML(model,2)];
+  if(!up&&rp&&realReady(model)&&rp.combo&&rp.front){
+    const out=[slideHTML(rp.combo,model,0),slideHTML(rp.front,model,1)];
+    if(cutsReady(model)) out.push(showcaseSlideHTML(model,out.length));
+    else if(rp.back) out.push(slideHTML(rp.back,model,out.length));
+    if(rp.lineup) out.push(lineupSlideHTML(model,out.length));
+    return out;
   }
   return urls.map((u,i)=>slideHTML(u,model,i));
 }
@@ -1158,7 +1185,38 @@ function renderProduct(){
     idx.textContent=(gi+1)+'/'+N;
     dots.querySelectorAll('.d').forEach((d,k)=>d.classList.toggle('on',k===gi));
     thumbs.querySelectorAll('.gth').forEach((t,k)=>t.classList.toggle('on',k===gi));
+    /* .cur drives the Ken Burns / drift animations; the gallery frame takes
+       the active slide's own sampled colour so photo and frame melt together */
+    const gw=track.closest('.gwrap');
+    track.querySelectorAll('.gslide').forEach((s,k)=>{
+      s.classList.toggle('cur',k===gi);
+      if(k===gi&&gw) gw.style.background=s.dataset.bg||'';
+    });
   }
+  /* sample the true corner colour of each photo so slide + frame match the
+     picture EXACTLY — no more mismatched "paper" edges */
+  function blendSlideBGs(){
+    track.querySelectorAll('.gslide img.photo').forEach(im=>{
+      const apply=()=>{
+        try{
+          /* read the two TOP corner pixels of the original image — pure
+             studio background in every asset, never touched by the phone */
+          const c=document.createElement('canvas'); c.width=2; c.height=1;
+          const x=c.getContext('2d');
+          x.drawImage(im,2,2,1,1,0,0,1,1);
+          x.drawImage(im,im.naturalWidth-3,2,1,1,1,0,1,1);
+          const d=x.getImageData(0,0,2,1).data;
+          const avg=[Math.round((d[0]+d[4])/2),Math.round((d[1]+d[5])/2),Math.round((d[2]+d[6])/2)];
+          const col=`rgb(${avg[0]},${avg[1]},${avg[2]})`;
+          const sl=im.closest('.gslide'); if(sl){ sl.style.background=col; sl.dataset.bg=col; }
+          const gw2=track.closest('.gwrap');
+          if(gw2&&im.closest('.gslide').classList.contains('cur')) gw2.style.background=col;
+        }catch(e){}
+      };
+      if(im.complete&&im.naturalWidth>0) apply(); else im.addEventListener('load',apply,{once:true});
+    });
+  }
+  blendSlideBGs();
   function chrome(){
     const N=liveN(); const one=N<=1;
     const gw=track.closest('.gwrap'); if(gw) gw.style.display=N?'':'none';
@@ -1174,7 +1232,7 @@ function renderProduct(){
   }
   window._galRefresh=()=>{ gi=0; chrome(); go(0); };
   window._galNext=()=>{ if(liveN()>1) go(gi+1); };
-  chrome();
+  chrome(); go(0);
   $('gPrev').onclick=e=>{ e.stopPropagation(); go(gi-1); };
   $('gNext').onclick=e=>{ e.stopPropagation(); go(gi+1); };
   let sx=0,mx=0,dragging=false;
