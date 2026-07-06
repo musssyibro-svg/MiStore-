@@ -156,6 +156,15 @@
   .step b{display:block;font-size:15px;letter-spacing:-.01em;margin-bottom:4px;}
   .step p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;}
 
+  /* ---------- customer / stock showcase (photos & videos) ---------- */
+  .scrow{display:flex;gap:12px;overflow-x:auto;padding:16px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}
+  .scrow::-webkit-scrollbar{display:none;}
+  .scitem{flex:0 0 auto;width:172px;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#111;position:relative;box-shadow:var(--shadow);scroll-snap-align:start;cursor:pointer;}
+  .scitem img,.scitem video{width:100%;height:100%;object-fit:cover;display:block;}
+  .scitem .sctag{position:absolute;top:9px;left:9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--ink);z-index:2;}
+  .scitem .scplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;z-index:2;pointer-events:none;}
+  .scitem .sccap{position:absolute;left:0;right:0;bottom:0;padding:22px 11px 10px;font-size:12px;color:#fff;font-weight:600;background:linear-gradient(transparent,rgba(0,0,0,.72));z-index:2;}
+
   /* ---------- reviews ---------- */
   .revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px;}
   .rev{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:17px;box-shadow:var(--shadow);}
@@ -541,6 +550,11 @@
     </div>
   </section>
 
+  <section id="showcase" style="display:none;">
+    <div class="sechead"><div><h2 id="scHead">Real customers</h2><p id="scSub">Real photos & videos from MiStore deliveries.</p></div></div>
+    <div class="scrow" id="scRow"></div>
+  </section>
+
   <section>
     <div class="sechead"><div><h2>What customers say</h2></div></div>
     <div class="revs" id="reviews"></div>
@@ -847,6 +861,18 @@ Object.keys(MODEL_META).forEach(m=>{ const mt=MODEL_META[m]; PHONE_IMAGES_DB[m]=
 
 /* Owner setting: set to true to show photos uploaded via admin.html again */
 const SHOW_ADMIN_PHOTOS = false;
+
+/* ===== Customer reviews + MiStore stock showcase (photos & videos) =====
+   Two sources, merged: (1) this list — paste direct media URLs to show
+   instantly, no setup; (2) whatever you upload from admin.html into the
+   Supabase `showcase_media` table. The whole section hides itself when
+   empty, so it can never look broken. */
+const SHOWCASE_MEDIA = [
+  // { type:'image', kind:'review', src:'https://…/photo.jpg', caption:'A. from Kano' },
+  // { type:'video', kind:'stock',  src:'https://…/clip.mp4',  caption:'Fresh stock just in' },
+];
+const SHOWCASE_BUCKET = 'catalog-photos';   /* reuse the existing public bucket, showcase/ prefix */
+function showcaseUrl(p){ return p ? (/^https?:/i.test(p) ? p : `${SUPABASE_URL}/storage/v1/object/public/${SHOWCASE_BUCKET}/${p}`) : ''; }
 
 let CATALOG_IMAGES = {};
 function adminImg(model,condKey){ return SHOW_ADMIN_PHOTOS?CATALOG_IMAGES[model+'|'+condKey]:''; }
@@ -1434,6 +1460,38 @@ function bootChrome(){
   $('reviews').innerHTML=REVIEWS.map(r=>`<div class="rev"><div class="q">"</div><div class="rt">${esc(r.text)}</div><div class="rb"><span>${esc(r.name)}</span><span class="stars">${'★'.repeat(r.stars)}</span></div></div>`).join('');
 }
 
+/* ---------- customer / stock showcase ---------- */
+let SHOWCASE_ROWS=[];
+function renderShowcase(){
+  const sec=$('showcase'), row=$('scRow'); if(!sec||!row) return;
+  const items=(SHOWCASE_ROWS||[]).filter(m=>m&&m.src);
+  if(!items.length){ sec.style.display='none'; return; }
+  const anyReview=items.some(m=>m.kind!=='stock');
+  $('scHead').textContent=anyReview?'Real customers':'Fresh from MiStore';
+  $('scSub').textContent=anyReview?'Real photos & videos from MiStore deliveries.':'Latest stock, straight from us.';
+  sec.style.display='';
+  row.innerHTML=items.map(m=>{
+    const tag=m.kind==='stock'?'MiStore':'Customer';
+    const media = m.type==='video'
+      ? `<video src="${esc(m.src)}" muted loop playsinline preload="metadata" onmouseover="try{this.play()}catch(e){}" onmouseout="try{this.pause()}catch(e){}" onerror="this.closest('.scitem').remove()"></video><span class="scplay">▶</span>`
+      : `<img loading="lazy" src="${esc(m.src)}" alt="${esc(m.caption||'MiStore')}" onerror="this.closest('.scitem').remove()">`;
+    return `<div class="scitem"><span class="sctag">${esc(tag)}</span>${media}${m.caption?`<span class="sccap">${esc(m.caption)}</span>`:''}</div>`;
+  }).join('');
+  /* tap a video to toggle sound/play on mobile */
+  row.querySelectorAll('video').forEach(v=>v.closest('.scitem').addEventListener('click',()=>{ if(v.paused){ v.muted=false; v.play(); } else { v.muted=true; v.pause(); } }));
+}
+async function loadShowcase(){
+  const rows=[...SHOWCASE_MEDIA];
+  try{
+    const c=getClient();
+    if(c){
+      const {data}=await c.from('showcase_media').select('kind,media_type,path,caption,sort').order('sort',{ascending:true});
+      if(Array.isArray(data)) data.forEach(r=>{ const src=showcaseUrl(r.path); if(src) rows.push({type:(r.media_type==='video'?'video':'image'),kind:(r.kind==='stock'?'stock':'review'),src,caption:r.caption||''}); });
+    }
+  }catch(e){}
+  SHOWCASE_ROWS=rows; renderShowcase();
+}
+
 /* ---------- boot ---------- */
 buildFallbackCAT();
 bootChrome();
@@ -1443,6 +1501,7 @@ renderGrid();
 renderHotDeal();
 updateBars();
 loadManifest();   /* swap in real studio photos once /assets/manifest.json loads */
+renderShowcase(); /* show any config media immediately; Supabase adds more when ready */
 
 /* ========== CINEMA HERO ========== */
 (function(){
@@ -1666,7 +1725,7 @@ loadLive=async function(){
 };
 
 (function waitSb(tries){
-  if(window.supabase){ loadLive(); }
+  if(window.supabase){ loadLive(); loadShowcase(); }
   else if(tries>0){ setTimeout(()=>waitSb(tries-1),150); }
 })(40);
 </script>
