@@ -100,6 +100,23 @@
   .phero:has(img.photo){background:#ECECEC;padding-bottom:0;}
   .phero:has(img.photo)::after{display:none;}
   @media (hover:hover){ .pcard:hover .phero img.photo{transform:scale(1.06);} }
+  /* ---- 2.5D layered stack: real transparent cutouts, back peeking behind
+     front like Apple's pair shots. Layers own their tilt; the float animation
+     lives on the container so the two never fight over `transform`. ---- */
+  .phero .stack{position:absolute;inset:0;z-index:2;}
+  .phero .lyr{position:absolute;left:50%;width:auto;object-fit:contain;transition:transform .4s cubic-bezier(.22,.9,.3,1);will-change:transform;backface-visibility:hidden;}
+  /* STRAIGHT, upright. BACK sits up & centered so the camera + titanium peek
+     above the front; no tilt, no crossing. */
+  .phero .lyr.back{top:2%;height:78%;transform:translateX(-50%);z-index:2;}
+  /* FRONT sits lower & on top — Dynamic Island + wallpaper fully visible. One
+     soft shadow only (this + the .phero::after ground shadow); back casts none,
+     so there's no smudge under the base. */
+  .phero .lyr.front{top:13%;height:82%;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 11px 22px rgba(0,0,0,.15));}
+  @media (hover:hover){
+    .pcard:hover .phero .lyr.back{transform:translateX(-50%) translateY(-1.5%);}
+    .pcard:hover .phero .lyr.front{transform:translateX(-50%) translateY(1%) scale(1.02);}
+  }
+  .pcard.vis .phero .stack{animation:phoneFloat 5.5s ease-in-out infinite;}
   .condchip{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;border-radius:999px;padding:4px 9px;background:var(--green-soft);color:var(--green);z-index:2;}
   .pinfo{padding:13px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1;}
   .pname{font-size:15.5px;font-weight:700;letter-spacing:-.02em;line-height:1.2;}
@@ -522,8 +539,11 @@
         onerror="window._gsapFailed=true"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
         onerror="window._gsapFailed=true"></script>
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
-        onerror="window._mvFailed=true"></script>
+<!-- model-viewer is SELF-HOSTED (assets/vendor/) so the 3D hero works on every
+     network — ajax.googleapis.com is a Google CDN and is blocked in China,
+     which is why the 3D never appeared. jsdelivr is the fallback. -->
+<script type="module" src="assets/vendor/model-viewer.min.js"
+        onerror="this.remove();var s=document.createElement('script');s.type='module';s.src='https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';s.onerror=function(){window._mvFailed=true};document.head.appendChild(s)"></script>
 <script>
 /* ============================================================
    MiStore storefront
@@ -794,7 +814,7 @@ function loadManifest(){
   fetch('assets/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(m=>{
     if(!m||!Array.isArray(m.phones)) return;
     const next={};
-    m.phones.forEach(p=>{ if(p.name) next[p.name]={front:p.front||'',back:p.back||'',combo:p.combo||''}; });
+    m.phones.forEach(p=>{ if(p.name) next[p.name]={front:p.front||'',back:p.back||'',combo:p.combo||'',cutFront:p.cutFront||'',cutBack:p.cutBack||''}; });
     REAL_PHOTOS=next;
     verifyRealPhotos();   /* render-first; upgrade each card as its photo confirms */
   }).catch(()=>{});
@@ -802,6 +822,8 @@ function loadManifest(){
 /* Preload each phone's real photo. Cards keep showing the instant built-in
    render until a real photo is CONFIRMED loadable, then swap in smoothly —
    so a missing/late file never flashes a broken image. */
+let CUT_OK = {};             /* model → true once BOTH transparent cutouts load */
+function cutsReady(model){ return CUT_OK[model]===true; }
 function verifyRealPhotos(){
   Object.keys(REAL_PHOTOS).forEach(model=>{
     const rp=REAL_PHOTOS[model]; const test=rp.front||rp.combo||rp.back; if(!test) return;
@@ -809,6 +831,17 @@ function verifyRealPhotos(){
     im.onload=()=>{ REAL_OK[model]=true; patchCard(model); };
     im.onerror=()=>{ REAL_OK[model]=false; };
     im.src=test;
+    /* transparent cutouts (assets/cutouts/) power the layered 2.5D cards and
+       the real-photo hero; each unlocks the moment both its files confirm */
+    if(rp.cutBack&&rp.cutFront){
+      const cb=new Image();
+      cb.onload=()=>{ const cf=new Image();
+        cf.onload=()=>{ CUT_OK[model]=true; patchCard(model); if(window._heroCutout) window._heroCutout(model); };
+        cf.onerror=()=>{ CUT_OK[model]=false; };
+        cf.src=rp.cutFront; };
+      cb.onerror=()=>{ CUT_OK[model]=false; };
+      cb.src=rp.cutBack;
+    }
   });
 }
 function patchCard(model){
@@ -873,8 +906,20 @@ function thumbHTML(url,model,i,on){
   return `<button class="gth ${on?'on':''}" data-gth="${i}" data-sid="${i}" aria-label="Photo ${i+1}"><img loading="lazy" src="${esc(url)}" alt="" data-model="${esc(model)}" data-sid="${i}" onerror="thumbFail(this)"></button>`;
 }
 function cardVisual(model,condKey){
+  const up=adminImg(model,condKey);
+  /* premium 2.5D: the real BACK peeks out behind the real FRONT — both are
+     transparent cutouts, so they layer on the card's own stage (no gray box) */
+  const rpAll=REAL_PHOTOS[model]||null;
+  if(!up && rpAll && cutsReady(model)){
+    return `<div class="stack" data-model="${esc(model)}">
+      <img class="lyr back"  loading="lazy" src="${esc(rpAll.cutBack)}"  alt="" aria-hidden="true">
+      <img class="lyr front" loading="lazy" src="${esc(rpAll.cutFront)}" alt="${esc(model)}">
+    </div>`;
+  }
   const rp=realPhotos(model);
-  const src=adminImg(model,condKey)||(rp&&(rp.front||rp.combo))||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
+  /* fallback order leads with the BACK (the recognizable side), never the
+     front wallpaper */
+  const src=up||(rp&&(rp.back||rp.combo||rp.front))||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
   if(!src) return `<span style="font-size:32px;opacity:.3">📱</span>`;
   return `<img class="real ${imgClass(src)}" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
 }
@@ -1278,6 +1323,19 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
   if(ctSpec) ctSpec.textContent=heroNames[0]||'';
   if(wrap) wrap.style.visibility='visible';
 
+  /* the REAL titanium cutout (transparent) replaces the built-in render the
+     moment its files confirm — a real photo floating on the dark hero. The
+     3D model still swaps in on top of this when the library loads. */
+  let heroReal=false;
+  window._heroCutout=model=>{
+    if(model!==HERO_MODEL||heroAdmin||heroReal) return;
+    const rp=REAL_PHOTOS[HERO_MODEL]; if(!rp||!rp.cutBack) return;
+    heroReal=true;
+    if(img1) img1.style.opacity='0';
+    if(img0){ img0.onerror=()=>{ img0.onerror=null; heroReal=false; img0.src=heroSlides[0]; }; img0.src=rp.cutBack; }
+    if(ctSpec) ctSpec.textContent='Titanium';
+  };
+
   /* hero keeps the clean transparent render (looks best on the dark hero);
      the real studio photos power the light catalog + product pages */
   window._heroRefresh=()=>{};
@@ -1300,7 +1358,7 @@ loadManifest();   /* swap in real studio photos once /assets/manifest.json loads
 
   /* colour crossfade every 4s across the built-in colourways */
   function morphColor(){
-    if(heroAdmin||heroSlides.length<2){ setTimeout(morphColor,4000); return; }
+    if(heroAdmin||heroReal||heroSlides.length<2){ setTimeout(morphColor,4000); return; }
     colorIdx=(colorIdx+1)%heroSlides.length;
     const next=activeSlot===0?img1:img0;
     const curr=activeSlot===0?img0:img1;
