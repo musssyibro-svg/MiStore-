@@ -210,7 +210,7 @@
       "combo": "assets/phones/iphone-17-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-front.webp",
       "cutBack": "assets/cutouts/iphone-17-back.webp",
-      "lineup": ""
+      "lineup": "assets/lineups/iphone-17.webp"
     },
     {
       "id": "iphone-17-air",
@@ -220,7 +220,7 @@
       "combo": "assets/phones/iphone-17-air-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-air-front.webp",
       "cutBack": "assets/cutouts/iphone-17-air-back.webp",
-      "lineup": ""
+      "lineup": "assets/lineups/iphone-17-air.webp"
     },
     {
       "id": "iphone-17-pro",
@@ -230,7 +230,7 @@
       "combo": "assets/phones/iphone-17-pro-combo.webp.jpg",
       "cutFront": "assets/cutouts/iphone-17-pro-front.webp",
       "cutBack": "assets/cutouts/iphone-17-pro-back.webp",
-      "lineup": ""
+      "lineup": "assets/lineups/iphone-17-pro.webp"
     },
     {
       "id": "iphone-17-pro-max",
