@@ -330,6 +330,20 @@
   .cpCondName{font-size:10.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
   .cpBtn{width:100%;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;padding:6px;font-size:10.5px;font-weight:600;color:var(--muted);cursor:pointer;}
   .cpBtn:active{background:var(--line);}
+  .cpBtn.primary{background:var(--ink,#111);color:#fff;border-color:var(--ink,#111);width:auto;padding:9px 16px;font-size:13px;}
+  .cpBtn.danger{color:#c0392b;border-color:rgba(192,57,43,.4);}
+
+  /* ---------- Showcase admin ---------- */
+  .scAdmBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 6px;}
+  .scAdmKind{font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+  .scAdmInput{flex:1;min-width:160px;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  .scAdmGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px;}
+  .scAdm{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);}
+  .scAdmThumb{position:relative;aspect-ratio:9/16;background:#111;}
+  .scAdmThumb img,.scAdmThumb video{width:100%;height:100%;object-fit:cover;display:block;}
+  .scAdmTag{position:absolute;top:7px;left:7px;font-size:9px;font-weight:800;text-transform:uppercase;background:rgba(255,255,255,.92);color:#111;padding:2px 7px;border-radius:999px;}
+  .scAdmCap{font-size:12px;padding:7px 9px 4px;color:var(--muted);min-height:14px;}
+  .scAdm .cpBtn{border:none;border-top:1px solid var(--line);border-radius:0;}
 
   /* ---------- Tabs ---------- */
   .tabs{display:flex;gap:6px;padding:12px 18px 0;}
@@ -476,6 +490,7 @@
   <button class="tab" data-tab="history">History</button>
   <button class="tab" data-tab="photos">Photos</button>
   <button class="tab" data-tab="prices">Prices</button>
+  <button class="tab" data-tab="showcase">Showcase</button>
 </div>
 
 <main id="app"></main>
@@ -1022,6 +1037,102 @@ document.getElementById('app').addEventListener('click', e=>{
 });
 
 /* ============================================================
+   Showcase tab — customer review + MiStore stock photos/videos
+   shown on the storefront's "Real customers" section.
+   Stored in the PUBLIC catalog-photos bucket under showcase/ and
+   indexed in the `showcase_media` table. Run this ONCE in the
+   Supabase SQL Editor to create the table + read policy:
+   ----------------------------------------------------------------
+   create table if not exists showcase_media (
+     id uuid default gen_random_uuid() primary key,
+     kind text not null default 'review',        -- 'review' | 'stock'
+     media_type text not null default 'image',   -- 'image' | 'video'
+     path text not null,
+     caption text,
+     sort int default 0,
+     created_at timestamptz default now()
+   );
+   alter table showcase_media enable row level security;
+   create policy "public read"  on showcase_media for select using (true);
+   create policy "auth write"   on showcase_media for all
+     using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+   ----------------------------------------------------------------
+   ============================================================ */
+let showcaseMedia = [];   // rows from showcase_media
+async function loadShowcaseMedia(){
+  if(!db) return;
+  const { data, error } = await db.from('showcase_media').select('id,kind,media_type,path,caption,sort').order('sort',{ascending:true}).order('created_at',{ascending:false});
+  if(error || !data){ showcaseMedia = []; return; }
+  showcaseMedia = data;
+}
+async function uploadShowcaseMedia(file, kind, caption){
+  if(!currentUser) throw new Error('Not signed in');
+  const isVideo = /^video\//.test(file.type);
+  if(file.size > (isVideo?50:8)*1024*1024) throw new Error((isVideo?'Video':'Image')+' too large (max '+(isVideo?'50':'8')+'MB)');
+  const ext = (file.name.split('.').pop()||(isVideo?'mp4':'jpg')).toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
+  const path = 'showcase/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext;
+  const up = await db.storage.from(CATALOG_PHOTO_BUCKET).upload(path, file, {contentType:file.type||'application/octet-stream', upsert:false});
+  if(up.error) throw up.error;
+  const { error } = await db.from('showcase_media').insert({ kind, media_type:isVideo?'video':'image', path, caption:caption||null, sort:showcaseMedia.length });
+  if(error) throw error;
+  await loadShowcaseMedia();
+}
+async function deleteShowcaseMedia(id, path){
+  if(!currentUser) throw new Error('Not signed in');
+  await db.from('showcase_media').delete().eq('id', id);
+  if(path) await db.storage.from(CATALOG_PHOTO_BUCKET).remove([path]);
+  await loadShowcaseMedia();
+}
+function renderShowcaseAdmin(){
+  const cards = showcaseMedia.map(m=>{
+    const url = catalogPhotoUrl(m.path);
+    const media = m.media_type==='video'
+      ? `<video src="${esc(url)}" muted playsinline preload="metadata"></video>`
+      : `<img src="${esc(url)}" alt="">`;
+    return `<div class="scAdm">
+      <div class="scAdmThumb">${media}<span class="scAdmTag">${m.kind==='stock'?'MiStore':'Customer'}</span></div>
+      <div class="scAdmCap">${esc(m.caption||'')}</div>
+      <button class="cpBtn danger" data-delshow="${esc(m.id)}" data-path="${esc(m.path)}">Delete</button>
+    </div>`;
+  }).join('') || `<p class="sub">No showcase media yet. Add your first customer photo/video or a stock clip below.</p>`;
+  return `<div class="sechead">Showcase <span class="count">${showcaseMedia.length}</span></div>
+    <p class="sub">Customer review photos/videos and your own stock clips — shown in the storefront's <b>Real customers</b> row. Hidden on the store until you add at least one.</p>
+    <div class="scAdmBar">
+      <label class="scAdmKind"><input type="radio" name="scKind" value="review" checked> Customer review</label>
+      <label class="scAdmKind"><input type="radio" name="scKind" value="stock"> MiStore stock</label>
+      <input id="scCaption" class="scAdmInput" placeholder="Caption (optional) — e.g. A. from Kano">
+      <button class="cpBtn primary" id="scAddBtn">+ Add photo / video</button>
+    </div>
+    <div class="scAdmGrid">${cards}</div>`;
+}
+document.getElementById('app').addEventListener('click', e=>{
+  const add = e.target.closest('#scAddBtn');
+  if(add){
+    if(!db){ toast('Supabase isn’t configured yet'); return; }
+    if(!currentUser){ toast('Sign in first'); return; }
+    const kind = (document.querySelector('input[name="scKind"]:checked')||{}).value || 'review';
+    const caption = (document.getElementById('scCaption')||{}).value || '';
+    const input = document.createElement('input');
+    input.type='file'; input.accept='image/*,video/*'; input.multiple=true;
+    input.onchange = async () => {
+      const files = Array.from(input.files||[]); if(!files.length) return;
+      add.textContent='…'; add.disabled=true;
+      try{
+        for(const f of files){ await uploadShowcaseMedia(f, kind, files.length===1?caption:''); }
+        toast('Added to showcase'); if(tab==='showcase') render();
+      }catch(err){ toast('⚠ Upload failed: '+(err.message||err)); add.textContent='+ Add photo / video'; add.disabled=false; }
+    };
+    input.click();
+    return;
+  }
+  const del = e.target.closest('[data-delshow]');
+  if(del){
+    if(!confirm('Delete this showcase item?')) return;
+    deleteShowcaseMedia(del.dataset.delshow, del.dataset.path).then(()=>{ if(tab==='showcase') render(); }).catch(err=>toast('⚠ '+(err.message||err)));
+  }
+});
+
+/* ============================================================
    Prices tab — edit catalogue prices & stock
    Reads/writes to `catalog_prices` table in Supabase.
    Falls back to ADMIN_CATALOG when the table doesn't exist yet.
@@ -1363,6 +1474,11 @@ function render(){
     app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
       <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
       ${renderCatalogPhotos()}`;
+    return;
+  }
+
+  if(tab==='showcase'){
+    app.innerHTML = renderShowcaseAdmin();
     return;
   }
 
@@ -2360,6 +2476,7 @@ function activateSession(user){
   loadCloud();
   setupRealtime();
   loadCatalogPrices().then(()=>{ if(tab==='prices') render(); });
+  loadShowcaseMedia().then(()=>{ if(tab==='showcase') render(); });
   if(!alertedThisSession){ alertedThisSession=true; setTimeout(inAppAlert,1500); }
 }
 function deactivateSession(){
