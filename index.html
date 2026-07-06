@@ -93,7 +93,9 @@
      thin seamless margin — no "A4 paper" look */
   .phero{position:relative;aspect-ratio:1/1.42;background:radial-gradient(115% 80% at 50% 22%,#FFFFFF 0%,#F4F4F8 55%,#E9E9F0 100%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:14px;}
   .phero::after{content:"";position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:66%;height:16px;background:radial-gradient(ellipse at center,rgba(0,0,0,.16),transparent 72%);filter:blur(3px);z-index:1;}
-  .phero img.render{width:88%;height:82%;object-fit:contain;object-position:center bottom;z-index:2;filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 62%,rgba(0,0,0,.14));}
+  /* placeholder render (shows only until the real photo confirms) — scaled
+     up so it doesn't look thin/slim in the card */
+  .phero img.render{width:100%;height:92%;object-fit:contain;object-position:center bottom;z-index:2;transform:scale(1.3);filter:drop-shadow(0 16px 20px rgba(0,0,0,.22));-webkit-box-reflect:below 1px linear-gradient(transparent 64%,rgba(0,0,0,.12));}
   /* real studio photos: whole phone always visible (contain); the tall card
      means the phone fills the height with only a thin seamless side margin */
   .phero img.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;padding:0;transition:transform .45s cubic-bezier(.2,.8,.2,1);}
@@ -111,6 +113,21 @@
   .phero img.combo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:2;padding:0;
     transform:scale(calc(1.06 * var(--msz,1)));transition:transform .45s cubic-bezier(.2,.8,.2,1);will-change:transform;}
   @media (hover:hover){ .pcard:hover .phero img.combo{transform:scale(calc(1.085 * var(--msz,1)));} }
+  /* ---- CARD HERO = straight overlapping pair (owner's favourite): the real
+     BACK cutout with the real FRONT cutout straight in front, offset to the
+     lower-right so the back colour shows. --msz sizes each model to its true
+     height so a Pro Max reads bigger than a Pro. No rotation, ever. ---- */
+  .phero:has(.cardpair){aspect-ratio:1/1.12;background:radial-gradient(120% 88% at 50% 28%,#FFFFFF 0%,#F2F2F6 58%,#E7E7EE 100%);padding-bottom:0;}
+  .phero:has(.cardpair)::after{content:"";left:50%;bottom:7%;width:60%;height:12px;background:radial-gradient(ellipse at center,rgba(0,0,0,.13),transparent 72%);filter:blur(4px);}
+  .cardpair{position:absolute;inset:0;z-index:2;}
+  .cardpair img{position:absolute;width:auto;transform:translateX(-50%);transition:transform .45s cubic-bezier(.2,.9,.3,1);}
+  .cardpair .cpb{left:41%;top:9%;height:calc(72% * var(--msz,1));z-index:1;}
+  .cardpair .cpf{left:60%;top:22%;height:calc(72% * var(--msz,1));z-index:2;filter:drop-shadow(-11px 13px 17px rgba(0,0,0,.20));}
+  @media (hover:hover){
+    .pcard:hover .cardpair .cpb{transform:translateX(-50%) translateY(-2.5%);}
+    .pcard:hover .cardpair .cpf{transform:translateX(-50%) translateY(1.5%) scale(1.02);}
+  }
+  .pcard.vis .cardpair{animation:phoneFloat 6s ease-in-out infinite;}
   /* glass light-sweep across the card art on hover (GPT: subtle shimmer) */
   .phero::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
     background:linear-gradient(112deg,transparent 32%,rgba(255,255,255,.32) 50%,transparent 68%);
@@ -322,7 +339,8 @@
   #heroGlow{
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     z-index:1;pointer-events:none;user-select:none;
-    font-weight:800;font-size:min(120px,26vw);line-height:1;letter-spacing:.01em;
+    /* sized so the whole word fits the viewport width on phones (was cut off) */
+    font-weight:800;font-size:min(120px,17.5vw);line-height:1;letter-spacing:-.01em;
     color:#FFF7E8;white-space:nowrap;
     animation:glowPulse 4.5s ease-in-out infinite;
   }
@@ -960,14 +978,14 @@ function lineupFail(img){
   const sl=img.closest('.gslide'); if(sl) sl.remove();
   if(typeof window._galRefresh==='function') window._galRefresh();
 }
-/* track blocks: composed pair → front → straight depth pair → all colours */
+/* gallery slides: composed pair → front only → back only → all colours */
 function slideBlocksFor(model,condKey,urls){
   const up=adminImg(model,condKey);
   const rp=REAL_PHOTOS[model];
-  if(!up&&rp&&realReady(model)&&rp.combo&&rp.front){
-    const out=[slideHTML(rp.combo,model,0),slideHTML(rp.front,model,1)];
-    if(cutsReady(model)) out.push(showcaseSlideHTML(model,out.length));
-    else if(rp.back) out.push(slideHTML(rp.back,model,out.length));
+  if(!up&&rp&&realReady(model)&&rp.combo){
+    const out=[slideHTML(rp.combo,model,0)];
+    if(rp.front) out.push(slideHTML(rp.front,model,out.length));
+    if(rp.back)  out.push(slideHTML(rp.back,model,out.length));
     if(rp.lineup) out.push(lineupSlideHTML(model,out.length));
     return out;
   }
@@ -990,11 +1008,18 @@ const MODEL_MM={
 };
 function sizeScale(model){ return ((MODEL_MM[model]||150)/163.4).toFixed(3); }
 
+function pairFail(img){ const m=img.dataset.model||''; if(m){ CUT_OK[m]=false; patchCard(m); } }
 function cardVisual(model,condKey){
   const up=adminImg(model,condKey);
   const rp=realPhotos(model);
-  /* the owner's original composed pair shot IS the card art (reference design);
-     --msz keeps every model at its true relative size */
+  /* card hero = straight overlapping pair (transparent cutouts) */
+  if(!up && rp && cutsReady(model) && rp.cutBack && rp.cutFront){
+    return `<div class="cardpair" style="--msz:${sizeScale(model)}">
+      <img class="cpb" loading="lazy" src="${esc(rp.cutBack)}" alt="" aria-hidden="true" data-model="${esc(model)}" onerror="pairFail(this)">
+      <img class="cpf" loading="lazy" src="${esc(rp.cutFront)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="pairFail(this)">
+    </div>`;
+  }
+  /* before cutouts confirm → the composed pair shot; keeps every model true size */
   if(!up && rp && rp.combo){
     return `<img class="real combo" loading="lazy" src="${esc(rp.combo)}" alt="${esc(model)}" data-model="${esc(model)}" style="--msz:${sizeScale(model)}" onerror="cardFail(this)">`;
   }
@@ -1609,17 +1634,19 @@ if(window.matchMedia('(hover:hover)').matches){
   $('grid').addEventListener('mouseleave',()=>{ if(_tc){_tc.style.transform='';_tc.style.boxShadow='';_tc=null;} });
 }
 
-/* ========== GALLERY AUTO-ADVANCE ========== */
-let _galTmr=null;
+/* ========== GALLERY AUTO-ADVANCE (fast; pauses briefly after a swipe) ========== */
+let _galTmr=null, _galTouch=0;
 new MutationObserver(()=>{
   if(_galTmr){ clearInterval(_galTmr); _galTmr=null; }
   const track=$('gTrack'); if(!track) return;
   _galTmr=setInterval(()=>{
     if(!prodSheet.classList.contains('show')) return;
+    if(Date.now()-_galTouch<4000) return;   /* resume 4s after user interacts */
     if(typeof window._galNext==='function') window._galNext();
-  },3600);
-  /* pause on any user interaction */
-  ['touchstart','click'].forEach(ev=>track.addEventListener(ev,()=>{ clearInterval(_galTmr); _galTmr=null; },{once:true,passive:true}));
+  },2500);
+  const mark=()=>{ _galTouch=Date.now(); };
+  track.addEventListener('touchstart',mark,{passive:true});
+  track.addEventListener('click',mark);
 })  .observe($('prodBody'),{childList:true});
 
 /* ========== LIVE REFRESH FOR CINEMA HERO ========== */
