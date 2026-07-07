@@ -36,6 +36,27 @@
   .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--tint);animation:ringspin .75s linear infinite;}
   @keyframes ringspin{to{transform:translate(-50%,-50%) rotate(360deg);}}
   img.fadein{opacity:0;transition:opacity .5s ease;} img.fadein.ready{opacity:1;}
+  /* category marketing hero */
+  .chero{background:linear-gradient(135deg,#0C0C10,#15151C);color:#fff;border-radius:var(--r);padding:26px 24px;margin:6px 0 22px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:22px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
+  .chero::after{content:"";position:absolute;right:-6%;top:-30%;width:320px;height:320px;background:radial-gradient(circle,rgba(48,209,88,.14),transparent 68%);pointer-events:none;}
+  .chtext{max-width:34ch;z-index:1;}
+  .cheyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+  .chtext h2{font-size:clamp(24px,5vw,34px);letter-spacing:-.03em;margin:8px 0 8px;font-weight:800;line-height:1.06;}
+  .chtext p{color:rgba(255,255,255,.7);font-size:14.5px;margin:0;line-height:1.5;}
+  .chcta{margin-top:16px;background:#fff;color:#0A0A0E;border:none;border-radius:999px;padding:12px 22px;font-weight:800;font-size:14px;box-shadow:0 10px 26px rgba(0,0,0,.3);}
+  .chfacts{display:flex;gap:26px;z-index:1;flex-wrap:wrap;}
+  .chfact{display:flex;flex-direction:column;gap:3px;}
+  .chfact .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+  .chfact .v{font-size:19px;font-weight:800;letter-spacing:-.01em;}
+  @media (max-width:640px){ .chero{padding:22px 20px;} .chfacts{gap:18px;width:100%;} }
+  /* product story block */
+  .bstory{margin-top:16px;}
+  .bwhy{font-size:14px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px 15px;font-weight:500;}
+  .bfacts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px;}
+  .bfact{display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 12px;}
+  .bfact svg{width:21px;height:21px;stroke:var(--green);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px;}
+  .bfact b{font-size:12.5px;font-weight:800;}
+  .bfact span{font-size:11px;color:var(--muted);}
   .themebtn{border:1px solid var(--line2);background:var(--card);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.04);}
   .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .themebtn .moon{display:none;} :root[data-theme="dark"] .themebtn .sun{display:none;} :root[data-theme="dark"] .themebtn .moon{display:block;}
@@ -306,6 +327,29 @@ const COMING={
  'optigo-premium':{icon:'🚲',title:'Premium E-Bikes — coming soon',note:'A premium commuter line. Landing shortly.',imgs:[]},
  'leilin-sport':{icon:'🏍️',title:'Sport Series — coming soon',note:'Sport-series electric motorcycles. Landing shortly.',imgs:[]},
 };
+const CAT_COPY={
+  all:{t:'Premium electric mobility',d:'Electric bikes and motorcycles that go the distance — honestly priced and delivered to your door anywhere in Nigeria.'},
+  'e-bikes':{t:'Electric Bikes',d:'Ride farther on premium lithium batteries — quiet, clean and built for Nigerian roads.'},
+  'e-motorcycles':{t:'Electric Motorcycles',d:'Serious torque, silent runs. Premium electric motorcycles for the daily commute and beyond.'},
+  'high-performance':{t:'High Performance',d:'Our most powerful electric motorcycles — 1500W and up, built for riders who want more.'},
+};
+function catHero(list){
+  const c=CAT_COPY[cat]||CAT_COPY.all;
+  const from=list.length?Math.min(...list.map(p=>priceOf(p))):0;
+  return `<div class="chero">
+    <div class="chtext">
+      <span class="cheyebrow">MiStore · Electric Mobility</span>
+      <h2>${esc(c.t)}</h2>
+      <p>${esc(c.d)}</p>
+      <button class="chcta" onclick="document.getElementById('view').querySelector('.bgrid').scrollIntoView({behavior:'smooth',block:'start'})">Explore ${list.length} model${list.length===1?'':'s'} →</button>
+    </div>
+    <div class="chfacts">
+      <div class="chfact"><span class="k">Starting from</span><span class="v">${from?fmt(from):'—'}</span></div>
+      <div class="chfact"><span class="k">Delivery</span><span class="v">60–90 days</span></div>
+      <div class="chfact"><span class="k">Warranty</span><span class="v">12 months</span></div>
+    </div>
+  </div>`;
+}
 function renderView(){
   const v=$('view');
   if(COMING[cat]){
@@ -316,13 +360,14 @@ function renderView(){
   }
   const list=activeList();
   $('count').textContent=list.length+' model'+(list.length===1?'':'s');
+  const hero=catHero(list);
   if(cat==='all'){
     const groups=[['Electric Bikes',list.filter(p=>p.category==='Electric Bikes')],['Electric Motorcycles',list.filter(p=>p.category==='Electric Motorcycles')]];
-    v.innerHTML=groups.filter(g=>g[1].length).map(g=>`
+    v.innerHTML=hero+groups.filter(g=>g[1].length).map(g=>`
       <section><div class="sechead"><h2>${g[0]}</h2><p>${g[1].length} model${g[1].length===1?'':'s'} · tap any to see full specs</p></div>
       <div class="bgrid">${g[1].map(cardHTML).join('')}</div></section>`).join('');
   } else {
-    v.innerHTML=`<section><div class="bgrid">${list.map(cardHTML).join('')}</div></section>`;
+    v.innerHTML=hero+`<section><div class="bgrid">${list.map(cardHTML).join('')}</div></section>`;
   }
   v.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openBike(el.dataset.open));
 }
@@ -338,9 +383,11 @@ function renderDetail(){
   const curFob = opts.length?opts[selOpt].fob:null;
   const curCur = opts.length?opts[selOpt].cur:(p.currency||'USD');
   const price = opts.length? priceOfOpt(p,opts[selOpt]) : priceOf(p);
+  const curMileage = opts.length ? opts[selOpt].mileage : null;
+  const curBattery = opts.length ? opts[selOpt].label : null;
   const specRows=[
-    ['Motor',p.motor],['Battery',p.battery_type],['Voltage',(p.voltage||'').toUpperCase()],
-    ['Top speed',p.top_speed],['Range',p.range],['Wheel',p.wheel_size],['Brakes',p.brake],
+    ['Motor',p.motor],['Battery',curBattery||p.battery_type],['Voltage',(p.voltage||'').toUpperCase()],
+    ['Top speed',p.top_speed],['Range',curMileage||p.range],['Wheel',p.wheel_size],['Brakes',p.brake],
     ['Max load',p.max_load],['Weight',p.weight]
   ].filter(r=>r[1]);
   $('dName').textContent=p.model;
@@ -351,14 +398,23 @@ function renderDetail(){
     </div>
     <div class="dtitle">${esc(p.model)}</div>
     <div class="dsub">${esc(p.category)}</div>
-    ${opts.length>1?`<div class="flabel">Battery / range</div><div class="chips" id="dOpts">${opts.map((o,i)=>`<button class="chip ${i===selOpt?'on':''}" data-opt="${i}">${esc(o.label)}${o.mileage?`<span class="cp">${esc(o.mileage)}</span>`:''}</button>`).join('')}</div>`:''}
+    ${opts.length>1?`<div class="flabel">Choose battery — range &amp; price update live</div><div class="chips" id="dOpts">${opts.map((o,i)=>`<button class="chip ${i===selOpt?'on':''}" data-opt="${i}">${esc(o.label)}${o.mileage?`<span class="cp">${esc(o.mileage)}</span>`:''}</button>`).join('')}</div>`:''}
     ${(p.features&&p.features.length)?`<div class="flabel">Features</div><div class="feat">${p.features.map(f=>`<span>✓ ${esc(f)}</span>`).join('')}</div>`:''}
     <div class="flabel">Specifications</div>
     <div class="specs">${specRows.map(r=>`<div><div class="k">${esc(r[0])}</div><div class="v">${esc(r[1])}</div></div>`).join('')}</div>
     <div class="pricebig"><span class="pv" id="dPrice">${fmt(price)}</span><span class="pnote">delivered · incl. shipping</span></div>
     <div class="breakdown" id="dBreak"></div>
     <button class="wabtn" id="dOrder">Order on WhatsApp</button>
-    <div class="disc">We confirm availability &amp; final delivery details with you on WhatsApp before any payment.</div>`;
+    <div class="disc">We confirm availability &amp; final delivery details with you on WhatsApp before any payment.</div>
+    <div class="bstory">
+      <div class="bwhy">Charged, inspected and road-tested before it ships. Delivered to your door anywhere in Nigeria with a 12-month warranty and MiStore support the whole way.</div>
+      <div class="bfacts">
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>Nationwide delivery</b><span>60–90 days by sea</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/></svg><b>12-month warranty</b><span>motor &amp; controller</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><b>Tested before dispatch</b><span>charged &amp; inspected</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><b>Secure payment</b><span>verified bank account</span></div>
+      </div>
+    </div>`;
   renderBreak();
   const thumbs=$('dThumbs');
   if(thumbs) thumbs.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{ selImg=+b.dataset.img; const mi=$('dMain').querySelector('img'); if(mi) mi.src=imgUrl(imgs[selImg]); thumbs.querySelectorAll('button').forEach((x,i)=>x.classList.toggle('on',i===selImg)); });

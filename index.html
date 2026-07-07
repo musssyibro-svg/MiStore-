@@ -515,6 +515,15 @@
   img.fadein{opacity:0;transition:opacity .55s ease;}
   img.fadein.ready{opacity:1;}
 
+  /* ---- product-page storytelling (sell before spec) ---- */
+  .pstory{margin-top:16px;}
+  .pwhy{font-size:14.5px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:15px 16px;font-weight:500;}
+  .pfacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .pfact{display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;}
+  .pfact svg{width:22px;height:22px;stroke:var(--tint);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-bottom:5px;}
+  .pfact b{font-size:13px;font-weight:800;letter-spacing:-.01em;}
+  .pfact span{font-size:11.5px;color:var(--muted);font-weight:500;}
+
   /* ---- department (category) navigation — premium tiles ---- */
   .deptbar{display:flex;gap:10px;overflow-x:auto;padding:16px 0 8px;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
   .deptbar::-webkit-scrollbar{display:none;}
@@ -1440,7 +1449,16 @@ function renderProduct(){
       ${sel.qty>1?`<div class="pqty">${sel.qty} × ${fmtFull(unit)}</div>`:''}
     </div>
     <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to order — '+fmtFull(unit*sel.qty):'Out of stock'}</button>
-    <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>`;
+    <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>
+    <div class="pstory">
+      <div class="pwhy">Every MiStore iPhone is hand-checked, honestly graded and delivered with a free case — the closest thing to new, without the new price.</div>
+      <div class="pfacts">
+        <div class="pfact"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>Free delivery</b><span>10–15 days · express 7–10</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><line x1="10" y1="18" x2="14" y2="18"/></svg><b>Free case</b><span>with every phone</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg><b>Honestly graded</b><span>condition explained first</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><b>Secure payment</b><span>verified bank account</span></div>
+      </div>
+    </div>`;
 
   /* gallery reads the live DOM so slides can be removed (failed images) at any time */
   let gi=0;
