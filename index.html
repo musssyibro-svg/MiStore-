@@ -525,6 +525,8 @@
   .dept .dico{width:100%;aspect-ratio:1/.92;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;}
   .dept .dico img{width:100%;height:100%;object-fit:contain;padding:6px;}
   .dept .dico .ph{font-size:30px;opacity:.85;}
+  .dept .dico .devico{width:52%;height:52%;color:var(--muted);opacity:.92;}
+  .dept.on .dico .devico{color:var(--tint);}
   .dept .dname{font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--muted);}
   .dept.on .dname{color:var(--tint);}
 
@@ -554,7 +556,10 @@
   .morecard .catmedia{aspect-ratio:16/10;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;}
   .morecard .catmedia img{width:100%;height:100%;object-fit:contain;padding:14px;}
   .morecard .catmedia .ph{font-size:38px;opacity:.8;}
-  .morecard .cattl{padding:11px 12px 13px;text-align:center;font-size:13.5px;font-weight:700;letter-spacing:-.01em;}
+  .morecard .catmedia .devico{width:34%;height:34%;color:var(--muted);opacity:.9;}
+  .morecard .cattx{padding:11px 12px 13px;display:flex;flex-direction:column;gap:2px;align-items:center;}
+  .morecard .cattl{font-size:13.5px;font-weight:700;letter-spacing:-.01em;}
+  .morecard .cattag{font-size:11px;color:var(--faint);font-weight:600;}
   @media (max-width:560px){ .moregrid{grid-template-columns:repeat(2,1fr);} }
 
   /* ---- why MiStore band ---- */
@@ -747,6 +752,7 @@
      which is why the 3D never appeared. jsdelivr is the fallback. -->
 <script type="module" src="assets/vendor/model-viewer.min.js"
         onerror="this.remove();var s=document.createElement('script');s.type='module';s.src='https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';s.onerror=function(){window._mvFailed=true};document.head.appendChild(s)"></script>
+<script src="assets/icons.js"></script>
 <script>
 /* ============================================================
    MiStore storefront
@@ -902,11 +908,11 @@ const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","
    shopped inline; Bikes links to its own page; the rest are coming soon. */
 const DEPARTMENTS = [
   { key:'phones',      name:'Phones',      ready:true,  img:'assets/cutouts/iphone-17-pro-max-back.webp' },
-  { key:'bikes',       name:'Bikes',       ready:true,  img:'assets/bikes/icon-sport.jpg', href:'bikes.html' },
-  { key:'laptops',     name:'Laptops',     ready:false, ph:'💻' },
-  { key:'tablets',     name:'Tablets',     ready:false, ph:'▦' },
-  { key:'gadgets',     name:'Gadgets',     ready:false, ph:'⌚' },
-  { key:'accessories', name:'Accessories', ready:false, ph:'🎧' }
+  { key:'bikes',       name:'Bikes',       ready:true,  img:'assets/bikes/icon-sport.png', href:'bikes.html' },
+  { key:'laptops',     name:'Laptops',     ready:false, dev:'laptop' },
+  { key:'tablets',     name:'Tablets',     ready:false, dev:'tablet' },
+  { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' },
+  { key:'accessories', name:'Accessories', ready:false, dev:'headphones' }
 ];
 /* Secondary brand navigation, per department. */
 const BRANDS = {
@@ -929,13 +935,14 @@ function brandList(){ return BRANDS[dept]||[]; }
 function brandDef(k){ return brandList().find(b=>b.key===k)||brandList()[0]||{key:k,name:'iPhone',ready:true,sub:''}; }
 /* Shop-More cards on the homepage */
 const MORE_CATS = [
-  { key:'bikes',       name:'Bikes',       href:'bikes.html', img:'assets/bikes/icon-sport.jpg' },
-  { key:'laptops',     name:'Laptops',     ph:'💻' },
-  { key:'tablets',     name:'Tablets',     ph:'▦' },
-  { key:'gadgets',     name:'Gadgets',     ph:'⌚' },
-  { key:'accessories', name:'Accessories', ph:'🎧' },
-  { key:'batteries',   name:'Batteries',   ph:'🔋' }
+  { key:'bikes',       name:'Bikes',       href:'bikes.html', img:'assets/bikes/icon-sport.png', tag:'Electric mobility' },
+  { key:'laptops',     name:'Laptops',     dev:'laptop',     tag:'Coming soon' },
+  { key:'tablets',     name:'Tablets',     dev:'tablet',     tag:'Coming soon' },
+  { key:'gadgets',     name:'Gadgets',     dev:'watch',      tag:'Coming soon' },
+  { key:'accessories', name:'Accessories', dev:'headphones', tag:'Coming soon' },
+  { key:'batteries',   name:'Batteries',   dev:'battery',    tag:'Coming soon' }
 ];
+function devIcon(k){ const g=(window.DEV_ICONS||{})[k]; return g?`<svg class="devico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${g}</svg>`:'<span class="ph">▦</span>'; }
 
 const REVIEWS = [
   { text:"Phone arrived clean and exactly as described. Smooth process.", name:"A. from Kano", stars:5 },
@@ -1290,14 +1297,16 @@ function modelsForCond(){
   });
 }
 
-const APPLE_LOGO_SVG='<svg viewBox="0 0 24 26" fill="currentColor" aria-hidden="true"><path d="'+_APPLE_PATH+'"/></svg>';
-/* small, brand-neutral text logos (real logo art is swapped in when supplied) */
-function brandLogo(b){ return b.key==='iphones'?APPLE_LOGO_SVG:esc(b.name); }
+/* authentic brand logos (simple-icons), monochrome so they adapt to the theme */
+function brandLogo(b){
+  const d=(window.BRAND_LOGOS||{})[b.key];
+  return d?`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`:esc(b.name);
+}
 
 /* ---- department (top category) navigation ---- */
 function renderDepts(){
   $('deptBar').innerHTML=DEPARTMENTS.map(d=>{
-    const ico=d.img?`<img loading="lazy" src="${esc(d.img)}" alt="${esc(d.name)}" onerror="this.remove()">`:`<span class="ph">${d.ph||'▦'}</span>`;
+    const ico=d.img?`<img loading="lazy" src="${esc(d.img)}" alt="${esc(d.name)}" onerror="this.remove()">`:(d.dev?devIcon(d.dev):`<span class="ph">${d.ph||'▦'}</span>`);
     return `<button class="dept ${d.key===dept?'on':''}" data-dept="${esc(d.key)}"><span class="dico">${ico}</span><span class="dname">${esc(d.name)}</span></button>`;
   }).join('');
   $('deptBar').querySelectorAll('[data-dept]').forEach(b=>b.onclick=()=>selectDept(b.dataset.dept));
@@ -1321,8 +1330,8 @@ function renderBrands(){
 /* ---- shop more categories ---- */
 function renderMore(){
   $('moreGrid').innerHTML=MORE_CATS.map(c=>{
-    const media=c.img?`<img loading="lazy" src="${esc(c.img)}" alt="${esc(c.name)}" onerror="this.parentElement.innerHTML='<span class=\\'ph\\'>${c.ph||'▦'}</span>'">`:`<span class="ph">${c.ph||'▦'}</span>`;
-    return `<button class="morecard" data-more="${esc(c.key)}"><span class="catmedia">${media}</span><span class="cattl">${esc(c.name)}</span></button>`;
+    const media=c.img?`<img loading="lazy" src="${esc(c.img)}" alt="${esc(c.name)}" onerror="this.remove()">`:(c.dev?devIcon(c.dev):`<span class="ph">▦</span>`);
+    return `<button class="morecard" data-more="${esc(c.key)}"><span class="catmedia">${media}</span><span class="cattx"><span class="cattl">${esc(c.name)}</span>${c.tag?`<span class="cattag">${esc(c.tag)}</span>`:''}</span></button>`;
   }).join('');
   $('moreGrid').querySelectorAll('[data-more]').forEach(el=>el.onclick=()=>{
     const c=MORE_CATS.find(x=>x.key===el.dataset.more);
