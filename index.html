@@ -582,6 +582,43 @@
   :root[data-theme="dark"] .whyitem .wico{color:var(--ink);}
   @media (max-width:640px){ .whyband{grid-template-columns:repeat(2,1fr);gap:16px 12px;} }
 
+  /* ---- wishlist heart on cards ---- */
+  .wishbtn{position:absolute;top:9px;right:9px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .14s;}
+  :root[data-theme="dark"] .wishbtn{background:rgba(40,40,44,.7);}
+  .wishbtn:active{transform:scale(.86);}
+  .wishbtn svg{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:1.9;}
+  .wishbtn.on svg{fill:var(--red);stroke:var(--red);}
+  .wishbtn.pop{animation:wishpop .32s ease;}
+  @keyframes wishpop{0%{transform:scale(1);}45%{transform:scale(1.32);}100%{transform:scale(1);}}
+  .phero{position:relative;}
+  /* wishlist rows */
+  .wrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .wrow .wthumb{width:56px;height:56px;border-radius:12px;background:var(--bg);flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .wrow .wthumb img{width:100%;height:100%;object-fit:contain;}
+  .wrow .wmeta{flex:1;min-width:0;}
+  .wrow .wnm{font-weight:700;font-size:14.5px;letter-spacing:-.01em;}
+  .wrow .wpr{font-size:13px;color:var(--muted);font-weight:600;}
+  .wrow .wopen{border:1px solid var(--line2);background:var(--card);border-radius:10px;padding:8px 13px;font-weight:700;font-size:12.5px;}
+  .wrow .wdel{border:none;background:none;color:var(--faint);font-size:18px;padding:6px;}
+
+  /* ---- instant search overlay ---- */
+  .searchoverlay{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;}
+  .searchoverlay.show{display:flex;}
+  .searchbar{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;border-bottom:1px solid var(--line);background:var(--hdr);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+  .searchbar .sicon{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;flex:0 0 auto;}
+  .searchbar input{flex:1;border:none;background:transparent;font-family:inherit;font-size:17px;color:var(--ink);outline:none;padding:6px 0;}
+  .searchbar #searchCancel{border:none;background:none;color:var(--tint);font-weight:700;font-size:15px;flex:0 0 auto;}
+  .searchresults{flex:1;overflow-y:auto;padding:8px 16px 30px;max-width:640px;margin:0 auto;width:100%;}
+  .shint{color:var(--faint);font-size:14px;text-align:center;padding:34px 12px;font-weight:500;}
+  .sres{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .sres:active{background:var(--card);}
+  .sres .sth{width:48px;height:48px;border-radius:10px;background:var(--card);flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .sres .sth img{width:100%;height:100%;object-fit:contain;padding:3px;}
+  .sres .sm{flex:1;min-width:0;}
+  .sres .smn{font-weight:700;font-size:14.5px;letter-spacing:-.01em;}
+  .sres .smp{font-size:12.5px;color:var(--muted);font-weight:600;}
+  .sres .sgo{color:var(--faint);font-size:18px;}
+
   /* ---- mobile bottom navigation (iOS style) ---- */
   .botnav{position:fixed;left:0;right:0;bottom:0;z-index:55;display:none;background:var(--hdr);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--line);padding:8px 6px calc(env(safe-area-inset-bottom) + 6px);}
   .botnav .bn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--faint);font-size:10px;font-weight:600;padding:4px 0;transition:color .15s,transform .12s;}
@@ -746,6 +783,22 @@
   <div class="grab"></div>
   <div class="shead"><h2>Checkout</h2><button class="xbtn" id="kClose">✕</button></div>
   <div class="sbody" id="checkoutBody"></div>
+</div>
+
+<div class="sheet" id="wishSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Wishlist</h2><button class="xbtn" id="wSheetClose">✕</button></div>
+  <div class="sbody" id="wishBody"></div>
+</div>
+
+<!-- ===== instant search ===== -->
+<div class="searchoverlay" id="searchOverlay">
+  <div class="searchbar">
+    <svg viewBox="0 0 24 24" class="sicon"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="search" autocomplete="off" placeholder="Search iPhone — try “17”, “Pro Max”…">
+    <button id="searchCancel">Cancel</button>
+  </div>
+  <div class="searchresults" id="searchResults"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1294,6 +1347,46 @@ let cart=[];
 let express=false;
 const cust={name:'',phone:'',whatsapp:'',address:'',city:'',state:'',email:''};
 
+/* ---------- wishlist (localStorage) ---------- */
+let wish=[]; try{ wish=JSON.parse(localStorage.getItem('mistore-wish')||'[]')||[]; }catch(e){ wish=[]; }
+function saveWish(){ try{ localStorage.setItem('mistore-wish',JSON.stringify(wish)); }catch(e){} }
+function inWish(m){ return wish.indexOf(m)>=0; }
+function toggleWish(m){ if(inWish(m)){ wish=wish.filter(x=>x!==m); } else { wish.push(m); } saveWish(); updateWishUI(); }
+function updateWishUI(){
+  const n=wish.length;
+  ['wishN','wishNbot'].forEach(id=>{ const e=$(id); if(e){ e.textContent=n; e.classList.toggle('show',n>0); } });
+  document.querySelectorAll('.wishbtn').forEach(b=>b.classList.toggle('on',inWish(b.dataset.wish)));
+}
+function anyFromPrice(m){ let best=Infinity; CONDITIONS.forEach(cd=>variantsOf(m,cd.key).forEach(v=>{ if(v[2]!==false&&v[1]<best) best=v[1]; })); if(best===Infinity) CONDITIONS.forEach(cd=>variantsOf(m,cd.key).forEach(v=>{ if(v[1]<best) best=v[1]; })); return best===Infinity?0:best; }
+function modelThumb(m){ const rp=realPhotos(m); return (rp&&(rp.combo||rp.front||rp.back))||firstImg(m); }
+function openProductAnyCond(m){ const cd=CONDITIONS.find(c=>variantsOf(m,c.key).length); if(cd) cond=cd.key; renderTabs(); renderGrid(); openProduct(m); }
+function renderWish(){
+  if(!wish.length){ $('wishBody').innerHTML='<div class="empty"><div class="big">🤍</div>Your wishlist is empty.<br>Tap the heart on any phone to save it here.</div>'; return; }
+  $('wishBody').innerHTML=wish.map(m=>{
+    const th=modelThumb(m); const p=anyFromPrice(m);
+    return `<div class="wrow"><div class="wthumb">${th?`<img loading="lazy" src="${esc(th)}" alt="${esc(m)}" onerror="this.style.display='none'">`:'📱'}</div>
+      <div class="wmeta"><div class="wnm">${esc(m)}</div><div class="wpr">${p?'from '+fmtFull(p):'Tap to view'}</div></div>
+      <button class="wopen" data-wopen="${esc(m)}">View</button><button class="wdel" data-wdel="${esc(m)}" aria-label="Remove">✕</button></div>`;
+  }).join('');
+  $('wishBody').querySelectorAll('[data-wopen]').forEach(b=>b.onclick=()=>{ hideSheets(); openProductAnyCond(b.dataset.wopen); });
+  $('wishBody').querySelectorAll('[data-wdel]').forEach(b=>b.onclick=()=>{ toggleWish(b.dataset.wdel); renderWish(); });
+}
+function openWish(){ renderWish(); showSheet($('wishSheet')); }
+
+/* ---------- instant search ---------- */
+function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); document.body.style.overflow='hidden'; setTimeout(()=>$('searchInput').focus(),60); }
+function closeSearch(){ $('searchOverlay').classList.remove('show'); document.body.style.overflow=''; }
+function runSearch(q){
+  q=(q||'').trim().toLowerCase(); const res=$('searchResults');
+  if(!q){ res.innerHTML='<div class="shint">Search any model — try “17”, “Pro Max”, “13”…</div>'; return; }
+  const matches=CATALOG_MODELS.filter(m=>m.toLowerCase().includes(q)).slice(0,14);
+  if(!matches.length){ res.innerHTML='<div class="shint">No matches for “'+esc(q)+'”.</div>'; return; }
+  res.innerHTML=matches.map(m=>{ const th=modelThumb(m); const p=anyFromPrice(m);
+    return `<div class="sres" data-sopen="${esc(m)}"><div class="sth">${th?`<img loading="lazy" src="${esc(th)}" alt="" onerror="this.style.display='none'">`:'📱'}</div><div class="sm"><div class="smn">${esc(m)}</div><div class="smp">${p?'from '+fmtFull(p):'View details'}</div></div><span class="sgo">›</span></div>`;
+  }).join('');
+  res.querySelectorAll('[data-sopen]').forEach(el=>el.onclick=()=>{ closeSearch(); openProductAnyCond(el.dataset.sopen); });
+}
+
 function variantsOf(model,c){ return (CAT[c]||{})[model]||[]; }
 function priceFor(model,c,mem){ const v=variantsOf(model,c).find(x=>x[0]===mem); return v?v[1]:0; }
 function inStock(model,c,mem){ const v=variantsOf(model,c).find(x=>x[0]===mem); return v?v[2]!==false:false; }
@@ -1377,7 +1470,7 @@ function renderGrid(){
   if(!list.length){ $('grid').innerHTML=`<div class="comingsoon"><div class="big">📦</div>No phones in this condition right now — check another tab or <a href="https://wa.me/${WHATSAPP}" style="color:var(--red);font-weight:700">message us</a>.</div>`; return; }
   $('grid').innerHTML=list.map(x=>`
     <article class="pcard" data-open="${esc(x.model)}">
-      <div class="phero">${cardVisual(x.model,cond)}</div>
+      <div class="phero"><button class="wishbtn ${inWish(x.model)?'on':''}" data-wish="${esc(x.model)}" aria-label="Save to wishlist"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>${cardVisual(x.model,cond)}</div>
       <div class="pinfo">
         <div class="pname">${esc(x.model)}</div>
         <div class="pmem">${x.mems.join('GB · ')}GB</div>
@@ -1386,6 +1479,7 @@ function renderGrid(){
       </div>
     </article>`).join('');
   $('grid').querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openProduct(el.dataset.open));
+  $('grid').querySelectorAll('.wishbtn').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.add('pop'); setTimeout(()=>b.classList.remove('pop'),320); toggleWish(b.dataset.wish); });
 }
 
 /* ---------- product sheet + swipeable gallery ---------- */
@@ -1665,7 +1759,7 @@ function setBackgroundActive(active){
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet].forEach(s=>s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
 scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
@@ -1746,9 +1840,13 @@ async function loadShowcase(){
   applyTheme(theme);
   const tb=$('themeBtn'); if(tb) tb.onclick=()=>{ theme=(theme==='dark'?'light':'dark'); applyTheme(theme); try{localStorage.setItem('mistore-theme',theme);}catch(e){} };
 
-  /* header search — jump to phones and let the shopper scan the grid */
-  const sb=$('searchBtn'); if(sb) sb.onclick=()=>document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'});
-  const wb=$('wishBtn'); if(wb) wb.onclick=()=>toast('Wishlist is coming soon.');
+  /* header search + wishlist */
+  const sb=$('searchBtn'); if(sb) sb.onclick=openSearch;
+  const wb=$('wishBtn'); if(wb) wb.onclick=openWish;
+  $('searchCancel').onclick=closeSearch;
+  $('searchInput').addEventListener('input',e=>runSearch(e.target.value));
+  $('searchInput').addEventListener('keydown',e=>{ if(e.key==='Escape') closeSearch(); if(e.key==='Enter'){ const first=document.querySelector('.sres[data-sopen]'); if(first) first.click(); } });
+  $('wSheetClose').onclick=hideSheets;
 
   /* bottom navigation */
   document.querySelectorAll('.botnav .bn').forEach(b=>b.onclick=()=>{
@@ -1757,9 +1855,10 @@ async function loadShowcase(){
     if(k==='home') window.scrollTo({top:0,behavior:'smooth'});
     else if(k==='shop') document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'});
     else if(k==='cats') document.getElementById('deptBar').scrollIntoView({behavior:'smooth',block:'start'});
-    else if(k==='wish') toast('Wishlist is coming soon.');
+    else if(k==='wish') openWish();
     else if(k==='account') toast('Accounts are coming soon.');
   });
+  updateWishUI();
 })();
 
 /* ---------- boot ---------- */
