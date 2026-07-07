@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F5F7">
+<script>
+(function(){try{var t=localStorage.getItem('mistore-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','#000000');}}catch(e){}})();
+</script>
 <title>MiStore — Electric Mobility</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +20,25 @@
     --shadow:0 1px 2px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.08);
     --shadow-lg:0 24px 70px rgba(0,0,0,.16);
     --r:22px;
+    --hdr:rgba(245,245,247,.8); --tint:#0071E3;
   }
+  :root[data-theme="dark"]{
+    --bg:#000000; --card:#1C1C1E; --ink:#F5F5F7; --muted:#98989F; --faint:#7C7C82;
+    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+    --red:#FF453A; --red-soft:rgba(255,69,58,.16);
+    --green:#30D158; --green-soft:rgba(48,209,88,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.65);
+    --hdr:rgba(20,20,22,.72); --tint:#0A84FF; color-scheme:dark;
+  }
+  :root[data-theme="dark"] .bmedia,:root[data-theme="dark"] .dmedia .main{background:#0E0E10;}
+  .bmedia,.dmedia .main{position:relative;}
+  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--tint);animation:ringspin .75s linear infinite;}
+  @keyframes ringspin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+  img.fadein{opacity:0;transition:opacity .5s ease;} img.fadein.ready{opacity:1;}
+  .themebtn{border:1px solid var(--line2);background:var(--card);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .themebtn .moon{display:none;} :root[data-theme="dark"] .themebtn .sun{display:none;} :root[data-theme="dark"] .themebtn .moon{display:block;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;overflow-x:hidden;}
   body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
@@ -26,7 +47,8 @@
   .mono{font-variant-numeric:tabular-nums;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
 
-  header{position:sticky;top:0;z-index:40;background:rgba(245,245,247,.8);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:40;background:var(--hdr);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  .hdrright{display:flex;align-items:center;gap:10px;}
   .nav{max-width:1080px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
   .logo{font-weight:800;font-size:21px;letter-spacing:-.045em;}
   .logo .dash{color:var(--red);}
@@ -146,7 +168,13 @@
       <a href="bikes.html" class="on">Electric Mobility</a>
       <a href="track.html">Track order</a>
     </nav>
-    <a class="backbtn" href="index.html">← Phones</a>
+    <div class="hdrright">
+      <button class="themebtn" id="themeBtn" aria-label="Toggle dark mode">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="backbtn" href="index.html">← Phones</a>
+    </div>
   </div>
 </header>
 
@@ -169,7 +197,6 @@
       <option value="phigh">Price: High to Low</option>
       <option value="power">Motor power</option>
     </select>
-    <select class="sel" id="suppSel"><option value="">All suppliers</option></select>
     <span class="count" id="count"></span>
   </div>
 
@@ -203,7 +230,7 @@ const WHATSAPP = "2348130164763";
 const IMG_BASE = "assets/bikes/images/";
 let CONFIG = { shipping_per_cbm_ngn:500000, profit_ngn:50000, logistics_ngn:10000, rmb_to_ngn:209, usd_to_ngn:1600 };
 let PRODUCTS = [], CATS = null;
-let cat = 'all', supplier = '', sort = 'new';
+let cat = 'all', sort = 'new';
 let sel = null, selOpt = 0, selImg = 0;
 
 const $=id=>document.getElementById(id);
@@ -239,7 +266,6 @@ function activeList(){
   if(cat==='e-bikes') list=list.filter(p=>p.category==='Electric Bikes');
   else if(cat==='e-motorcycles') list=list.filter(p=>p.category==='Electric Motorcycles');
   else if(cat==='high-performance') list=list.filter(p=>p.category==='Electric Motorcycles' && motorW(p)>=1500);
-  if(supplier) list=list.filter(p=>p.supplier===supplier);
   if(sort==='plow') list=[...list].sort((a,b)=>priceOf(a)-priceOf(b));
   else if(sort==='phigh') list=[...list].sort((a,b)=>priceOf(b)-priceOf(a));
   else if(sort==='power') list=[...list].sort((a,b)=>motorW(b)-motorW(a));
@@ -253,8 +279,8 @@ function renderCats(){
     {id:'e-motorcycles',name:'Electric Motorcycles'},
     {id:'high-performance',name:'High Performance'},
     {id:'e-tricycles',name:'Tricycles',soon:1},
-    {id:'optigo-premium',name:'OPTIGO Premium',soon:1},
-    {id:'leilin-sport',name:'Leilin Sport',soon:1},
+    {id:'optigo-premium',name:'Premium Series',soon:1},
+    {id:'leilin-sport',name:'Sport Series',soon:1},
   ];
   $('cats').innerHTML=chips.map(c=>`<button class="cchip ${c.id===cat?'on':''}" data-cat="${c.id}">${esc(c.name)}${c.soon?'<span class="soon">Soon</span>':''}</button>`).join('');
   $('cats').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; renderCats(); renderView(); });
@@ -264,7 +290,7 @@ function cardHTML(p){
   const spec=[p.motor,(p.voltage||'').split('/')[0].trim().toUpperCase(),(p.top_speed||'')].filter(Boolean).join(' · ');
   const badges=[p.range?('🔋 '+p.range.split('/')[0].trim()):'',p.brake?('🛑 '+(p.brake.includes('Disc')?'Disc brake':'Drum brake')):''].filter(Boolean);
   return `<article class="bcard" data-open="${esc(p.id)}">
-    <div class="bmedia"><img loading="lazy" src="${esc(imgUrl(p.image))}" alt="${esc(p.model)}" onerror="this.style.opacity=.25"></div>
+    <div class="bmedia"><span class="ring"></span><img class="fadein" loading="lazy" src="${esc(imgUrl(p.image))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
     <div class="binfo">
       <div class="bname">${esc(p.model)}</div>
       <div class="bspec">${esc(spec)}</div>
@@ -277,11 +303,11 @@ function cardHTML(p){
 
 const COMING={
  'e-tricycles':{icon:'🛺',title:'Electric Tricycles — coming soon',note:'Cargo & passenger trikes. Full specs are being added.',imgs:[]},
- 'optigo-premium':{icon:'🚲',title:'OPTIGO Premium E-Bikes — coming soon',note:'A premium commuter line. Landing shortly.',imgs:[]},
- 'leilin-sport':{icon:'🏍️',title:'Leilin Sport Series — coming soon',note:'Sport-series electric motorcycles. Landing shortly.',imgs:[]},
+ 'optigo-premium':{icon:'🚲',title:'Premium E-Bikes — coming soon',note:'A premium commuter line. Landing shortly.',imgs:[]},
+ 'leilin-sport':{icon:'🏍️',title:'Sport Series — coming soon',note:'Sport-series electric motorcycles. Landing shortly.',imgs:[]},
 };
 function renderView(){
-  const v=$('view'); const supName=supplier?(' · '+supplier):'';
+  const v=$('view');
   if(COMING[cat]){
     const c=COMING[cat];
     v.innerHTML=`<section><div class="comingsoon"><div class="big">${c.icon}</div><h3>${esc(c.title)}</h3><p style="max-width:40ch;margin:0 auto;color:var(--muted)">${esc(c.note)} Want to be notified? <a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hi MiStore, tell me when '+c.title.split(' — ')[0]+' are available.')}" target="_blank" rel="noopener" style="color:var(--green);font-weight:700">Message us</a>.</p>${c.imgs.length?`<div class="csgrid">${c.imgs.map(i=>`<img loading="lazy" src="${esc(imgUrl(i))}" alt="">`).join('')}</div>`:''}</div></section>`;
@@ -289,7 +315,7 @@ function renderView(){
     return;
   }
   const list=activeList();
-  $('count').textContent=list.length+' model'+(list.length===1?'':'s')+supName;
+  $('count').textContent=list.length+' model'+(list.length===1?'':'s');
   if(cat==='all'){
     const groups=[['Electric Bikes',list.filter(p=>p.category==='Electric Bikes')],['Electric Motorcycles',list.filter(p=>p.category==='Electric Motorcycles')]];
     v.innerHTML=groups.filter(g=>g[1].length).map(g=>`
@@ -315,16 +341,16 @@ function renderDetail(){
   const specRows=[
     ['Motor',p.motor],['Battery',p.battery_type],['Voltage',(p.voltage||'').toUpperCase()],
     ['Top speed',p.top_speed],['Range',p.range],['Wheel',p.wheel_size],['Brakes',p.brake],
-    ['Max load',p.max_load],['Weight',p.weight],['Supplier',p.supplier]
+    ['Max load',p.max_load],['Weight',p.weight]
   ].filter(r=>r[1]);
   $('dName').textContent=p.model;
   $('dBody').innerHTML=`
     <div class="dmedia">
-      <div class="main" id="dMain"><img src="${esc(imgUrl(imgs[0]))}" alt="${esc(p.model)}" onerror="this.style.opacity=.25"></div>
+      <div class="main" id="dMain"><span class="ring"></span><img class="fadein" src="${esc(imgUrl(imgs[0]))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
       ${imgs.length>1?`<div class="dthumbs" id="dThumbs">${imgs.map((im,i)=>`<button class="${i===0?'on':''}" data-img="${i}"><img src="${esc(imgUrl(im))}" alt=""></button>`).join('')}</div>`:''}
     </div>
     <div class="dtitle">${esc(p.model)}</div>
-    <div class="dsub">${esc(p.category)}${p.supplier?' · '+esc(p.supplier):''}</div>
+    <div class="dsub">${esc(p.category)}</div>
     ${opts.length>1?`<div class="flabel">Battery / range</div><div class="chips" id="dOpts">${opts.map((o,i)=>`<button class="chip ${i===selOpt?'on':''}" data-opt="${i}">${esc(o.label)}${o.mileage?`<span class="cp">${esc(o.mileage)}</span>`:''}</button>`).join('')}</div>`:''}
     ${(p.features&&p.features.length)?`<div class="flabel">Features</div><div class="feat">${p.features.map(f=>`<span>✓ ${esc(f)}</span>`).join('')}</div>`:''}
     <div class="flabel">Specifications</div>
@@ -335,7 +361,7 @@ function renderDetail(){
     <div class="disc">We confirm availability &amp; final delivery details with you on WhatsApp before any payment.</div>`;
   renderBreak();
   const thumbs=$('dThumbs');
-  if(thumbs) thumbs.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{ selImg=+b.dataset.img; $('dMain').firstElementChild.src=imgUrl(imgs[selImg]); thumbs.querySelectorAll('button').forEach((x,i)=>x.classList.toggle('on',i===selImg)); });
+  if(thumbs) thumbs.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{ selImg=+b.dataset.img; const mi=$('dMain').querySelector('img'); if(mi) mi.src=imgUrl(imgs[selImg]); thumbs.querySelectorAll('button').forEach((x,i)=>x.classList.toggle('on',i===selImg)); });
   const optEls=$('dOpts');
   if(optEls) optEls.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{ selOpt=+b.dataset.opt; renderDetail(); });
   $('dOrder').onclick=orderWhatsApp;
@@ -365,8 +391,15 @@ function hideSheet(){ scrim.classList.remove('show'); sheet.classList.remove('sh
 scrim.onclick=hideSheet; $('dClose').onclick=hideSheet;
 $('heroShop').onclick=()=>$('cats').scrollIntoView({behavior:'smooth'});
 $('sortSel').onchange=e=>{ sort=e.target.value; renderView(); };
-$('suppSel').onchange=e=>{ supplier=e.target.value; renderView(); };
 $('yr').textContent=new Date().getFullYear();
+
+/* theme toggle — default light, remembered, never auto-dark */
+(function(){
+  let theme='light'; try{ theme=localStorage.getItem('mistore-theme')||'light'; }catch(e){}
+  function apply(t){ if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');} const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content',t==='dark'?'#000000':'#F5F5F7'); }
+  apply(theme);
+  const tb=$('themeBtn'); if(tb) tb.onclick=()=>{ theme=(theme==='dark'?'light':'dark'); apply(theme); try{localStorage.setItem('mistore-theme',theme);}catch(e){} };
+})();
 
 /* ---- boot: load bundled data ---- */
 Promise.all([
@@ -376,8 +409,6 @@ Promise.all([
   if(cfg) CONFIG={...CONFIG,...cfg};
   else if(pj&&pj.config) CONFIG={...CONFIG,...pj.config};
   PRODUCTS=(pj.products||pj||[]).slice();
-  const supps=[...new Set(PRODUCTS.filter(p=>p.is_primary!==false).map(p=>p.supplier).filter(Boolean))].sort();
-  $('suppSel').innerHTML='<option value="">All suppliers</option>'+supps.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
   renderCats(); renderView();
 }).catch(e=>{
   $('view').innerHTML='<section><div class="comingsoon"><div class="big">🛵</div><h3>Loading…</h3><p style="color:var(--muted)">Bikes are on the way.</p></div></section>';
