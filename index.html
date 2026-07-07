@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F5F7">
+<script>
+/* Apply saved theme before first paint (default light; never auto-dark). */
+(function(){try{var t=localStorage.getItem('mistore-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','#000000');}}catch(e){}})();
+</script>
 <title>MiStore — Premium devices, delivered across Nigeria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +22,26 @@
     --shadow:0 1px 2px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.08);
     --shadow-lg:0 24px 70px rgba(0,0,0,.16);
     --r:22px;
+    --hdr:rgba(245,245,247,.8);
+    --tint:#0071E3; --tint-soft:rgba(0,113,227,.10);
   }
+  /* ---------- dark theme (opt-in; light is always the default) ---------- */
+  :root[data-theme="dark"]{
+    --bg:#000000; --card:#1C1C1E; --ink:#F5F5F7; --muted:#98989F; --faint:#7C7C82;
+    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+    --red:#FF453A; --red-soft:rgba(255,69,58,.16);
+    --green:#30D158; --green-soft:rgba(48,209,88,.16);
+    --amber:#FFB340; --amber-soft:rgba(255,179,64,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.65);
+    --hdr:rgba(20,20,22,.72);
+    --tint:#0A84FF; --tint-soft:rgba(10,132,255,.16);
+  }
+  :root[data-theme="dark"] .phero,
+  :root[data-theme="dark"] .catmedia,
+  :root[data-theme="dark"] .bmedia{background:#0E0E10;}
+  html{color-scheme:light;}
+  :root[data-theme="dark"]{color-scheme:dark;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;overflow-x:hidden;}
   body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
@@ -28,7 +51,15 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
 
   /* ---------- header ---------- */
-  header{position:sticky;top:0;z-index:40;background:rgba(245,245,247,.8);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:40;background:var(--hdr);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  .hdricons{display:flex;align-items:center;gap:6px;}
+  .iconbtn{width:38px;height:38px;border-radius:50%;border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:18px;transition:background .18s,transform .12s;position:relative;}
+  .iconbtn:hover{background:var(--line);}
+  .iconbtn:active{transform:scale(.92);}
+  .iconbtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .iconbtn .badge{position:absolute;top:2px;right:2px;background:var(--tint);color:#fff;font-size:10px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;}
+  .iconbtn .badge.show{display:inline-flex;}
+  .themebtn .moon{display:none;} :root[data-theme="dark"] .themebtn .sun{display:none;} :root[data-theme="dark"] .themebtn .moon{display:block;}
   .nav{max-width:1080px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
   .logo{font-weight:800;font-size:21px;letter-spacing:-.045em;}
   .logo .dash{color:var(--red);}
@@ -473,6 +504,140 @@
     *{transition:none!important;animation:none!important;}
     .titem,.pcard,.step,.rev{opacity:1!important;transform:none!important;}
   }
+
+  /* ============================================================
+     PHASE 2 — store architecture, loading ring, bottom nav
+     ============================================================ */
+  /* ---- loading ring (replaces the old flat pre-render) ---- */
+  .imgload{display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:120px;}
+  .imgload .ring{width:36px;height:36px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--tint);animation:ringspin .75s linear infinite;}
+  @keyframes ringspin{to{transform:rotate(360deg);}}
+  img.fadein{opacity:0;transition:opacity .55s ease;}
+  img.fadein.ready{opacity:1;}
+
+  /* ---- product-page storytelling (sell before spec) ---- */
+  .pstory{margin-top:16px;}
+  .pwhy{font-size:14.5px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:15px 16px;font-weight:500;}
+  .pfacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .pfact{display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;}
+  .pfact svg{width:22px;height:22px;stroke:var(--tint);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-bottom:5px;}
+  .pfact b{font-size:13px;font-weight:800;letter-spacing:-.01em;}
+  .pfact span{font-size:11.5px;color:var(--muted);font-weight:500;}
+
+  /* ---- department (category) navigation — premium tiles ---- */
+  .deptbar{display:flex;gap:10px;overflow-x:auto;padding:16px 0 8px;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .deptbar::-webkit-scrollbar{display:none;}
+  .dept{flex:0 0 auto;scroll-snap-align:start;width:104px;border:1.5px solid var(--line);background:var(--card);border-radius:18px;padding:12px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--shadow);transition:transform .16s,border-color .18s,box-shadow .2s;cursor:pointer;}
+  .dept:active{transform:scale(.97);}
+  @media (hover:hover){ .dept:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.10);} }
+  .dept.on{border-color:var(--tint);box-shadow:0 0 0 1px var(--tint),var(--shadow);}
+  .dept .dico{width:100%;aspect-ratio:1/.92;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .dept .dico img{width:100%;height:100%;object-fit:contain;padding:6px;}
+  .dept .dico .ph{font-size:30px;opacity:.85;}
+  .dept .dico .devico{width:52%;height:52%;color:var(--muted);opacity:.92;}
+  .dept.on .dico .devico{color:var(--tint);}
+  .dept .dname{font-size:12.5px;font-weight:700;letter-spacing:-.01em;color:var(--muted);}
+  .dept.on .dname{color:var(--tint);}
+
+  /* ---- brand navigation (secondary) ---- */
+  .brandhead{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 2px;}
+  .brandhead h2{font-size:20px;font-weight:800;letter-spacing:-.03em;margin:0;}
+  .brandhead a{font-size:13.5px;font-weight:700;color:var(--tint);}
+  .brandbar{display:flex;gap:10px;overflow-x:auto;padding:12px 0 4px;scroll-snap-type:x mandatory;scrollbar-width:none;}
+  .brandbar::-webkit-scrollbar{display:none;}
+  .brand{flex:0 0 auto;scroll-snap-align:start;width:96px;border:1.5px solid var(--line);background:var(--card);border-radius:16px;padding:14px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:9px;box-shadow:var(--shadow);cursor:pointer;transition:transform .16s,border-color .18s;position:relative;}
+  .brand:active{transform:scale(.97);}
+  .brand.on{border-color:var(--tint);box-shadow:0 0 0 1px var(--tint),var(--shadow);}
+  .brand .blogo{height:34px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;letter-spacing:-.02em;color:var(--ink);}
+  .brand .blogo svg{height:30px;width:auto;}
+  .brand .bname{font-size:12px;font-weight:700;color:var(--muted);}
+  .brand.on .bname{color:var(--tint);}
+  .brand .soon{position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--amber-soft);color:var(--amber);padding:2px 5px;border-radius:6px;}
+
+  /* ---- shop more categories ---- */
+  .morehead{display:flex;align-items:baseline;justify-content:space-between;margin:6px 0 2px;}
+  .morehead h2{font-size:22px;font-weight:800;letter-spacing:-.03em;margin:0;}
+  .morehead a{font-size:13.5px;font-weight:700;color:var(--tint);}
+  .moregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+  .morecard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .16s,box-shadow .2s;display:flex;flex-direction:column;}
+  .morecard:active{transform:scale(.98);}
+  @media (hover:hover){ .morecard:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.10);} }
+  .morecard .catmedia{aspect-ratio:16/10;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .morecard .catmedia img{width:100%;height:100%;object-fit:contain;padding:14px;}
+  .morecard .catmedia .ph{font-size:38px;opacity:.8;}
+  .morecard .catmedia .devico{width:34%;height:34%;color:var(--muted);opacity:.9;}
+  .morecard .cattx{padding:11px 12px 13px;display:flex;flex-direction:column;gap:2px;align-items:center;}
+  .morecard .cattl{font-size:13.5px;font-weight:700;letter-spacing:-.01em;}
+  .morecard .cattag{font-size:11px;color:var(--faint);font-weight:600;}
+  @media (max-width:560px){ .moregrid{grid-template-columns:repeat(2,1fr);} }
+
+  /* ---- why MiStore band ---- */
+  .whyband{background:var(--ink);color:#fff;border-radius:22px;padding:22px 20px;margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  :root[data-theme="dark"] .whyband{background:var(--card);border:1px solid var(--line);}
+  .whyitem{display:flex;flex-direction:column;gap:5px;}
+  .whyitem .wt{font-size:14px;font-weight:800;letter-spacing:-.01em;}
+  .whyitem .wd{font-size:12px;color:rgba(255,255,255,.6);}
+  :root[data-theme="dark"] .whyitem .wd{color:var(--muted);}
+  .whyitem .wico{width:26px;height:26px;color:#fff;opacity:.9;}
+  :root[data-theme="dark"] .whyitem .wico{color:var(--ink);}
+  @media (max-width:640px){ .whyband{grid-template-columns:repeat(2,1fr);gap:16px 12px;} }
+
+  /* ---- wishlist heart on cards ---- */
+  .wishbtn{position:absolute;top:9px;right:9px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .14s;}
+  :root[data-theme="dark"] .wishbtn{background:rgba(40,40,44,.7);}
+  .wishbtn:active{transform:scale(.86);}
+  .wishbtn svg{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:1.9;}
+  .wishbtn.on svg{fill:var(--red);stroke:var(--red);}
+  .wishbtn.pop{animation:wishpop .32s ease;}
+  @keyframes wishpop{0%{transform:scale(1);}45%{transform:scale(1.32);}100%{transform:scale(1);}}
+  .phero{position:relative;}
+  /* wishlist rows */
+  .wrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .wrow .wthumb{width:56px;height:56px;border-radius:12px;background:var(--bg);flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .wrow .wthumb img{width:100%;height:100%;object-fit:contain;}
+  .wrow .wmeta{flex:1;min-width:0;}
+  .wrow .wnm{font-weight:700;font-size:14.5px;letter-spacing:-.01em;}
+  .wrow .wpr{font-size:13px;color:var(--muted);font-weight:600;}
+  .wrow .wopen{border:1px solid var(--line2);background:var(--card);border-radius:10px;padding:8px 13px;font-weight:700;font-size:12.5px;}
+  .wrow .wdel{border:none;background:none;color:var(--faint);font-size:18px;padding:6px;}
+
+  /* ---- instant search overlay ---- */
+  .searchoverlay{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column;}
+  .searchoverlay.show{display:flex;}
+  .searchbar{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;border-bottom:1px solid var(--line);background:var(--hdr);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+  .searchbar .sicon{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;flex:0 0 auto;}
+  .searchbar input{flex:1;border:none;background:transparent;font-family:inherit;font-size:17px;color:var(--ink);outline:none;padding:6px 0;}
+  .searchbar #searchCancel{border:none;background:none;color:var(--tint);font-weight:700;font-size:15px;flex:0 0 auto;}
+  .searchresults{flex:1;overflow-y:auto;padding:8px 16px 30px;max-width:640px;margin:0 auto;width:100%;}
+  .shint{color:var(--faint);font-size:14px;text-align:center;padding:34px 12px;font-weight:500;}
+  .sres{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .sres:active{background:var(--card);}
+  .sres .sth{width:48px;height:48px;border-radius:10px;background:var(--card);flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .sres .sth img{width:100%;height:100%;object-fit:contain;padding:3px;}
+  .sres .sm{flex:1;min-width:0;}
+  .sres .smn{font-weight:700;font-size:14.5px;letter-spacing:-.01em;}
+  .sres .smp{font-size:12.5px;color:var(--muted);font-weight:600;}
+  .sres .sgo{color:var(--faint);font-size:18px;}
+
+  /* ---- mobile bottom navigation (iOS style) ---- */
+  .botnav{position:fixed;left:0;right:0;bottom:0;z-index:55;display:none;background:var(--hdr);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--line);padding:8px 6px calc(env(safe-area-inset-bottom) + 6px);}
+  .botnav .bn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--faint);font-size:10px;font-weight:600;padding:4px 0;transition:color .15s,transform .12s;}
+  .botnav .bn.on{color:var(--tint);}
+  .botnav .bn:active{transform:scale(.9);}
+  .botnav .bn svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .botnav .bn .badge{position:absolute;transform:translate(12px,-4px);background:var(--tint);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;}
+  .botnav .bn .badge.show{display:inline-flex;}
+  @media (max-width:720px){ .botnav{display:flex;} body{padding-bottom:64px;} .cartbar{bottom:calc(env(safe-area-inset-bottom) + 72px);} }
+
+  /* ---- product-page isolation: freeze the listing behind an open sheet ---- */
+  :root.sheet-open #cinemaHero,
+  :root.sheet-open .hero .eyebrow,
+  :root.sheet-open #heroGlow,
+  :root.sheet-open #cinemaHint,
+  :root.sheet-open .himg,
+  :root.sheet-open .pcard,
+  :root.sheet-open .deptbar,
+  :root.sheet-open .brandbar{animation-play-state:paused!important;}
 </style>
 </head>
 <body>
@@ -482,10 +647,19 @@
     <a class="logo" href="#" id="logo"></a>
     <nav class="navlinks">
       <a href="#phones">Phones</a>
+      <a href="bikes.html">Electric Mobility</a>
       <a href="track.html">Track order</a>
       <a href="#how">How it works</a>
     </nav>
-    <button class="cartbtn" id="openCart">🛒 Cart <span class="n" id="cartN"></span></button>
+    <div class="hdricons">
+      <button class="iconbtn" id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="iconbtn" id="wishBtn" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="badge" id="wishN"></span></button>
+      <button class="iconbtn themebtn" id="themeBtn" aria-label="Toggle dark mode">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="iconbtn" id="openCart" aria-label="Cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.3 12.4a1.5 1.5 0 0 0 1.5 1.2h8.7a1.5 1.5 0 0 0 1.5-1.2L21.5 7H6"/></svg><span class="badge" id="cartN"></span></button>
+    </div>
   </div>
 </header>
 
@@ -511,34 +685,31 @@
 
 <div class="wrap">
 
-  <section class="hero">
-    <span class="eyebrow">UK-used · Delivered nationwide</span>
-    <h1>The phone you want. Delivered with trust.</h1>
-    <p>Premium London-used iPhones, honestly graded, shipped to your door anywhere in Nigeria — with a free case on every phone.</p>
-    <div class="heroctas">
-      <button class="cta" id="heroShop">Browse phones</button>
-      <a class="cta ghost" href="track.html">Track my order</a>
-    </div>
-    <div class="hotdeal" id="hotdeal" style="display:none;">
-      <span class="fire">🔥</span><span>Hot deal: <b id="hdName"></b> from <span class="hp" id="hdPrice"></span></span>
-    </div>
-  </section>
+  <!-- ===== department (category) navigation ===== -->
+  <div class="deptbar" id="deptBar"></div>
 
-  <div class="trust">
-    <span class="titem">🎁 Free case with every phone</span>
-    <span class="titem">🚚 Free shipping · 10–15 days</span>
-    <span class="titem">⚡ Express 7–10 days · +₦10,000</span>
-    <span class="titem">✅ Condition explained before you pay</span>
-  </div>
+  <!-- ===== brand navigation (secondary) ===== -->
+  <div class="brandhead"><h2 id="brandHead">Explore Phones</h2><a href="#phones" id="brandViewAll">View all</a></div>
+  <div class="brandbar" id="brandBar"></div>
 
+  <!-- ===== current category ===== -->
   <section id="phones">
     <div class="sechead">
-      <div><h2 id="catHead">iPhones</h2><p id="catSub">Pick a condition, then tap any phone to see it from every angle.</p></div>
+      <div><h2 id="catHead">Current iPhone</h2><p id="catSub">Pick a condition, then tap any phone to see it from every angle.</p></div>
     </div>
-    <div class="cattabs" id="catTabs"></div>
+    <div class="cattabs" id="catTabs" style="display:none;"></div>
     <div class="condtabs" id="condTabs"></div>
     <div class="condblurb" id="condBlurb"></div>
+    <div class="hotdeal" id="hotdeal" style="display:none;margin:0 0 14px;">
+      <span class="fire">🔥</span><span>Hot deal: <b id="hdName"></b> from <span class="hp" id="hdPrice"></span></span>
+    </div>
     <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ===== shop more categories ===== -->
+  <section id="more">
+    <div class="morehead"><h2>Shop More Categories</h2><a href="bikes.html" id="moreViewAll">View all</a></div>
+    <div class="moregrid" id="moreGrid"></div>
   </section>
 
   <section id="how">
@@ -549,6 +720,14 @@
       <div class="step"><div class="num">3</div><b>Track to your door</b><p>Follow your delivery step by step on our tracking page until it arrives — free case included.</p></div>
     </div>
   </section>
+
+  <!-- ===== why MiStore ===== -->
+  <div class="whyband">
+    <div class="whyitem"><svg class="wico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg><div class="wt">Official Warranty</div><div class="wd">On all products</div></div>
+    <div class="whyitem"><svg class="wico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><div class="wt">Secure Payment</div><div class="wd">100% secure</div></div>
+    <div class="whyitem"><svg class="wico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><div class="wt">Fast Delivery</div><div class="wd">Free · 10–15 days</div></div>
+    <div class="whyitem"><svg class="wico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="wt">24/7 Support</div><div class="wd">We're here to help</div></div>
+  </div>
 
   <section id="showcase" style="display:none;">
     <div class="sechead"><div><h2 id="scHead">Real customers</h2><p id="scSub">Real photos & videos from MiStore deliveries.</p></div></div>
@@ -572,6 +751,15 @@
     <div class="fnote"><span>© <span id="ftYear"></span> <span id="ftBrand"></span> · All prices in Naira (₦)</span></div>
   </div>
 </footer>
+
+<!-- ===== mobile bottom navigation ===== -->
+<nav class="botnav" id="botnav">
+  <button class="bn on" data-bn="home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>Home</button>
+  <button class="bn" data-bn="shop" aria-label="Shop"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Shop</button>
+  <button class="bn" data-bn="cats" aria-label="Categories"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Categories</button>
+  <button class="bn" data-bn="wish" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span class="badge" id="wishNbot"></span>Wishlist</button>
+  <button class="bn" data-bn="account" aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>Account</button>
+</nav>
 
 <!-- cart bar -->
 <div class="cartbar" id="cartbar"><span class="cl" id="barL"></span><span class="cr" id="barR"></span></div>
@@ -597,6 +785,22 @@
   <div class="sbody" id="checkoutBody"></div>
 </div>
 
+<div class="sheet" id="wishSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Wishlist</h2><button class="xbtn" id="wSheetClose">✕</button></div>
+  <div class="sbody" id="wishBody"></div>
+</div>
+
+<!-- ===== instant search ===== -->
+<div class="searchoverlay" id="searchOverlay">
+  <div class="searchbar">
+    <svg viewBox="0 0 24 24" class="sicon"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="search" autocomplete="off" placeholder="Search iPhone — try “17”, “Pro Max”…">
+    <button id="searchCancel">Cancel</button>
+  </div>
+  <div class="searchresults" id="searchResults"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
@@ -610,6 +814,7 @@
      which is why the 3D never appeared. jsdelivr is the fallback. -->
 <script type="module" src="assets/vendor/model-viewer.min.js"
         onerror="this.remove();var s=document.createElement('script');s.type='module';s.src='https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';s.onerror=function(){window._mvFailed=true};document.head.appendChild(s)"></script>
+<script src="assets/icons.js"></script>
 <script>
 /* ============================================================
    MiStore storefront
@@ -753,21 +958,53 @@ const CATALOG_MODELS = [
 ];
 const CONDITIONS = [
   { key:'clean',   name:'Clean (London Used)', short:'Original parts',   pick:'Original screen & battery · like new',  long:'<b>Clean (London Used).</b> Original screen and battery, clean body, premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone.' },
-  { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
   { key:'battery', name:'Battery Display',     short:'Replaced battery', pick:'Battery professionally replaced',       long:'<b>Battery Display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
+  { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
   { key:'double',  name:'Double Display',      short:'Screen + battery', pick:'Screen & battery replaced',             long:'<b>Double Display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
 ];
 const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
 
 /* MiStore is a full electronics store — iPhones today, more coming.
    Set ready:true (and wire products) when a category is stocked. */
-const CATEGORIES = [
-  { key:'iphones', name:'iPhones',        icon:'📱', ready:true,  sub:'Pick a condition, then tap any phone to see it from every angle.' },
-  { key:'samsung', name:'Samsung',        icon:'📲', ready:false, sub:'Premium Samsung Galaxy phones — landing soon at MiStore.' },
-  { key:'xiaomi',  name:'Xiaomi',         icon:'📶', ready:false, sub:'Xiaomi & Redmi devices — landing soon at MiStore.' },
-  { key:'bikes',   name:'Electric Bikes', icon:'🛵', ready:false, sub:'Electric bikes for getting around Nigeria — coming soon.' },
-  { key:'gadgets', name:'Gadgets',        icon:'🎧', ready:false, sub:'Watches, buds, chargers & accessories — coming soon.' }
+/* Top-level departments (the horizontal category selector). Only Phones is
+   shopped inline; Bikes links to its own page; the rest are coming soon. */
+const DEPARTMENTS = [
+  { key:'phones',      name:'Phones',      ready:true,  img:'assets/cutouts/iphone-17-pro-max-back.webp' },
+  { key:'bikes',       name:'Bikes',       ready:true,  img:'assets/bikes/icon-sport.png', href:'bikes.html' },
+  { key:'laptops',     name:'Laptops',     ready:false, dev:'laptop' },
+  { key:'tablets',     name:'Tablets',     ready:false, dev:'tablet' },
+  { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' },
+  { key:'accessories', name:'Accessories', ready:false, dev:'headphones' }
 ];
+/* Secondary brand navigation, per department. */
+const BRANDS = {
+  phones:[
+    { key:'iphones', name:'iPhone',  ready:true,  sub:'Pick a condition, then tap any phone to see it from every angle.' },
+    { key:'samsung', name:'Samsung', ready:false, sub:'Premium Samsung Galaxy phones — landing soon at MiStore.' },
+    { key:'google',  name:'Google',  ready:false, sub:'Google Pixel devices — landing soon at MiStore.' },
+    { key:'xiaomi',  name:'Xiaomi',  ready:false, sub:'Xiaomi & Redmi devices — landing soon at MiStore.' },
+    { key:'oneplus', name:'OnePlus', ready:false, sub:'OnePlus flagships — landing soon at MiStore.' },
+    { key:'nothing', name:'Nothing', ready:false, sub:'Nothing phones — landing soon at MiStore.' }
+  ],
+  laptops:['Apple','Dell','HP','Lenovo','ASUS','MSI'].map(n=>({key:n.toLowerCase(),name:n,ready:false,sub:n+' laptops — landing soon at MiStore.'})),
+  tablets:['Apple','Samsung','Lenovo','Xiaomi'].map(n=>({key:'t-'+n.toLowerCase(),name:n,ready:false,sub:n+' tablets — landing soon at MiStore.'})),
+  gadgets:['Watches','Earbuds','Chargers','Power banks'].map(n=>({key:'g-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — landing soon at MiStore.'})),
+  accessories:['Cases','Cables','Adapters','Screens'].map(n=>({key:'a-'+n.toLowerCase(),name:n,ready:false,sub:n+' — landing soon at MiStore.'})),
+  bikes:['City','Sport','Mountain','Fat Tire','Cargo','Folding','Motorcycles','Tricycles'].map(n=>({key:'b-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — see the full collection on our Electric Mobility page.'}))
+};
+function deptDef(k){ return DEPARTMENTS.find(d=>d.key===k)||DEPARTMENTS[0]; }
+function brandList(){ return BRANDS[dept]||[]; }
+function brandDef(k){ return brandList().find(b=>b.key===k)||brandList()[0]||{key:k,name:'iPhone',ready:true,sub:''}; }
+/* Shop-More cards on the homepage */
+const MORE_CATS = [
+  { key:'bikes',       name:'Bikes',       href:'bikes.html', img:'assets/bikes/icon-sport.png', tag:'Electric mobility' },
+  { key:'laptops',     name:'Laptops',     dev:'laptop',     tag:'Coming soon' },
+  { key:'tablets',     name:'Tablets',     dev:'tablet',     tag:'Coming soon' },
+  { key:'gadgets',     name:'Gadgets',     dev:'watch',      tag:'Coming soon' },
+  { key:'accessories', name:'Accessories', dev:'headphones', tag:'Coming soon' },
+  { key:'batteries',   name:'Batteries',   dev:'battery',    tag:'Coming soon' }
+];
+function devIcon(k){ const g=(window.DEV_ICONS||{})[k]; return g?`<svg class="devico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${g}</svg>`:'<span class="ph">▦</span>'; }
 
 const REVIEWS = [
   { text:"Phone arrived clean and exactly as described. Smooth process.", name:"A. from Kano", stars:5 },
@@ -1041,17 +1278,21 @@ function cardVisual(model,condKey){
   /* card hero = straight overlapping pair (transparent cutouts) */
   if(!up && rp && cutsReady(model) && rp.cutBack && rp.cutFront){
     return `<div class="cardpair" style="--msz:${sizeScale(model)}">
-      <img class="cpb" loading="lazy" src="${esc(rp.cutBack)}" alt="" aria-hidden="true" data-model="${esc(model)}" onerror="pairFail(this)">
-      <img class="cpf" loading="lazy" src="${esc(rp.cutFront)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="pairFail(this)">
+      <img class="cpb fadein" loading="lazy" src="${esc(rp.cutBack)}" alt="" aria-hidden="true" data-model="${esc(model)}" onload="this.classList.add('ready')" onerror="pairFail(this)">
+      <img class="cpf fadein" loading="lazy" src="${esc(rp.cutFront)}" alt="${esc(model)}" data-model="${esc(model)}" onload="this.classList.add('ready')" onerror="pairFail(this)">
     </div>`;
   }
   /* before cutouts confirm → the composed pair shot; keeps every model true size */
   if(!up && rp && rp.combo){
-    return `<img class="real combo" loading="lazy" src="${esc(rp.combo)}" alt="${esc(model)}" data-model="${esc(model)}" style="--msz:${sizeScale(model)}" onerror="cardFail(this)">`;
+    return `<img class="real combo fadein" loading="lazy" src="${esc(rp.combo)}" alt="${esc(model)}" data-model="${esc(model)}" style="--msz:${sizeScale(model)}" onload="this.classList.add('ready')" onerror="cardFail(this)">`;
   }
-  const src=up||(rp&&(rp.back||rp.front))||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||firstImg(model);
-  if(!src) return `<span style="font-size:32px;opacity:.3">📱</span>`;
-  return `<img class="real ${imgClass(src)}" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onerror="cardFail(this)">`;
+  const src=up||(Array.isArray(PHONE_IMAGES[model])&&PHONE_IMAGES[model][0])||'';
+  if(src) return `<img class="real ${imgClass(src)} fadein" loading="lazy" src="${esc(src)}" alt="${esc(model)}" data-model="${esc(model)}" onload="this.classList.add('ready')" onerror="cardFail(this)">`;
+  /* photo confirmed unavailable → subtle mark; otherwise a loading ring that
+     resolves the moment the bundled photo confirms (patchCard re-renders).
+     The old flat SVG pre-render is intentionally never shown here. */
+  if(REAL_OK[model]===false) return `<span style="font-size:32px;opacity:.3">📱</span>`;
+  return `<div class="imgload"><span class="ring"></span></div>`;
 }
 
 /* ============================================================
@@ -1094,16 +1335,62 @@ async function loadLive(){
    ============================================================ */
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
-function fmtK(n){ return n>=1000000?('₦'+n.toLocaleString()):('₦'+Math.floor(n/1000)+'k'); }
-function fmtFull(n){ return '₦'+Math.round(n).toLocaleString(); }
+/* MiStore price policy: round every displayed price UP to the nearest ₦5,000.
+   Under ₦1,000,000 → show as "₦255k"; ₦1,000,000+ → full number, no k. */
+function roundPrice(n){ return Math.ceil((+n||0)/5000)*5000; }
+function fmtK(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+function fmtFull(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+/* exact naira (no rounding) — for internal breakdowns only */
+function fmtExact(n){ return '₦'+Math.round(n).toLocaleString(); }
 function condDef(k){ return CONDITIONS.find(c=>c.key===k)||CONDITIONS[0]; }
 
-let category='iphones';
+let dept='phones';
+let category='iphones';   /* the active brand within the current department */
 let cond='clean';
 let sel=null;
 let cart=[];
 let express=false;
 const cust={name:'',phone:'',whatsapp:'',address:'',city:'',state:'',email:''};
+
+/* ---------- wishlist (localStorage) ---------- */
+let wish=[]; try{ wish=JSON.parse(localStorage.getItem('mistore-wish')||'[]')||[]; }catch(e){ wish=[]; }
+function saveWish(){ try{ localStorage.setItem('mistore-wish',JSON.stringify(wish)); }catch(e){} }
+function inWish(m){ return wish.indexOf(m)>=0; }
+function toggleWish(m){ if(inWish(m)){ wish=wish.filter(x=>x!==m); } else { wish.push(m); } saveWish(); updateWishUI(); }
+function updateWishUI(){
+  const n=wish.length;
+  ['wishN','wishNbot'].forEach(id=>{ const e=$(id); if(e){ e.textContent=n; e.classList.toggle('show',n>0); } });
+  document.querySelectorAll('.wishbtn').forEach(b=>b.classList.toggle('on',inWish(b.dataset.wish)));
+}
+function anyFromPrice(m){ let best=Infinity; CONDITIONS.forEach(cd=>variantsOf(m,cd.key).forEach(v=>{ if(v[2]!==false&&v[1]<best) best=v[1]; })); if(best===Infinity) CONDITIONS.forEach(cd=>variantsOf(m,cd.key).forEach(v=>{ if(v[1]<best) best=v[1]; })); return best===Infinity?0:best; }
+function modelThumb(m){ const rp=realPhotos(m); return (rp&&(rp.combo||rp.front||rp.back))||firstImg(m); }
+function openProductAnyCond(m){ const cd=CONDITIONS.find(c=>variantsOf(m,c.key).length); if(cd) cond=cd.key; renderTabs(); renderGrid(); openProduct(m); }
+function renderWish(){
+  if(!wish.length){ $('wishBody').innerHTML='<div class="empty"><div class="big">🤍</div>Your wishlist is empty.<br>Tap the heart on any phone to save it here.</div>'; return; }
+  $('wishBody').innerHTML=wish.map(m=>{
+    const th=modelThumb(m); const p=anyFromPrice(m);
+    return `<div class="wrow"><div class="wthumb">${th?`<img loading="lazy" src="${esc(th)}" alt="${esc(m)}" onerror="this.style.display='none'">`:'📱'}</div>
+      <div class="wmeta"><div class="wnm">${esc(m)}</div><div class="wpr">${p?'from '+fmtFull(p):'Tap to view'}</div></div>
+      <button class="wopen" data-wopen="${esc(m)}">View</button><button class="wdel" data-wdel="${esc(m)}" aria-label="Remove">✕</button></div>`;
+  }).join('');
+  $('wishBody').querySelectorAll('[data-wopen]').forEach(b=>b.onclick=()=>{ hideSheets(); openProductAnyCond(b.dataset.wopen); });
+  $('wishBody').querySelectorAll('[data-wdel]').forEach(b=>b.onclick=()=>{ toggleWish(b.dataset.wdel); renderWish(); });
+}
+function openWish(){ renderWish(); showSheet($('wishSheet')); }
+
+/* ---------- instant search ---------- */
+function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); document.body.style.overflow='hidden'; setTimeout(()=>$('searchInput').focus(),60); }
+function closeSearch(){ $('searchOverlay').classList.remove('show'); document.body.style.overflow=''; }
+function runSearch(q){
+  q=(q||'').trim().toLowerCase(); const res=$('searchResults');
+  if(!q){ res.innerHTML='<div class="shint">Search any model — try “17”, “Pro Max”, “13”…</div>'; return; }
+  const matches=CATALOG_MODELS.filter(m=>m.toLowerCase().includes(q)).slice(0,14);
+  if(!matches.length){ res.innerHTML='<div class="shint">No matches for “'+esc(q)+'”.</div>'; return; }
+  res.innerHTML=matches.map(m=>{ const th=modelThumb(m); const p=anyFromPrice(m);
+    return `<div class="sres" data-sopen="${esc(m)}"><div class="sth">${th?`<img loading="lazy" src="${esc(th)}" alt="" onerror="this.style.display='none'">`:'📱'}</div><div class="sm"><div class="smn">${esc(m)}</div><div class="smp">${p?'from '+fmtFull(p):'View details'}</div></div><span class="sgo">›</span></div>`;
+  }).join('');
+  res.querySelectorAll('[data-sopen]').forEach(el=>el.onclick=()=>{ closeSearch(); openProductAnyCond(el.dataset.sopen); });
+}
 
 function variantsOf(model,c){ return (CAT[c]||{})[model]||[]; }
 function priceFor(model,c,mem){ const v=variantsOf(model,c).find(x=>x[0]===mem); return v?v[1]:0; }
@@ -1117,20 +1404,57 @@ function modelsForCond(){
   });
 }
 
-function catDef(k){ return CATEGORIES.find(c=>c.key===k)||CATEGORIES[0]; }
-function renderCategories(){
-  $('catTabs').innerHTML=CATEGORIES.map(c=>
-    `<button class="cattab ${c.key===category?'on':''}" data-cat="${c.key}"><span class="ci">${c.icon}</span>${esc(c.name)}${c.ready?'':'<span class="soon">Soon</span>'}</button>`
-  ).join('');
-  $('catTabs').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ category=b.dataset.cat; renderCategories(); renderTabs(); renderGrid(); document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'}); });
-  const c=catDef(category);
-  $('catHead').textContent=c.name;
-  $('catSub').textContent=c.sub;
+/* authentic brand logos (simple-icons), monochrome so they adapt to the theme */
+function brandLogo(b){
+  const d=(window.BRAND_LOGOS||{})[b.key];
+  return d?`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`:esc(b.name);
 }
+
+/* ---- department (top category) navigation ---- */
+function renderDepts(){
+  $('deptBar').innerHTML=DEPARTMENTS.map(d=>{
+    const ico=d.img?`<img loading="lazy" src="${esc(d.img)}" alt="${esc(d.name)}" onerror="this.remove()">`:(d.dev?devIcon(d.dev):`<span class="ph">${d.ph||'▦'}</span>`);
+    return `<button class="dept ${d.key===dept?'on':''}" data-dept="${esc(d.key)}"><span class="dico">${ico}</span><span class="dname">${esc(d.name)}</span></button>`;
+  }).join('');
+  $('deptBar').querySelectorAll('[data-dept]').forEach(b=>b.onclick=()=>selectDept(b.dataset.dept));
+}
+function selectDept(key){
+  const d=deptDef(key);
+  if(d.href){ window.location.href=d.href; return; }   /* Bikes -> its own page */
+  dept=key;
+  const bl=brandList(); category=(bl.find(b=>b.ready)||bl[0]||{}).key;
+  renderDepts(); renderBrands(); renderTabs(); renderGrid();
+  document.getElementById('deptBar').scrollIntoView({behavior:'smooth',block:'start'});
+}
+/* ---- brand (secondary) navigation ---- */
+function renderBrands(){
+  $('brandHead').textContent='Explore '+deptDef(dept).name;
+  $('brandBar').innerHTML=brandList().map(b=>
+    `<button class="brand ${b.key===category?'on':''}" data-brand="${esc(b.key)}">${b.ready?'':'<span class="soon">Soon</span>'}<span class="blogo">${brandLogo(b)}</span><span class="bname">${esc(b.name)}</span></button>`
+  ).join('');
+  $('brandBar').querySelectorAll('[data-brand]').forEach(b=>b.onclick=()=>{ category=b.dataset.brand; renderBrands(); renderTabs(); renderGrid(); document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'}); });
+}
+/* ---- shop more categories ---- */
+function renderMore(){
+  $('moreGrid').innerHTML=MORE_CATS.map(c=>{
+    const media=c.img?`<img loading="lazy" src="${esc(c.img)}" alt="${esc(c.name)}" onerror="this.remove()">`:(c.dev?devIcon(c.dev):`<span class="ph">▦</span>`);
+    return `<button class="morecard" data-more="${esc(c.key)}"><span class="catmedia">${media}</span><span class="cattx"><span class="cattl">${esc(c.name)}</span>${c.tag?`<span class="cattag">${esc(c.tag)}</span>`:''}</span></button>`;
+  }).join('');
+  $('moreGrid').querySelectorAll('[data-more]').forEach(el=>el.onclick=()=>{
+    const c=MORE_CATS.find(x=>x.key===el.dataset.more);
+    if(c&&c.href){ window.location.href=c.href; return; }
+    selectDept(DEPARTMENTS.some(d=>d.key===el.dataset.more)?el.dataset.more:'phones');
+  });
+}
+/* legacy alias — the old category tab strip is hidden; nav is driven by depts+brands */
+function renderCategories(){ renderDepts(); renderBrands(); }
 function renderTabs(){
-  const ready=catDef(category).ready;
+  const ready=brandDef(category).ready;
+  $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
+  $('catSub').textContent=brandDef(category).sub||'';
   /* condition tabs + blurb only apply to iPhones (they have conditions) */
-  if(!ready){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; return; }
+  const hd=$('hotdeal');
+  if(!ready){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; if(hd) hd.style.display='none'; return; }
   $('condBlurb').style.display='';
   /* only show conditions that actually have phones — no dead "coming soon" tabs */
   const avail=CONDITIONS.filter(c=>CATALOG_MODELS.some(m=>variantsOf(m,c.key).length));
@@ -1141,17 +1465,17 @@ function renderTabs(){
   $('condBlurb').innerHTML=condDef(cond).long+' <span style="color:var(--faint)">· Free case included with every phone.</span>';
 }
 function renderGrid(){
-  /* coming-soon categories show an elegant panel instead of products */
-  if(!catDef(category).ready){
-    const c=catDef(category);
-    $('grid').innerHTML=`<div class="catempty"><div class="cbig">${c.icon}</div><h3>${esc(c.name)} — coming soon</h3><p>${esc(c.sub)} Want to be first to know when they drop? Message us on WhatsApp.</p><a class="cwa" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hi MiStore, please notify me when '+c.name+' are available.')}" target="_blank" rel="noopener">Notify me on WhatsApp</a></div>`;
+  /* coming-soon brands show an elegant panel instead of products */
+  if(!brandDef(category).ready){
+    const c=brandDef(category); const nm=deptDef(dept).name+' · '+c.name;
+    $('grid').innerHTML=`<div class="catempty"><div class="cbig">${deptDef(dept).ph||'📱'}</div><h3>${esc(c.name)} — coming soon</h3><p>${esc(c.sub)} Want to be first to know when they drop? Message us on WhatsApp.</p><a class="cwa" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hi MiStore, please notify me when '+nm+' are available.')}" target="_blank" rel="noopener">Notify me on WhatsApp</a></div>`;
     return;
   }
   const list=modelsForCond();
   if(!list.length){ $('grid').innerHTML=`<div class="comingsoon"><div class="big">📦</div>No phones in this condition right now — check another tab or <a href="https://wa.me/${WHATSAPP}" style="color:var(--red);font-weight:700">message us</a>.</div>`; return; }
   $('grid').innerHTML=list.map(x=>`
     <article class="pcard" data-open="${esc(x.model)}">
-      <div class="phero">${cardVisual(x.model,cond)}</div>
+      <div class="phero"><button class="wishbtn ${inWish(x.model)?'on':''}" data-wish="${esc(x.model)}" aria-label="Save to wishlist"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>${cardVisual(x.model,cond)}</div>
       <div class="pinfo">
         <div class="pname">${esc(x.model)}</div>
         <div class="pmem">${x.mems.join('GB · ')}GB</div>
@@ -1160,6 +1484,7 @@ function renderGrid(){
       </div>
     </article>`).join('');
   $('grid').querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openProduct(el.dataset.open));
+  $('grid').querySelectorAll('.wishbtn').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.add('pop'); setTimeout(()=>b.classList.remove('pop'),320); toggleWish(b.dataset.wish); });
 }
 
 /* ---------- product sheet + swipeable gallery ---------- */
@@ -1176,7 +1501,9 @@ function condOptsHTML(){
   const baseP=condPickPrice(sel.model,'clean',sel.mem);
   return avail.map(cd=>{
     const p=condPickPrice(sel.model,cd.key,sel.mem);
-    const save=(cd.key!=='clean'&&baseP&&p&&baseP>p)?baseP-p:0;
+    /* Save is the gap between the ROUNDED prices so it always matches the
+       rounded figures shown to the customer. */
+    const save=(cd.key!=='clean'&&baseP&&p&&roundPrice(baseP)>roundPrice(p))?roundPrice(baseP)-roundPrice(p):0;
     return `<button class="copt ${cd.key===sel.cond?'on':''}" data-pcond="${cd.key}">
       <span class="rad"></span>
       <span class="cinf"><span class="cnm">${esc(cd.name)}</span><span class="cds">${esc(cd.pick)}</span></span>
@@ -1223,7 +1550,16 @@ function renderProduct(){
       ${sel.qty>1?`<div class="pqty">${sel.qty} × ${fmtFull(unit)}</div>`:''}
     </div>
     <button class="addbtn" id="pAdd" ${ok?'':'disabled'}>${ok?'Add to order — '+fmtFull(unit*sel.qty):'Out of stock'}</button>
-    <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>`;
+    <div class="freebie">🎁 Free case included · Free shipping · Express delivery +₦10,000</div>
+    <div class="pstory">
+      <div class="pwhy">Every MiStore iPhone is hand-checked, honestly graded and delivered with a free case — the closest thing to new, without the new price.</div>
+      <div class="pfacts">
+        <div class="pfact"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>Free delivery</b><span>10–15 days · express 7–10</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><line x1="10" y1="18" x2="14" y2="18"/></svg><b>Free case</b><span>with every phone</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg><b>Honestly graded</b><span>condition explained first</span></div>
+        <div class="pfact"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><b>Secure payment</b><span>verified bank account</span></div>
+      </div>
+    </div>`;
 
   /* gallery reads the live DOM so slides can be removed (failed images) at any time */
   let gi=0;
@@ -1328,7 +1664,7 @@ function renderCart(){
   $('cartBody').innerHTML=
     cart.map((it,i)=>`
       <div class="citem">
-        <div class="cthumb">${(adminImg(it.model,it.cond)||firstImg(it.model))?`<img loading="lazy" src="${esc(adminImg(it.model,it.cond)||firstImg(it.model))}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`:''}</div>
+        <div class="cthumb">${(()=>{const rp=realPhotos(it.model);const src=adminImg(it.model,it.cond)||(rp&&(rp.combo||rp.front||rp.back))||firstImg(it.model);return src?`<img loading="lazy" src="${esc(src)}" alt="${esc(it.model)}" style="width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'">`:'';})()}</div>
         <div class="cmainx">
           <div class="cn">${esc(it.model)} · ${it.mem}GB</div>
           <div class="cm">${esc(it.condName)}${it.color!=='No preference'?' · '+esc(it.color):''}</div>
@@ -1421,12 +1757,19 @@ function copyOrder(){
 
 /* ---------- sheets / bars / toast ---------- */
 const scrim=$('scrim'),prodSheet=$('prodSheet'),cartSheet=$('cartSheet'),checkoutSheet=$('checkoutSheet');
-function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet].forEach(s=>s.classList.remove('show')); document.body.style.overflow=''; updateBars(); }
+/* Product-page isolation: while a sheet is open the listing behind it is
+   suspended — background animations pause and the hero 3D stops rotating so
+   only the active screen consumes resources. */
+function setBackgroundActive(active){
+  document.documentElement.classList.toggle('sheet-open',!active);
+  const mv=window._heroMV;
+  if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
+}
+function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
 scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
-$('heroShop').onclick=()=>document.getElementById('phones').scrollIntoView({behavior:'smooth'});
 $('cartbar').onclick=openCart;
 function updateBars(){
   const q=totalQty();
@@ -1492,10 +1835,45 @@ async function loadShowcase(){
   SHOWCASE_ROWS=rows; renderShowcase();
 }
 
+/* ---------- theme, header icons & bottom nav ---------- */
+(function initChrome(){
+  /* theme toggle — default light, remember choice, never auto-dark */
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t==='dark'?'dark':'light');
+    const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content', t==='dark'?'#000000':'#F5F5F7');
+    if(t!=='dark') document.documentElement.removeAttribute('data-theme');
+  }
+  let theme='light'; try{ theme=localStorage.getItem('mistore-theme')||'light'; }catch(e){}
+  applyTheme(theme);
+  const tb=$('themeBtn'); if(tb) tb.onclick=()=>{ theme=(theme==='dark'?'light':'dark'); applyTheme(theme); try{localStorage.setItem('mistore-theme',theme);}catch(e){} };
+
+  /* header search + wishlist */
+  const sb=$('searchBtn'); if(sb) sb.onclick=openSearch;
+  const wb=$('wishBtn'); if(wb) wb.onclick=openWish;
+  $('searchCancel').onclick=closeSearch;
+  $('searchInput').addEventListener('input',e=>runSearch(e.target.value));
+  $('searchInput').addEventListener('keydown',e=>{ if(e.key==='Escape') closeSearch(); if(e.key==='Enter'){ const first=document.querySelector('.sres[data-sopen]'); if(first) first.click(); } });
+  $('wSheetClose').onclick=hideSheets;
+
+  /* bottom navigation */
+  document.querySelectorAll('.botnav .bn').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.botnav .bn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const k=b.dataset.bn;
+    if(k==='home') window.scrollTo({top:0,behavior:'smooth'});
+    else if(k==='shop') document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'});
+    else if(k==='cats') document.getElementById('deptBar').scrollIntoView({behavior:'smooth',block:'start'});
+    else if(k==='wish') openWish();
+    else if(k==='account') toast('Accounts are coming soon.');
+  });
+  updateWishUI();
+})();
+
 /* ---------- boot ---------- */
 buildFallbackCAT();
 bootChrome();
-renderCategories();
+renderDepts();
+renderBrands();
+renderMore();
 renderTabs();
 renderGrid();
 renderHotDeal();
@@ -1642,6 +2020,7 @@ renderShowcase(); /* show any config media immediately; Supabase adds more when 
         mv.addEventListener('load',()=>{ ok=true; mv.style.opacity='1';
           ['himg0','himg1','heroShine'].forEach(id=>{ const el=$(id); if(el) el.style.display='none'; }); });
         mv.addEventListener('error',()=>{ mv.remove(); });
+        window._heroMV=mv;   /* referenced by product-page isolation to pause rotation */
         wrap.appendChild(mv);
         setTimeout(()=>{ if(!ok) mv.remove(); },10000);         /* stuck? drop it, keep render */
         return;

@@ -1,0 +1,65 @@
+{
+ "active": [
+  {
+   "id": "e-bikes",
+   "name": "Electric Bikes",
+   "suppliers": [
+    "KUAILUZX"
+   ],
+   "count_hint": 57
+  },
+  {
+   "id": "e-motorcycles",
+   "name": "Electric Motorcycles",
+   "suppliers": [
+    "KUAILUZX",
+    "Leilin"
+   ],
+   "subcategories": [
+    {
+     "id": "high-performance",
+     "name": "High Performance",
+     "suppliers": [
+      "KUAILUZX"
+     ]
+    }
+   ]
+  }
+ ],
+ "image_only": [
+  {
+   "id": "e-tricycles",
+   "name": "Electric Tricycles",
+   "suppliers": [
+    "KUAILUZX"
+   ],
+   "status": "future",
+   "note": "Single-image catalog; specs need OCR/manual entry. Full-res strip provided."
+  },
+  {
+   "id": "optigo-premium",
+   "name": "OPTIGO Premium E-Bikes",
+   "suppliers": [
+    "OPTIGO"
+   ],
+   "status": "images_ready",
+   "note": "85 native full-page catalog images. Per-model specs need OCR/manual entry."
+  },
+  {
+   "id": "leilin-sport",
+   "name": "Leilin Sport Series",
+   "suppliers": [
+    "Leilin"
+   ],
+   "status": "images_ready",
+   "note": "Sport-series slides; model names embedded in images. Specs need OCR/manual entry."
+  }
+ ],
+ "future": [
+  "Scooters",
+  "Accessories",
+  "Batteries",
+  "Chargers",
+  "Helmets"
+ ]
+}

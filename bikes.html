@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F5F7">
+<script>
+(function(){try{var t=localStorage.getItem('mistore-theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','#000000');}}catch(e){}})();
+</script>
+<title>MiStore — Electric Mobility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F5F7; --card:#FFFFFF; --ink:#1D1D1F; --muted:#6E6E73; --faint:#9A9AA1;
+    --line:rgba(0,0,0,.07); --line2:rgba(0,0,0,.12);
+    --red:#FF3B30; --red-soft:rgba(255,59,48,.10);
+    --green:#1F9D5B; --green-soft:rgba(31,157,91,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.08);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.16);
+    --r:22px;
+    --hdr:rgba(245,245,247,.8); --tint:#0071E3;
+  }
+  :root[data-theme="dark"]{
+    --bg:#000000; --card:#1C1C1E; --ink:#F5F5F7; --muted:#98989F; --faint:#7C7C82;
+    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+    --red:#FF453A; --red-soft:rgba(255,69,58,.16);
+    --green:#30D158; --green-soft:rgba(48,209,88,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);
+    --shadow-lg:0 24px 70px rgba(0,0,0,.65);
+    --hdr:rgba(20,20,22,.72); --tint:#0A84FF; color-scheme:dark;
+  }
+  :root[data-theme="dark"] .bmedia,:root[data-theme="dark"] .dmedia .main{background:#0E0E10;}
+  .bmedia,.dmedia .main{position:relative;}
+  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--tint);animation:ringspin .75s linear infinite;}
+  @keyframes ringspin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+  img.fadein{opacity:0;transition:opacity .5s ease;} img.fadein.ready{opacity:1;}
+  /* category marketing hero */
+  .chero{background:linear-gradient(135deg,#0C0C10,#15151C);color:#fff;border-radius:var(--r);padding:26px 24px;margin:6px 0 22px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:22px;box-shadow:var(--shadow);overflow:hidden;position:relative;}
+  .chero::after{content:"";position:absolute;right:-6%;top:-30%;width:320px;height:320px;background:radial-gradient(circle,rgba(48,209,88,.14),transparent 68%);pointer-events:none;}
+  .chtext{max-width:34ch;z-index:1;}
+  .cheyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+  .chtext h2{font-size:clamp(24px,5vw,34px);letter-spacing:-.03em;margin:8px 0 8px;font-weight:800;line-height:1.06;}
+  .chtext p{color:rgba(255,255,255,.7);font-size:14.5px;margin:0;line-height:1.5;}
+  .chcta{margin-top:16px;background:#fff;color:#0A0A0E;border:none;border-radius:999px;padding:12px 22px;font-weight:800;font-size:14px;box-shadow:0 10px 26px rgba(0,0,0,.3);}
+  .chfacts{display:flex;gap:26px;z-index:1;flex-wrap:wrap;}
+  .chfact{display:flex;flex-direction:column;gap:3px;}
+  .chfact .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+  .chfact .v{font-size:19px;font-weight:800;letter-spacing:-.01em;}
+  @media (max-width:640px){ .chero{padding:22px 20px;} .chfacts{gap:18px;width:100%;} }
+  /* product story block */
+  .bstory{margin-top:16px;}
+  .bwhy{font-size:14px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px 15px;font-weight:500;}
+  .bfacts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px;}
+  .bfact{display:flex;flex-direction:column;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 12px;}
+  .bfact svg{width:21px;height:21px;stroke:var(--green);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px;}
+  .bfact b{font-size:12.5px;font-weight:800;}
+  .bfact span{font-size:11px;color:var(--muted);}
+  .themebtn{border:1px solid var(--line2);background:var(--card);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .themebtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .themebtn .moon{display:none;} :root[data-theme="dark"] .themebtn .sun{display:none;} :root[data-theme="dark"] .themebtn .moon{display:block;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;overflow-x:hidden;}
+  body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  button{font-family:inherit;cursor:pointer;color:inherit;}
+  a{color:inherit;text-decoration:none;}
+  .mono{font-variant-numeric:tabular-nums;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
+
+  header{position:sticky;top:0;z-index:40;background:var(--hdr);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+  .hdrright{display:flex;align-items:center;gap:10px;}
+  .nav{max-width:1080px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .logo{font-weight:800;font-size:21px;letter-spacing:-.045em;}
+  .logo .dash{color:var(--red);}
+  .navlinks{display:flex;gap:20px;font-size:13.5px;font-weight:600;color:var(--muted);}
+  .navlinks a.on{color:var(--ink);}
+  .navlinks a:active{color:var(--ink);}
+  .backbtn{border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:8px 15px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+
+  /* hero */
+  .hero{padding:52px 0 14px;text-align:center;background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(31,157,91,.06) 0%,transparent 66%);}
+  .hero .eyebrow{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);background:var(--green-soft);border-radius:999px;padding:6px 13px;}
+  .hero h1{font-size:clamp(32px,7vw,52px);letter-spacing:-.045em;line-height:1.05;margin:16px auto 12px;font-weight:800;max-width:15ch;}
+  .hero p{color:var(--muted);font-size:16.5px;max-width:46ch;margin:0 auto;}
+  .heroctas{display:flex;gap:11px;justify-content:center;margin-top:24px;flex-wrap:wrap;}
+  .cta{border:none;background:var(--ink);color:#fff;border-radius:999px;padding:14px 26px;font-weight:700;font-size:15px;box-shadow:0 12px 28px rgba(0,0,0,.18);}
+  .cta.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line2);box-shadow:none;}
+
+  /* category chips */
+  .cats{display:flex;gap:9px;overflow-x:auto;padding:20px 0 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .cats::-webkit-scrollbar{display:none;}
+  .cchip{flex:0 0 auto;border:1px solid var(--line2);background:var(--card);color:var(--muted);border-radius:999px;padding:10px 18px;font-weight:700;font-size:14px;white-space:nowrap;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px;transition:.18s;}
+  .cchip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .cchip .soon{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--green-soft);color:var(--green);padding:2px 6px;border-radius:6px;}
+  .cchip.on .soon{background:rgba(255,255,255,.2);color:#fff;}
+
+  /* controls */
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 4px;}
+  .controls .sel{border:1px solid var(--line2);background:var(--card);border-radius:12px;padding:9px 13px;font-size:13.5px;font-weight:600;color:var(--ink);font-family:inherit;}
+  .controls .count{margin-left:auto;font-size:13px;color:var(--faint);font-weight:600;}
+
+  /* section */
+  section{padding:26px 0 6px;}
+  .sechead h2{font-size:24px;letter-spacing:-.03em;margin:0;font-weight:800;}
+  .sechead p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
+
+  /* bike grid — image-first, minimal */
+  .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:18px;}
+  .bcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .18s,box-shadow .22s;}
+  .bcard:active{transform:scale(.99);}
+  @media (hover:hover){ .bcard:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(0,0,0,.13);} }
+  .bmedia{aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .bmedia img{width:100%;height:100%;object-fit:contain;padding:8px;}
+  .binfo{padding:14px 15px 16px;display:flex;flex-direction:column;gap:3px;flex:1;}
+  .bname{font-size:16px;font-weight:700;letter-spacing:-.02em;}
+  .bspec{font-size:12.5px;color:var(--faint);font-weight:600;}
+  .bbadges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .bbadge{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px 8px;}
+  .bfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;}
+  .bprice{font-size:18px;font-weight:800;letter-spacing:-.02em;}
+  .bprice small{font-size:11.5px;color:var(--muted);font-weight:600;}
+  .bstock{font-size:11px;font-weight:700;color:var(--green);display:inline-flex;align-items:center;gap:5px;}
+  .bstock::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);}
+  .bview{margin-top:12px;border:1px solid var(--line2);background:var(--bg);border-radius:12px;padding:10px;font-weight:700;font-size:13px;text-align:center;}
+
+  .comingsoon{text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line2);border-radius:var(--r);padding:46px 20px;box-shadow:var(--shadow);}
+  .comingsoon .big{font-size:40px;margin-bottom:10px;}
+  .comingsoon h3{margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+  .csgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:20px;}
+  .csgrid img{width:100%;border-radius:14px;border:1px solid var(--line);background:#fff;}
+
+  footer{margin-top:48px;background:var(--card);border-top:1px solid var(--line);padding:26px 0 30px;}
+  .fnote{font-size:12px;color:var(--faint);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .fnote a{color:var(--muted);font-weight:600;}
+
+  /* detail sheet */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.34);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .scrim.show{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--bg);border-radius:24px 24px 0 0;box-shadow:var(--shadow-lg);transform:translateY(102%);transition:transform .32s cubic-bezier(.32,.72,0,1);max-height:93vh;overflow-y:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 22px);}
+  .sheet.show{transform:translateY(0);}
+  .grab{width:38px;height:4px;background:var(--line2);border-radius:99px;margin:10px auto 4px;}
+  .shead{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 13px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:2;}
+  .shead h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em;}
+  .xbtn{border:none;background:var(--line);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .sbody{padding:16px 20px 0;max-width:640px;margin:0 auto;width:100%;}
+  .dmedia{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;}
+  .dmedia .main{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+  .dmedia .main img{width:100%;height:100%;object-fit:contain;padding:12px;}
+  .dthumbs{display:flex;gap:8px;overflow-x:auto;padding:10px;scrollbar-width:none;}
+  .dthumbs::-webkit-scrollbar{display:none;}
+  .dthumbs button{flex:0 0 auto;width:56px;height:48px;border-radius:10px;border:2px solid transparent;background:#fff;overflow:hidden;padding:0;}
+  .dthumbs button.on{border-color:var(--red);}
+  .dthumbs img{width:100%;height:100%;object-fit:contain;padding:3px;}
+  .dtitle{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:16px 0 2px;}
+  .dsub{font-size:13px;color:var(--muted);}
+  .flabel{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13px;color:var(--ink);}
+  .chip .cp{font-size:11px;color:var(--muted);font-weight:600;display:block;}
+  .chip.on{border-color:var(--red);background:#FFF5F4;color:var(--red);}
+  .chip.on .cp{color:var(--red);opacity:.75;}
+  .specs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:6px;}
+  .specs div{background:var(--card);padding:11px 13px;}
+  .specs .k{font-size:11px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+  .specs .v{font-size:14px;font-weight:600;margin-top:2px;}
+  .feat{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+  .feat span{font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 11px;}
+  .pricebig{display:block;margin:20px 0 4px;}
+  .pricebig .pv{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1;}
+  .pricebig .pnote{font-size:13px;color:var(--muted);font-weight:500;margin-left:8px;}
+  .breakdown{font-size:12.5px;color:var(--faint);margin-top:8px;line-height:1.7;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .breakdown b{color:var(--ink);}
+  .wabtn{width:100%;border:none;background:#1FAA53;color:#fff;border-radius:15px;padding:16px;font-weight:800;font-size:15.5px;margin-top:14px;box-shadow:0 12px 26px rgba(31,170,83,.28);}
+  .disc{font-size:11.5px;color:var(--faint);text-align:center;margin-top:10px;}
+
+  /* premium bike hero — real product photo on white (blends with the image's
+     own white background); stays a light spotlight card in dark mode too */
+  .bikehero{margin:16px 0 6px;border-radius:26px;overflow:hidden;position:relative;
+    background:#FFFFFF;color:#1D1D1F;border:1px solid rgba(0,0,0,.08);box-shadow:var(--shadow-lg);}
+  .bhinner{display:flex;align-items:center;gap:14px;padding:30px 34px;flex-wrap:wrap;position:relative;z-index:1;}
+  .bhtext{flex:1 1 290px;min-width:250px;}
+  .bhtext .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1F9D5B;background:rgba(31,157,91,.10);border-radius:999px;padding:6px 13px;}
+  .bhtext h1{font-size:clamp(32px,6vw,50px);letter-spacing:-.045em;line-height:1.04;margin:15px 0 11px;font-weight:800;color:#1D1D1F;}
+  .bhtext p{color:#6E6E73;font-size:15.5px;max-width:38ch;margin:0;line-height:1.5;}
+  .bikehero .heroctas{justify-content:flex-start;}
+  .bikehero .cta{background:#1D1D1F;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.18);}
+  .bikehero .cta.ghost{background:#fff;color:#1D1D1F;border:1px solid rgba(0,0,0,.14);box-shadow:none;}
+  .bhstage{flex:1 1 320px;position:relative;display:flex;align-items:center;justify-content:center;min-height:220px;}
+  .bhbike{width:100%;max-width:480px;z-index:1;mix-blend-mode:multiply;}
+  @media (max-width:720px){ .bhinner{padding:26px 22px 6px;flex-direction:column;text-align:center;} .bhtext{min-width:0;} .bhtext p{margin:0 auto;} .bikehero .heroctas{justify-content:center;} .bhstage{width:100%;min-height:0;} .bhbike{max-width:400px;} }
+
+  @media (max-width:640px){ .navlinks{display:none;} .specs{grid-template-columns:1fr 1fr;} }
+  @media (max-width:500px){ .bgrid{grid-template-columns:repeat(2,1fr);gap:12px;} .bname{font-size:14px;} .bprice{font-size:15px;} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="index.html">Mi<span class="dash">Store</span></a>
+    <nav class="navlinks">
+      <a href="index.html">iPhones</a>
+      <a href="bikes.html" class="on">Electric Mobility</a>
+      <a href="track.html">Track order</a>
+    </nav>
+    <div class="hdrright">
+      <button class="themebtn" id="themeBtn" aria-label="Toggle dark mode">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="backbtn" href="index.html">← Phones</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="bikehero">
+    <div class="bhinner">
+      <div class="bhtext">
+        <span class="eyebrow">Electric Mobility</span>
+        <h1>Ride smarter.</h1>
+        <p>Premium electric bikes and motorcycles — honestly priced and delivered to your door anywhere in Nigeria.</p>
+        <div class="heroctas">
+          <button class="cta" id="heroShop">Browse the collection</button>
+          <a class="cta ghost" href="index.html">Shop iPhones</a>
+        </div>
+      </div>
+      <div class="bhstage">
+        <img class="bhbike" src="assets/bikes/hero-bike-photo.webp" alt="Premium electric motorcycle" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </section>
+
+  <div class="cats" id="cats"></div>
+  <div class="controls">
+    <select class="sel" id="sortSel">
+      <option value="new">Newest</option>
+      <option value="plow">Price: Low to High</option>
+      <option value="phigh">Price: High to Low</option>
+      <option value="power">Motor power</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="view"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fnote">
+      <span>© <span id="yr"></span> MiStore · Electric Mobility · Prices in Naira (₦)</span>
+      <span><a href="index.html">iPhones</a> · <a href="track.html">Track order</a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="dName">Details</h2><button class="xbtn" id="dClose">✕</button></div>
+  <div class="sbody" id="dBody"></div>
+</div>
+
+<script>
+/* ============================================================
+   MiStore — Electric Mobility (bikes)
+   Data + images are bundled in the repo (assets/bikes/*) so the
+   page loads on any network. Prices are computed live from
+   assets/bikes/data/config.json — never hardcoded.
+   ============================================================ */
+const WHATSAPP = "2348130164763";
+const IMG_BASE = "assets/bikes/images/";
+let CONFIG = { shipping_per_cbm_ngn:500000, logistics_service_ngn:70000, rmb_to_ngn:208, usd_to_rmb:7.2 };
+let PRODUCTS = [], CATS = null;
+let cat = 'all', sort = 'new';
+let sel = null, selOpt = 0, selImg = 0;
+
+const $=id=>document.getElementById(id);
+function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
+/* MiStore price policy: round displayed prices UP to the nearest ₦5,000.
+   Under ₦1,000,000 → "₦515k"; ₦1,000,000+ → full number, no k. */
+function roundPrice(n){ return Math.ceil((+n||0)/5000)*5000; }
+function fmt(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+function fmtExact(n){ return '₦'+Math.round(n).toLocaleString(); }
+function fmtK(n){ return n>=1000000?('₦'+(n/1000000).toFixed(2).replace(/\.?0+$/,'')+'m'):('₦'+Math.round(n/1000)+'k'); }
+function imgUrl(p){ return IMG_BASE+p; }
+
+/* ---- pricing (compute, never hardcode) ----
+   USD FOB is converted USD->RMB->Naira; RMB FOB uses the Naira rate directly. */
+function logServ(){ return CONFIG.logistics_service_ngn!=null ? CONFIG.logistics_service_ngn : ((CONFIG.logistics_ngn||0)+(CONFIG.profit_ngn||0)); }
+function rateFor(cur){ return cur==='RMB' ? CONFIG.rmb_to_ngn : (CONFIG.usd_to_rmb||7.2)*CONFIG.rmb_to_ngn; }
+function priceOf(p, fob){
+  const cur=p.currency||'USD';
+  const f = fob!=null ? fob : p.fob_price;
+  const shipping = (p.cbm||0)*CONFIG.shipping_per_cbm_ngn;
+  const cost = (f||0)*rateFor(cur);
+  return shipping + logServ() + cost;
+}
+/* battery/motor options → [{label, fob, cur}] */
+function optionsOf(p){
+  const out=[];
+  if(Array.isArray(p.battery_price_map)&&p.battery_price_map.length){
+    p.battery_price_map.forEach(b=>out.push({label:b.battery||b.config||'Standard', fob:(b.fob_usd!=null?b.fob_usd:(b.fob_rmb!=null?b.fob_rmb:b.rmb)), cur:(b.fob_rmb!=null||b.rmb!=null)?'RMB':(p.currency||'USD'), mileage:b.mileage}));
+  } else if(Array.isArray(p.price_ladder)&&p.price_ladder.length){
+    p.price_ladder.forEach(b=>out.push({label:b.config||'Standard', fob:b.rmb, cur:'RMB', mileage:b.mileage}));
+  }
+  return out.filter(o=>o.fob!=null);
+}
+
+function motorW(p){ const m=(p.motor||'').match(/(\d+)\s*W/i); return m?+m[1]:0; }
+
+function activeList(){
+  let list = PRODUCTS.filter(p=>p.is_primary!==false);
+  if(cat==='e-bikes') list=list.filter(p=>p.category==='Electric Bikes');
+  else if(cat==='e-motorcycles') list=list.filter(p=>p.category==='Electric Motorcycles');
+  else if(cat==='high-performance') list=list.filter(p=>p.category==='Electric Motorcycles' && motorW(p)>=1500);
+  if(sort==='plow') list=[...list].sort((a,b)=>priceOf(a)-priceOf(b));
+  else if(sort==='phigh') list=[...list].sort((a,b)=>priceOf(b)-priceOf(a));
+  else if(sort==='power') list=[...list].sort((a,b)=>motorW(b)-motorW(a));
+  return list;
+}
+
+function renderCats(){
+  const chips=[
+    {id:'all',name:'All'},
+    {id:'e-bikes',name:'Electric Bikes'},
+    {id:'e-motorcycles',name:'Electric Motorcycles'},
+    {id:'high-performance',name:'High Performance'},
+    {id:'e-tricycles',name:'Tricycles',soon:1},
+    {id:'optigo-premium',name:'Premium Series',soon:1},
+    {id:'leilin-sport',name:'Sport Series',soon:1},
+  ];
+  $('cats').innerHTML=chips.map(c=>`<button class="cchip ${c.id===cat?'on':''}" data-cat="${c.id}">${esc(c.name)}${c.soon?'<span class="soon">Soon</span>':''}</button>`).join('');
+  $('cats').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; renderCats(); renderView(); });
+}
+
+function cardHTML(p){
+  const spec=[p.motor,(p.voltage||'').split('/')[0].trim().toUpperCase(),(p.top_speed||'')].filter(Boolean).join(' · ');
+  const badges=[p.range?('🔋 '+p.range.split('/')[0].trim()):'',p.brake?('🛑 '+(p.brake.includes('Disc')?'Disc brake':'Drum brake')):''].filter(Boolean);
+  return `<article class="bcard" data-open="${esc(p.id)}">
+    <div class="bmedia"><span class="ring"></span><img class="fadein" loading="lazy" src="${esc(imgUrl(p.image))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
+    <div class="binfo">
+      <div class="bname">${esc(p.model)}</div>
+      <div class="bspec">${esc(spec)}</div>
+      <div class="bbadges">${badges.map(b=>`<span class="bbadge">${esc(b)}</span>`).join('')}</div>
+      <div class="bfoot"><span class="bprice">${fmt(priceOf(p))}</span><span class="bstock">In stock</span></div>
+      <div class="bview">View details</div>
+    </div>
+  </article>`;
+}
+
+const COMING={
+ 'e-tricycles':{icon:'🛺',title:'Electric Tricycles — coming soon',note:'Cargo & passenger trikes. Full specs are being added.',imgs:[]},
+ 'optigo-premium':{icon:'🚲',title:'Premium E-Bikes — coming soon',note:'A premium commuter line. Landing shortly.',imgs:[]},
+ 'leilin-sport':{icon:'🏍️',title:'Sport Series — coming soon',note:'Sport-series electric motorcycles. Landing shortly.',imgs:[]},
+};
+const CAT_COPY={
+  all:{t:'Premium electric mobility',d:'Electric bikes and motorcycles that go the distance — honestly priced and delivered to your door anywhere in Nigeria.'},
+  'e-bikes':{t:'Electric Bikes',d:'Ride farther on premium lithium batteries — quiet, clean and built for Nigerian roads.'},
+  'e-motorcycles':{t:'Electric Motorcycles',d:'Serious torque, silent runs. Premium electric motorcycles for the daily commute and beyond.'},
+  'high-performance':{t:'High Performance',d:'Our most powerful electric motorcycles — 1500W and up, built for riders who want more.'},
+};
+function catHero(list){
+  const c=CAT_COPY[cat]||CAT_COPY.all;
+  const from=list.length?Math.min(...list.map(p=>priceOf(p))):0;
+  return `<div class="chero">
+    <div class="chtext">
+      <span class="cheyebrow">MiStore · Electric Mobility</span>
+      <h2>${esc(c.t)}</h2>
+      <p>${esc(c.d)}</p>
+      <button class="chcta" onclick="document.getElementById('view').querySelector('.bgrid').scrollIntoView({behavior:'smooth',block:'start'})">Explore ${list.length} model${list.length===1?'':'s'} →</button>
+    </div>
+    <div class="chfacts">
+      <div class="chfact"><span class="k">Starting from</span><span class="v">${from?fmt(from):'—'}</span></div>
+      <div class="chfact"><span class="k">Delivery</span><span class="v">60–90 days</span></div>
+      <div class="chfact"><span class="k">Warranty</span><span class="v">12 months</span></div>
+    </div>
+  </div>`;
+}
+function renderView(){
+  const v=$('view');
+  if(COMING[cat]){
+    const c=COMING[cat];
+    v.innerHTML=`<section><div class="comingsoon"><div class="big">${c.icon}</div><h3>${esc(c.title)}</h3><p style="max-width:40ch;margin:0 auto;color:var(--muted)">${esc(c.note)} Want to be notified? <a href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent('Hi MiStore, tell me when '+c.title.split(' — ')[0]+' are available.')}" target="_blank" rel="noopener" style="color:var(--green);font-weight:700">Message us</a>.</p>${c.imgs.length?`<div class="csgrid">${c.imgs.map(i=>`<img loading="lazy" src="${esc(imgUrl(i))}" alt="">`).join('')}</div>`:''}</div></section>`;
+    $('count').textContent='';
+    return;
+  }
+  const list=activeList();
+  $('count').textContent=list.length+' model'+(list.length===1?'':'s');
+  const hero=catHero(list);
+  if(cat==='all'){
+    const groups=[['Electric Bikes',list.filter(p=>p.category==='Electric Bikes')],['Electric Motorcycles',list.filter(p=>p.category==='Electric Motorcycles')]];
+    v.innerHTML=hero+groups.filter(g=>g[1].length).map(g=>`
+      <section><div class="sechead"><h2>${g[0]}</h2><p>${g[1].length} model${g[1].length===1?'':'s'} · tap any to see full specs</p></div>
+      <div class="bgrid">${g[1].map(cardHTML).join('')}</div></section>`).join('');
+  } else {
+    v.innerHTML=hero+`<section><div class="bgrid">${list.map(cardHTML).join('')}</div></section>`;
+  }
+  v.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openBike(el.dataset.open));
+}
+
+/* ---- detail sheet ---- */
+function openBike(id){
+  sel=PRODUCTS.find(p=>p.id===id); if(!sel) return;
+  selOpt=0; selImg=0; renderDetail(); showSheet();
+}
+function renderDetail(){
+  const p=sel; const opts=optionsOf(p);
+  const imgs=(p.images&&p.images.length?p.images:[p.image]);
+  const curFob = opts.length?opts[selOpt].fob:null;
+  const curCur = opts.length?opts[selOpt].cur:(p.currency||'USD');
+  const price = opts.length? priceOfOpt(p,opts[selOpt]) : priceOf(p);
+  const curMileage = opts.length ? opts[selOpt].mileage : null;
+  const curBattery = opts.length ? opts[selOpt].label : null;
+  const specRows=[
+    ['Motor',p.motor],['Battery',curBattery||p.battery_type],['Voltage',(p.voltage||'').toUpperCase()],
+    ['Top speed',p.top_speed],['Range',curMileage||p.range],['Wheel',p.wheel_size],['Brakes',p.brake],
+    ['Max load',p.max_load],['Weight',p.weight]
+  ].filter(r=>r[1]);
+  $('dName').textContent=p.model;
+  $('dBody').innerHTML=`
+    <div class="dmedia">
+      <div class="main" id="dMain"><span class="ring"></span><img class="fadein" src="${esc(imgUrl(imgs[0]))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
+      ${imgs.length>1?`<div class="dthumbs" id="dThumbs">${imgs.map((im,i)=>`<button class="${i===0?'on':''}" data-img="${i}"><img src="${esc(imgUrl(im))}" alt=""></button>`).join('')}</div>`:''}
+    </div>
+    <div class="dtitle">${esc(p.model)}</div>
+    <div class="dsub">${esc(p.category)}</div>
+    ${opts.length>1?`<div class="flabel">Choose battery — range &amp; price update live</div><div class="chips" id="dOpts">${opts.map((o,i)=>`<button class="chip ${i===selOpt?'on':''}" data-opt="${i}">${esc(o.label)}${o.mileage?`<span class="cp">${esc(o.mileage)}</span>`:''}</button>`).join('')}</div>`:''}
+    ${(p.features&&p.features.length)?`<div class="flabel">Features</div><div class="feat">${p.features.map(f=>`<span>✓ ${esc(f)}</span>`).join('')}</div>`:''}
+    <div class="flabel">Specifications</div>
+    <div class="specs">${specRows.map(r=>`<div><div class="k">${esc(r[0])}</div><div class="v">${esc(r[1])}</div></div>`).join('')}</div>
+    <div class="pricebig"><span class="pv" id="dPrice">${fmt(price)}</span><span class="pnote">delivered · incl. shipping</span></div>
+    <div class="breakdown" id="dBreak"></div>
+    <button class="wabtn" id="dOrder">Order on WhatsApp</button>
+    <div class="disc">We confirm availability &amp; final delivery details with you on WhatsApp before any payment.</div>
+    <div class="bstory">
+      <div class="bwhy">Charged, inspected and road-tested before it ships. Delivered to your door anywhere in Nigeria with a 12-month warranty and MiStore support the whole way.</div>
+      <div class="bfacts">
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>Nationwide delivery</b><span>60–90 days by sea</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/></svg><b>12-month warranty</b><span>motor &amp; controller</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><b>Tested before dispatch</b><span>charged &amp; inspected</span></div>
+        <div class="bfact"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><b>Secure payment</b><span>verified bank account</span></div>
+      </div>
+    </div>`;
+  renderBreak();
+  const thumbs=$('dThumbs');
+  if(thumbs) thumbs.querySelectorAll('[data-img]').forEach(b=>b.onclick=()=>{ selImg=+b.dataset.img; const mi=$('dMain').querySelector('img'); if(mi) mi.src=imgUrl(imgs[selImg]); thumbs.querySelectorAll('button').forEach((x,i)=>x.classList.toggle('on',i===selImg)); });
+  const optEls=$('dOpts');
+  if(optEls) optEls.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{ selOpt=+b.dataset.opt; renderDetail(); });
+  $('dOrder').onclick=orderWhatsApp;
+}
+function priceOfOpt(p,o){ return priceOf({...p,currency:o.cur}, o.fob); }
+function renderBreak(){
+  const p=sel; const opts=optionsOf(p);
+  const cur=opts.length?opts[selOpt].cur:(p.currency||'USD');
+  const fob=opts.length?opts[selOpt].fob:p.fob_price;
+  const rate=rateFor(cur);
+  const shipping=(p.cbm||0)*CONFIG.shipping_per_cbm_ngn;
+  const cost=(fob||0)*rate;
+  const calc = cur==='RMB' ? `¥${fob} × ${CONFIG.rmb_to_ngn}` : `$${fob} × ${CONFIG.usd_to_rmb} × ${CONFIG.rmb_to_ngn}`;
+  $('dBreak').innerHTML=`Product cost: <b>${fmtExact(cost)}</b> (${calc})<br>Shipping (${(p.cbm||0).toFixed(3)} CBM): <b>${fmtExact(shipping)}</b><br>Logistics &amp; services: <b>${fmtExact(logServ())}</b>`;
+}
+function orderWhatsApp(){
+  const p=sel; const opts=optionsOf(p);
+  const optTxt=opts.length?('\nBattery: '+opts[selOpt].label):'';
+  const price=opts.length?priceOfOpt(p,opts[selOpt]):priceOf(p);
+  let t=`🛵 MiStore — Electric Mobility order\n\nModel: ${p.model}\nCategory: ${p.category}\nMotor: ${p.motor||'—'} · ${(p.voltage||'').toUpperCase()}${optTxt}\nPrice: ${fmt(price)} (delivered)\n\nPlease confirm availability & delivery to my area.`;
+  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(t)}`,'_blank');
+}
+
+/* ---- sheet plumbing ---- */
+const scrim=$('scrim'),sheet=$('sheet');
+function showSheet(){ scrim.classList.add('show'); sheet.classList.add('show'); document.body.style.overflow='hidden'; }
+function hideSheet(){ scrim.classList.remove('show'); sheet.classList.remove('show'); document.body.style.overflow=''; }
+scrim.onclick=hideSheet; $('dClose').onclick=hideSheet;
+$('heroShop').onclick=()=>$('cats').scrollIntoView({behavior:'smooth'});
+$('sortSel').onchange=e=>{ sort=e.target.value; renderView(); };
+$('yr').textContent=new Date().getFullYear();
+
+/* theme toggle — default light, remembered, never auto-dark */
+(function(){
+  let theme='light'; try{ theme=localStorage.getItem('mistore-theme')||'light'; }catch(e){}
+  function apply(t){ if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');} const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content',t==='dark'?'#000000':'#F5F5F7'); }
+  apply(theme);
+  const tb=$('themeBtn'); if(tb) tb.onclick=()=>{ theme=(theme==='dark'?'light':'dark'); apply(theme); try{localStorage.setItem('mistore-theme',theme);}catch(e){} };
+})();
+
+/* Live pricing overrides set in the admin panel (Supabase). Falls back
+   silently to the bundled config.json when unreachable. */
+const SUPABASE_URL='https://pisfsnmwwotxxuouogqz.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';
+function loadRemoteConfig(){
+  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),3500);
+  return fetch(`${SUPABASE_URL}/rest/v1/bike_config?id=eq.default&select=shipping_per_cbm_ngn,logistics_service_ngn,rmb_to_ngn,usd_to_rmb`,
+      {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY},signal:ctl.signal})
+    .then(r=>r.ok?r.json():null)
+    .then(rows=>{ clearTimeout(t); if(Array.isArray(rows)&&rows[0]){ CONFIG={...CONFIG,...rows[0]}; if(PRODUCTS.length){ renderCats(); renderView(); } } })
+    .catch(()=>{ clearTimeout(t); });
+}
+
+/* ---- boot: load bundled data ---- */
+Promise.all([
+  fetch('assets/bikes/data/products.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('assets/bikes/data/config.json',{cache:'no-store'}).then(r=>r.json()).catch(()=>null),
+]).then(([pj,cfg])=>{
+  if(cfg) CONFIG={...CONFIG,...cfg};
+  else if(pj&&pj.config) CONFIG={...CONFIG,...pj.config};
+  PRODUCTS=(pj.products||pj||[]).slice();
+  renderCats(); renderView();
+  loadRemoteConfig();   /* apply admin overrides if present */
+}).catch(e=>{
+  $('view').innerHTML='<section><div class="comingsoon"><div class="big">🛵</div><h3>Loading…</h3><p style="color:var(--muted)">Bikes are on the way.</p></div></section>';
+});
+</script>
+</body>
+</html>
