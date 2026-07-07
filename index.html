@@ -958,8 +958,8 @@ const CATALOG_MODELS = [
 ];
 const CONDITIONS = [
   { key:'clean',   name:'Clean (London Used)', short:'Original parts',   pick:'Original screen & battery · like new',  long:'<b>Clean (London Used).</b> Original screen and battery, clean body, premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone.' },
-  { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
   { key:'battery', name:'Battery Display',     short:'Replaced battery', pick:'Battery professionally replaced',       long:'<b>Battery Display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
+  { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
   { key:'double',  name:'Double Display',      short:'Screen + battery', pick:'Screen & battery replaced',             long:'<b>Double Display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
 ];
 const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","Purple","Red","Pink","Titanium"];
@@ -1335,8 +1335,13 @@ async function loadLive(){
    ============================================================ */
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
-function fmtK(n){ return n>=1000000?('₦'+n.toLocaleString()):('₦'+Math.floor(n/1000)+'k'); }
-function fmtFull(n){ return '₦'+Math.round(n).toLocaleString(); }
+/* MiStore price policy: round every displayed price UP to the nearest ₦5,000.
+   Under ₦1,000,000 → show as "₦255k"; ₦1,000,000+ → full number, no k. */
+function roundPrice(n){ return Math.ceil((+n||0)/5000)*5000; }
+function fmtK(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+function fmtFull(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+/* exact naira (no rounding) — for internal breakdowns only */
+function fmtExact(n){ return '₦'+Math.round(n).toLocaleString(); }
 function condDef(k){ return CONDITIONS.find(c=>c.key===k)||CONDITIONS[0]; }
 
 let dept='phones';
@@ -1496,7 +1501,9 @@ function condOptsHTML(){
   const baseP=condPickPrice(sel.model,'clean',sel.mem);
   return avail.map(cd=>{
     const p=condPickPrice(sel.model,cd.key,sel.mem);
-    const save=(cd.key!=='clean'&&baseP&&p&&baseP>p)?baseP-p:0;
+    /* Save is the gap between the ROUNDED prices so it always matches the
+       rounded figures shown to the customer. */
+    const save=(cd.key!=='clean'&&baseP&&p&&roundPrice(baseP)>roundPrice(p))?roundPrice(baseP)-roundPrice(p):0;
     return `<button class="copt ${cd.key===sel.cond?'on':''}" data-pcond="${cd.key}">
       <span class="rad"></span>
       <span class="cinf"><span class="cnm">${esc(cd.name)}</span><span class="cds">${esc(cd.pick)}</span></span>

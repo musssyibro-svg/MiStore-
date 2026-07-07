@@ -174,6 +174,26 @@
   .wabtn{width:100%;border:none;background:#1FAA53;color:#fff;border-radius:15px;padding:16px;font-weight:800;font-size:15.5px;margin-top:14px;box-shadow:0 12px 26px rgba(31,170,83,.28);}
   .disc{font-size:11.5px;color:var(--faint);text-align:center;margin-top:10px;}
 
+  /* premium bike hero (real trimmed photo on a studio background — no 3D) */
+  .bikehero{margin:16px 0 6px;border-radius:26px;overflow:hidden;position:relative;color:#fff;
+    background:radial-gradient(125% 130% at 82% 8%, #17352a 0%, #101820 42%, #0a0a0e 72%, #08080b 100%);
+    box-shadow:var(--shadow-lg);}
+  .bikehero::before{content:"";position:absolute;right:2%;bottom:2%;width:66%;height:78%;
+    background:radial-gradient(circle at 60% 60%, rgba(48,209,88,.20), transparent 62%);pointer-events:none;}
+  .bhinner{display:flex;align-items:center;gap:18px;padding:38px 34px;flex-wrap:wrap;position:relative;z-index:1;}
+  .bhtext{flex:1 1 300px;min-width:250px;}
+  .bhtext .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#5FE39A;background:rgba(48,209,88,.14);border:1px solid rgba(48,209,88,.25);border-radius:999px;padding:6px 13px;}
+  .bhtext h1{font-size:clamp(34px,6.4vw,54px);letter-spacing:-.045em;line-height:1.03;margin:16px 0 12px;font-weight:800;color:#fff;}
+  .bhtext p{color:rgba(255,255,255,.72);font-size:16px;max-width:40ch;margin:0;line-height:1.5;}
+  .bikehero .heroctas{justify-content:flex-start;}
+  .bikehero .cta{background:#fff;color:#0A0A0E;box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  .bikehero .cta.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.28);}
+  .bhstage{flex:1 1 320px;position:relative;display:flex;align-items:center;justify-content:center;min-height:230px;}
+  .bhbike{width:100%;max-width:470px;z-index:1;filter:drop-shadow(0 34px 44px rgba(0,0,0,.6));animation:bhfloat 6s ease-in-out infinite;}
+  .bhstage::after{content:"";position:absolute;bottom:9%;left:50%;transform:translateX(-50%);width:64%;height:24px;background:radial-gradient(ellipse at center, rgba(0,0,0,.6), transparent 70%);filter:blur(7px);z-index:0;}
+  @keyframes bhfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+  @media (max-width:720px){ .bhinner{padding:30px 22px 8px;flex-direction:column;text-align:center;} .bhtext{min-width:0;} .bhtext p{margin:0 auto;} .bikehero .heroctas{justify-content:center;} .bhstage{width:100%;min-height:200px;} .bhbike{max-width:340px;} }
+
   @media (max-width:640px){ .navlinks{display:none;} .specs{grid-template-columns:1fr 1fr;} }
   @media (max-width:500px){ .bgrid{grid-template-columns:repeat(2,1fr);gap:12px;} .bname{font-size:14px;} .bprice{font-size:15px;} }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important;} }
@@ -200,13 +220,20 @@
 </header>
 
 <div class="wrap">
-  <section class="hero">
-    <span class="eyebrow">Electric Mobility</span>
-    <h1>Ride smarter.</h1>
-    <p>A curated collection of electric bikes and motorcycles — honestly priced and shipped to your door anywhere in Nigeria.</p>
-    <div class="heroctas">
-      <button class="cta" id="heroShop">Browse the collection</button>
-      <a class="cta ghost" href="index.html">Shop iPhones</a>
+  <section class="bikehero">
+    <div class="bhinner">
+      <div class="bhtext">
+        <span class="eyebrow">Electric Mobility</span>
+        <h1>Ride smarter.</h1>
+        <p>Premium electric bikes and motorcycles — honestly priced and delivered to your door anywhere in Nigeria.</p>
+        <div class="heroctas">
+          <button class="cta" id="heroShop">Browse the collection</button>
+          <a class="cta ghost" href="index.html">Shop iPhones</a>
+        </div>
+      </div>
+      <div class="bhstage">
+        <img class="bhbike" src="assets/bikes/hero-bike.png" alt="Premium electric sport motorcycle" onerror="this.style.display='none'">
+      </div>
     </div>
   </section>
 
@@ -256,7 +283,11 @@ let sel = null, selOpt = 0, selImg = 0;
 
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
-function fmt(n){ return '₦'+Math.round(n).toLocaleString(); }
+/* MiStore price policy: round displayed prices UP to the nearest ₦5,000.
+   Under ₦1,000,000 → "₦515k"; ₦1,000,000+ → full number, no k. */
+function roundPrice(n){ return Math.ceil((+n||0)/5000)*5000; }
+function fmt(n){ const r=roundPrice(n); return r>=1000000?('₦'+r.toLocaleString()):('₦'+(r/1000)+'k'); }
+function fmtExact(n){ return '₦'+Math.round(n).toLocaleString(); }
 function fmtK(n){ return n>=1000000?('₦'+(n/1000000).toFixed(2).replace(/\.?0+$/,'')+'m'):('₦'+Math.round(n/1000)+'k'); }
 function imgUrl(p){ return IMG_BASE+p; }
 
@@ -430,7 +461,8 @@ function renderBreak(){
   const rate=rateFor(cur);
   const shipping=(p.cbm||0)*CONFIG.shipping_per_cbm_ngn;
   const cost=(fob||0)*rate;
-  $('dBreak').innerHTML=`Product cost: <b>${fmt(cost)}</b> (${cur==='RMB'?'¥':'$'}${fob} × ${rate})<br>Shipping (${(p.cbm||0).toFixed(3)} CBM): <b>${fmt(shipping)}</b><br>Logistics: <b>${fmt(CONFIG.logistics_ngn)}</b> · Service: <b>${fmt(CONFIG.profit_ngn)}</b>`;
+  const logserv=(CONFIG.logistics_ngn||0)+(CONFIG.profit_ngn||0);
+  $('dBreak').innerHTML=`Product cost: <b>${fmtExact(cost)}</b> (${cur==='RMB'?'¥':'$'}${fob} × ${rate})<br>Shipping (${(p.cbm||0).toFixed(3)} CBM): <b>${fmtExact(shipping)}</b><br>Logistics &amp; services: <b>${fmtExact(logserv)}</b>`;
 }
 function orderWhatsApp(){
   const p=sel; const opts=optionsOf(p);
