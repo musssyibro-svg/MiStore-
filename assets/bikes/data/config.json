@@ -1,0 +1,13 @@
+{
+  "currency": "NGN",
+  "shipping_per_cbm_ngn": 500000,
+  "profit_ngn": 50000,
+  "logistics_ngn": 10000,
+  "rmb_to_ngn": 209,
+  "usd_to_ngn": 1600,
+  "_notes": {
+    "usd_to_ngn": "CLIENT DID NOT PROVIDE A USD RATE. 1600 is a placeholder default; update in admin panel. Only affects KUAILUZX + High-Power (USD FOB). Leilin is RMB and uses rmb_to_ngn=209.",
+    "cbm": "KUAILUZX / High-Power CBM is ESTIMATED from container capacity (40HQ~76.3m3 else 20FCL~33.1m3 / units). Leilin CBM is computed from real carton packing dimensions. Verify KUAILUZX cartons before quoting freight.",
+    "formula": "customer_price_ngn = (cbm * shipping_per_cbm_ngn) + profit_ngn + logistics_ngn + (fob_price * rate)  ; rate = rmb_to_ngn if RMB else usd_to_ngn"
+  }
+}
