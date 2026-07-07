@@ -462,6 +462,13 @@
   @media (prefers-reduced-motion: reduce){
     *{animation:none!important;transition:none!important;}
   }
+  /* bike pricing form */
+  .bkform{max-width:440px;margin-top:14px;display:flex;flex-direction:column;gap:12px;}
+  .bkrow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card,#fff);border:1px solid var(--line,rgba(0,0,0,.08));border-radius:12px;padding:12px 14px;}
+  .bkrow span{font-size:13.5px;font-weight:600;color:var(--ink,#111);}
+  .bkrow input{width:130px;border:1px solid var(--line,rgba(0,0,0,.14));border-radius:9px;padding:9px 11px;font-size:15px;font-family:inherit;text-align:right;}
+  .bkprev{background:var(--card,#fff);border:1px dashed var(--line,rgba(0,0,0,.18));border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted,#666);display:flex;flex-direction:column;gap:5px;}
+  .bkprev b{color:var(--ink,#111);}
 </style>
 </head>
 <body>
@@ -490,6 +497,7 @@
   <button class="tab" data-tab="history">History</button>
   <button class="tab" data-tab="photos">Photos</button>
   <button class="tab" data-tab="prices">Prices</button>
+  <button class="tab" data-tab="bikes">Bike pricing</button>
   <button class="tab" data-tab="showcase">Showcase</button>
 </div>
 
@@ -1199,6 +1207,52 @@ function getPriceEntry(cond, model, storage){
   return null;
 }
 
+/* ===== Bike pricing config (editable rates + fees for the bikes page) ===== */
+const BIKE_CONFIG_DEFAULT = { shipping_per_cbm_ngn:500000, logistics_service_ngn:70000, rmb_to_ngn:208, usd_to_rmb:7.2 };
+let BIKE_CONFIG = {...BIKE_CONFIG_DEFAULT};
+async function loadBikeConfig(){
+  if(!db) return;
+  try{
+    const { data, error } = await db.from('bike_config').select('shipping_per_cbm_ngn,logistics_service_ngn,rmb_to_ngn,usd_to_rmb').eq('id','default').maybeSingle();
+    if(!error && data){ BIKE_CONFIG = {...BIKE_CONFIG_DEFAULT, ...data}; }
+  }catch(e){}
+}
+async function saveBikeConfig(){
+  const g=id=>parseFloat(document.getElementById(id).value)||0;
+  const row={ id:'default',
+    shipping_per_cbm_ngn:g('bkShip'), logistics_service_ngn:g('bkLogserv'),
+    rmb_to_ngn:g('bkRmb'), usd_to_rmb:g('bkUsd'), updated_at:new Date().toISOString() };
+  const btn=document.getElementById('bkSave'); if(btn){ btn.disabled=true; btn.textContent='Saving…'; }
+  try{
+    const { error } = await db.from('bike_config').upsert(row, { onConflict:'id' });
+    if(error) throw error;
+    BIKE_CONFIG={...BIKE_CONFIG_DEFAULT,...row};
+    toast('✓ Bike pricing saved — the bikes page updates on next load');
+  }catch(e){ toast('⚠ Could not save: '+(e.message||e)); }
+  if(btn){ btn.disabled=false; btn.textContent='Save bike pricing'; }
+}
+function renderBikeConfigTab(){
+  const c=BIKE_CONFIG;
+  return `<div class="sechead">Bike pricing</div>
+    <p class="sub">These control every price on the Electric Mobility page. Customer price = (CBM × shipping) + logistics &amp; service + (FOB × rate). USD stock converts $→¥→₦; ¥ stock uses the Naira rate directly.</p>
+    <div class="bkform" id="bkForm">
+      <label class="bkrow"><span>Shipping per CBM (₦)</span><input id="bkShip" type="number" step="1000" value="${c.shipping_per_cbm_ngn}"></label>
+      <label class="bkrow"><span>Logistics &amp; service (₦)</span><input id="bkLogserv" type="number" step="1000" value="${c.logistics_service_ngn}"></label>
+      <label class="bkrow"><span>¥ → ₦ rate (RMB to Naira)</span><input id="bkRmb" type="number" step="0.1" value="${c.rmb_to_ngn}"></label>
+      <label class="bkrow"><span>$ → ¥ rate (USD to RMB)</span><input id="bkUsd" type="number" step="0.05" value="${c.usd_to_rmb}"></label>
+      <div class="bkprev">
+        <div>Example ¥ stock: <b id="bkPrevRmb">—</b></div>
+        <div>Example $ stock: <b id="bkPrevUsd">—</b></div>
+      </div>
+      <button class="cpBtn primary" id="bkSave">Save bike pricing</button>
+      <p class="sub" style="margin-top:10px">Saving overrides the bundled defaults live (the bikes page reads it on next load). One-time setup — run this once in Supabase → SQL editor:</p>
+      <code style="display:block;white-space:pre-wrap;font-size:11px;background:var(--card,#f4f4f5);border:1px solid var(--line,rgba(0,0,0,.1));border-radius:10px;padding:10px 12px;line-height:1.5;">create table if not exists bike_config (id text primary key, shipping_per_cbm_ngn numeric not null default 500000, logistics_service_ngn numeric not null default 70000, rmb_to_ngn numeric not null default 208, usd_to_rmb numeric not null default 7.2, updated_at timestamptz default now());
+alter table bike_config enable row level security;
+create policy "bc_read" on bike_config for select using (true);
+create policy "bc_write" on bike_config for all using (auth.uid() is not null);</code>
+    </div>`;
+}
+
 function renderPricesTab(){
   const condDefs = CATALOG_CONDITIONS;
   const models   = CATALOG_MODELS;
@@ -1474,6 +1528,23 @@ function render(){
     app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
       <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
       ${renderCatalogPhotos()}`;
+    return;
+  }
+
+  if(tab==='bikes'){
+    app.innerHTML = renderBikeConfigTab();
+    const f=document.getElementById('bkForm');
+    if(f){
+      const upd=()=>{
+        const g=id=>parseFloat(document.getElementById(id).value)||0;
+        const cbm=g('bkShip'), ls=g('bkLogserv'), rmb=g('bkRmb'), usd=g('bkUsd');
+        const rmbEx=2900, usdEx=359; // worked examples
+        document.getElementById('bkPrevRmb').textContent = '¥'+rmbEx+' → ₦'+Math.round(rmbEx*rmb).toLocaleString();
+        document.getElementById('bkPrevUsd').textContent = '$'+usdEx+' → ₦'+Math.round(usdEx*usd*rmb).toLocaleString();
+      };
+      f.querySelectorAll('input').forEach(i=>i.addEventListener('input',upd)); upd();
+      document.getElementById('bkSave').onclick=saveBikeConfig;
+    }
     return;
   }
 
@@ -2477,6 +2548,7 @@ function activateSession(user){
   setupRealtime();
   loadCatalogPrices().then(()=>{ if(tab==='prices') render(); });
   loadShowcaseMedia().then(()=>{ if(tab==='showcase') render(); });
+  loadBikeConfig().then(()=>{ if(tab==='bikes') render(); });
   if(!alertedThisSession){ alertedThisSession=true; setTimeout(inAppAlert,1500); }
 }
 function deactivateSession(){

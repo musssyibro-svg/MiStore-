@@ -1,13 +1,14 @@
 {
   "currency": "NGN",
   "shipping_per_cbm_ngn": 500000,
-  "profit_ngn": 50000,
-  "logistics_ngn": 10000,
-  "rmb_to_ngn": 209,
-  "usd_to_ngn": 1600,
+  "logistics_service_ngn": 70000,
+  "rmb_to_ngn": 208,
+  "usd_to_rmb": 7.2,
   "_notes": {
-    "usd_to_ngn": "CLIENT DID NOT PROVIDE A USD RATE. 1600 is a placeholder default; update in admin panel. Only affects KUAILUZX + High-Power (USD FOB). Leilin is RMB and uses rmb_to_ngn=209.",
-    "cbm": "KUAILUZX / High-Power CBM is ESTIMATED from container capacity (40HQ~76.3m3 else 20FCL~33.1m3 / units). Leilin CBM is computed from real carton packing dimensions. Verify KUAILUZX cartons before quoting freight.",
-    "formula": "customer_price_ngn = (cbm * shipping_per_cbm_ngn) + profit_ngn + logistics_ngn + (fob_price * rate)  ; rate = rmb_to_ngn if RMB else usd_to_ngn"
+    "rate_model": "USD FOB is converted to RMB (fob_usd * usd_to_rmb) then to Naira (* rmb_to_ngn). RMB FOB uses rmb_to_ngn directly.",
+    "usd_to_rmb": "USD->RMB market rate. Default 7.2 — editable in the admin panel.",
+    "logistics_service_ngn": "Combined logistics + service fee, shown as one line. Editable in the admin panel.",
+    "cbm": "KUAILUZX / High-Power CBM is ESTIMATED from container capacity. Leilin CBM is computed from real carton packing dimensions.",
+    "formula": "customer_price_ngn = (cbm * shipping_per_cbm_ngn) + logistics_service_ngn + (fob * rate); rate = rmb_to_ngn if RMB else usd_to_rmb * rmb_to_ngn"
   }
 }
