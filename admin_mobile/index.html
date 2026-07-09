@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MiStore Admin (Mobile)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="top">MiStore Admin (Mobile)</header>
+
+    <main id="main">
+      <section id="login" class="panel">
+        <h2>Admin login</h2>
+        <input id="email" placeholder="Email" />
+        <input id="password" type="password" placeholder="Password" />
+        <button id="btnLogin">Log in</button>
+        <div id="loginMsg" class="msg"></div>
+      </section>
+
+      <section id="dashboard" class="panel hidden">
+        <div class="row">
+          <button id="btnProducts">Products</button>
+          <button id="btnHomepage">Homepage</button>
+          <button id="btnImages">Images</button>
+        </div>
+
+        <div id="viewport"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
