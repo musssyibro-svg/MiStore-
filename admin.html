@@ -1704,18 +1704,52 @@ async function bkApi(path, opts={}){
 async function loadBikeAdminList(){
   bkAdmLoading = true; render();
   try{
-    const q = bkAdmSearch ? '&q='+encodeURIComponent(bkAdmSearch) : '';
-    const j = await bkApi('/bikes?limit=200'+q);
-    bkAdmBikes = j.bikes || [];
-  }catch(e){ toast('⚠ Failed to load bikes: '+e.message); bkAdmBikes = []; }
+    const { data, error } = await db.from('bikes').select('*, bike_images(*)').order('updated_at',{ascending:false}).limit(500);
+    if(error) throw error;
+    let list = data || [];
+    if(bkAdmSearch){ const s=bkAdmSearch.toLowerCase(); list = list.filter(b=>[b.name,b.model,b.supplier,b.sku].some(v=>(v||'').toLowerCase().includes(s))); }
+    bkAdmBikes = list;
+  }catch(e){ toast('⚠ Failed to load bikes: '+(e.message||e)); bkAdmBikes = []; }
   bkAdmLoading = false; render();
 }
 
 function bkCoverUrl(bike){
   const imgs = bike.bike_images || bike.images || [];
   const cover = imgs.find(i=>i.is_cover) || imgs[0];
-  if(!cover) return '';
-  return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||BIKE_PHOTO_BUCKET}/${cover.storage_path}`;
+  if(cover) return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||BIKE_PHOTO_BUCKET}/${cover.storage_path}`;
+  // imported bikes keep their original repo photo until you upload a new one
+  if(bike.metadata && bike.metadata.legacy_image) return 'assets/bikes/images/'+bike.metadata.legacy_image;
+  return '';
+}
+async function importExistingBikes(){
+  if(!confirm('Import your existing bikes from the current catalog into the database? Safe to run — it skips ones already imported.')) return;
+  const btn=document.getElementById('bkAdmImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
+  try{
+    const d = await (await fetch('assets/bikes/data/products.json',{cache:'no-store'})).json();
+    const products = d.products || d || [];
+    const catMap = {};
+    for(const cn of ['Electric Bikes','Electric Motorcycles']){
+      const slug = cn.toLowerCase().replace(/\s+/g,'-');
+      let { data:cat } = await db.from('bike_categories').select('id').eq('slug',slug).maybeSingle();
+      if(!cat){ const r = await db.from('bike_categories').insert({name:cn,slug}).select('id').single(); cat=r.data; }
+      catMap[cn] = cat ? cat.id : null;
+    }
+    const { data:existing } = await db.from('bikes').select('legacy_id');
+    const have = new Set((existing||[]).map(x=>x.legacy_id).filter(Boolean));
+    const rows = products.filter(p=>p.is_primary!==false && !have.has(p.id)).map(p=>({
+      name: p.model, model: p.model, supplier: p.supplier||null, category_id: catMap[p.category]||null,
+      fob_price: p.fob_price||null, fob_currency: p.currency||'USD', cbm: p.cbm||null,
+      customer_price_ngn: p.customer_price_ngn||null, availability:'in_stock',
+      status: p.hidden ? 'archived' : 'published',
+      specs: { motor:p.motor, battery_type:p.battery_type, voltage:p.voltage, top_speed:p.top_speed, range:p.range, wheel_size:p.wheel_size, brake:p.brake, weight:p.weight, max_load:p.max_load },
+      features: p.features||[], battery_price_map: p.battery_price_map||[], price_ladder: p.price_ladder||[],
+      is_primary:true, legacy_id: p.id, metadata:{ legacy_image: p.image||null },
+    }));
+    let n=0;
+    for(let i=0;i<rows.length;i+=50){ const chunk=rows.slice(i,i+50); const { error } = await db.from('bikes').insert(chunk); if(error) throw error; n+=chunk.length; }
+    toast('✓ Imported '+n+' bikes'); bkAdmBikes=[]; render();
+  }catch(e){ toast('⚠ Import failed: '+(e.message||e)); }
+  if(btn){ btn.disabled=false; btn.textContent='Import my existing bikes'; }
 }
 
 function renderBikeAdminTab(){
@@ -1748,12 +1782,14 @@ function renderBikeAdminTab(){
       <input class="bkAdmInput" id="bkAdmSearchInput" placeholder="Search by name, model, supplier, SKU…" value="${esc(bkAdmSearch)}">
       <button class="cpBtn primary" id="bkAdmNewBtn">+ New bike</button>
     </div>
+    ${bkAdmBikes.length===0 && !bkAdmLoading ? '<button class="cpBtn" id="bkAdmImportBtn" style="width:auto;margin-bottom:10px;">⬇ Import my existing bikes</button>' : ''}
     <div class="bkAdmChips">${filters}</div>
     ${bkAdmLoading?'<p class="sub">Loading…</p>':''}
     <div class="bkAdmList">${rows || (bkAdmLoading?'':'<p class="sub">No bikes in this view.</p>')}</div>
   `;
 
   document.getElementById('bkAdmNewBtn').onclick = ()=> openBikeAdminForm('new');
+  const importBtn = document.getElementById('bkAdmImportBtn'); if(importBtn) importBtn.onclick = importExistingBikes;
   const search = document.getElementById('bkAdmSearchInput');
   let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ bkAdmSearch=search.value.trim(); loadBikeAdminList(); }, 350); };
   app.querySelectorAll('[data-filter]').forEach(el=>{ el.onclick=()=>{ bkAdmStatusFilter=el.dataset.filter; render(); }; });
@@ -1768,11 +1804,12 @@ async function openBikeAdminForm(id){
   if(!bkAdmCategories.length) await loadBikeCategories();
   if(id !== 'new'){
     try{
-      const bike = await bkApi('/bikes?id='+id);
-      bkAdmOpenImages = bike.images || [];
+      const { data:bike, error } = await db.from('bikes').select('*, bike_images(*)').eq('id',id).single();
+      if(error) throw error;
+      bkAdmOpenImages = (bike.bike_images||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
       bkAdmBikes = bkAdmBikes.map(b=> b.id===id ? Object.assign({}, b, bike) : b);
       bkAdmOpenBike = bike;
-    }catch(e){ toast('⚠ '+e.message); bkAdmOpenId=null; render(); return; }
+    }catch(e){ toast('⚠ '+(e.message||e)); bkAdmOpenId=null; render(); return; }
   } else {
     bkAdmOpenBike = { name:'', model:'', supplier:'', description:'', fob_price:'', fob_currency:'USD',
       customer_price_ngn:'', stock:0, sku:'', slug:'', warranty:'', shipping_notes:'', status:'draft',
@@ -1786,9 +1823,8 @@ let bkAdmCategories = [];
 
 async function loadBikeCategories(){
   try{
-    const res = await fetch(`${SUPABASE_URL.trim()}/rest/v1/bike_categories?select=id,name,parent_id&order=position`,
-      { headers: { apikey: SUPABASE_ANON_KEY, ...(await bkAuthHeaders()) } });
-    bkAdmCategories = res.ok ? await res.json() : [];
+    const { data, error } = await db.from('bike_categories').select('id,name,parent_id').order('position');
+    bkAdmCategories = (!error && data) ? data : [];
   }catch(e){ bkAdmCategories = []; }
 }
 
@@ -1942,11 +1978,13 @@ async function saveBikeAdminForm(){
   try{
     const payload = collectBikeFormPayload();
     if(bkAdmOpenId === 'new'){
-      const created = await bkApi('/bikes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const { data:created, error } = await db.from('bikes').insert(payload).select().single();
+      if(error) throw error;
       toast('✓ Bike created — now add photos');
       bkAdmOpenId = created.id; bkAdmOpenBike = created; bkAdmOpenImages = [];
     } else {
-      const updated = await bkApi('/bikes?id='+bkAdmOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const { data:updated, error } = await db.from('bikes').update(payload).eq('id',bkAdmOpenId).select().single();
+      if(error) throw error;
       toast('✓ Saved');
       bkAdmOpenBike = Object.assign({}, bkAdmOpenBike, updated);
     }
@@ -1963,7 +2001,7 @@ async function deleteBikeAdmin(){
   if(b.status === 'archived'){
     if(!confirm('Permanently delete this bike and all of its photos? This cannot be undone.')) return;
     try{
-      await bkApi('/bikes?id='+bkAdmOpenId, { method:'DELETE' });
+      { const { error } = await db.from('bikes').delete().eq('id',bkAdmOpenId); if(error) throw error; }
       toast('✓ Deleted permanently');
       bkAdmOpenId = null; bkAdmOpenBike = null; bkAdmBikes = [];
       render();
@@ -1972,7 +2010,7 @@ async function deleteBikeAdmin(){
   }
   const prev = b.status || 'draft';
   try{
-    await bkApi('/bikes?id='+bkAdmOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'archived' }) });
+    { const { error } = await db.from('bikes').update({ status:'archived' }).eq('id',bkAdmOpenId); if(error) throw error; }
     const id = bkAdmOpenId;
     bkAdmOpenId = null; bkAdmOpenBike = null; bkAdmBikes = [];
     bkAdmStatusFilter = 'archived';   // jump to trash so Restore is one tap away
@@ -1982,7 +2020,7 @@ async function deleteBikeAdmin(){
 }
 async function restoreBike(id, toStatus){
   try{
-    await bkApi('/bikes?id='+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status: toStatus||'draft' }) });
+    { const { error } = await db.from('bikes').update({ status: toStatus||'draft' }).eq('id',id); if(error) throw error; }
     bkAdmBikes = []; toast('✓ Restored'); render();
   }catch(e){ toast('⚠ '+e.message); }
 }
@@ -1994,7 +2032,8 @@ async function duplicateBikeAdmin(){
     payload.name = (payload.name||'Bike') + ' (copy)';
     payload.sku = null; payload.slug = null;   // must stay unique
     payload.status = 'draft';
-    const created = await bkApi('/bikes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const { data:created, error } = await db.from('bikes').insert(payload).select().single();
+    if(error) throw error;
     toast('✓ Duplicated as draft — photos are not copied');
     bkAdmBikes = []; bkAdmOpenId = created.id; bkAdmOpenBike = created; bkAdmOpenImages = [];
     render();
@@ -2088,45 +2127,75 @@ async function uploadBikeImages(fileList){
   grid && grid.prepend(placeholder);
 
   try{
-    const form = new FormData();
-    form.append('bike_id', bkAdmOpenId);
-    files.forEach(f=> form.append('files', f));
-    const headers = await bkAuthHeaders();
-    const res = await fetch(FUNCTIONS_BASE + '/bike-images', { method:'POST', headers, body: form });
-    const j = await res.json();
-    if(!res.ok) throw new Error(j.error || 'upload failed');
-    bkAdmOpenImages = bkAdmOpenImages.concat(j.images||[]);
-    toast('✓ Uploaded '+(j.images||[]).length+' photo(s)');
-  }catch(e){ toast('⚠ '+e.message); }
+    // client-side downscale/compress big images before upload (keeps storage light)
+    const newImgs = [];
+    for(const f of files){
+      const blob = await compressImage(f);
+      const ext = 'jpg';
+      const path = 'bikes/'+bkAdmOpenId+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+      const { error:upErr } = await db.storage.from(BIKE_PHOTO_BUCKET).upload(path, blob, { contentType:'image/jpeg', upsert:true });
+      if(upErr) throw upErr;
+      const isCover = (bkAdmOpenImages.length + newImgs.length) === 0;
+      const { data:row, error } = await db.from('bike_images').insert({
+        bike_id: bkAdmOpenId, storage_bucket: BIKE_PHOTO_BUCKET, storage_path: path,
+        filename: f.name, mime:'image/jpeg', is_cover: isCover, position: bkAdmOpenImages.length + newImgs.length
+      }).select().single();
+      if(error) throw error;
+      newImgs.push(row);
+    }
+    bkAdmOpenImages = bkAdmOpenImages.concat(newImgs);
+    toast('✓ Uploaded '+newImgs.length+' photo(s)');
+  }catch(e){ toast('⚠ '+(e.message||e)); }
   render();
+}
+
+/* Downscale to <=1600px and re-encode as JPEG so phone photos aren't multi-MB. */
+function compressImage(file){
+  return new Promise((resolve)=>{
+    if(!/^image\//.test(file.type)) return resolve(file);
+    const img = new Image();
+    img.onload = ()=>{
+      const max=1600; let {width:w,height:h}=img;
+      if(w>max||h>max){ const r=Math.min(max/w,max/h); w=Math.round(w*r); h=Math.round(h*r); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(b=> resolve(b||file), 'image/jpeg', 0.85);
+    };
+    img.onerror = ()=> resolve(file);
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 async function setBikeImageCover(id){
   try{
-    await bkApi('/bike-images?id='+id+'&action=cover', { method:'PUT' });
+    await db.from('bike_images').update({ is_cover:false }).eq('bike_id', bkAdmOpenId);
+    const { error } = await db.from('bike_images').update({ is_cover:true }).eq('id', id);
+    if(error) throw error;
     bkAdmOpenImages = bkAdmOpenImages.map(i=>({...i, is_cover: i.id===id}));
     render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
 }
 
 async function deleteBikeImage(id){
   if(!confirm('Delete this photo?')) return;
   try{
-    await bkApi('/bike-images?id='+id, { method:'DELETE' });
+    const img = bkAdmOpenImages.find(i=>i.id===id);
+    const { error } = await db.from('bike_images').delete().eq('id', id);
+    if(error) throw error;
+    if(img && img.storage_path){ db.storage.from(img.storage_bucket||BIKE_PHOTO_BUCKET).remove([img.storage_path]).catch(()=>{}); }
     bkAdmOpenImages = bkAdmOpenImages.filter(i=>i.id!==id);
     render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
 }
 
 async function persistBikeImageOrder(){
   const grid = document.getElementById('bkImgGrid');
   if(!grid) return;
   const ids = Array.from(grid.querySelectorAll('.bkImgCard')).map(c=>c.dataset.imgId).filter(Boolean);
-  const payload = ids.map((id,i)=>({ id, position:i }));
   try{
-    await bkApi('/bike-images', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    for(let i=0;i<ids.length;i++){ await db.from('bike_images').update({ position:i }).eq('id', ids[i]); }
     bkAdmOpenImages = ids.map((id,i)=> Object.assign({}, bkAdmOpenImages.find(x=>x.id===id), { position:i }));
-  }catch(e){ toast('⚠ Reorder failed: '+e.message); }
+  }catch(e){ toast('⚠ Reorder failed: '+(e.message||e)); }
 }
 
 /* ===== Bike pricing config (editable rates + fees for the bikes page) ===== */
