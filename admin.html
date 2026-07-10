@@ -388,7 +388,7 @@
   .settingsForm input{width:100%;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:15px;font-family:inherit;}
 
   /* ---------- Tabs ---------- */
-  .tabs{display:flex;gap:6px;padding:12px 18px 0;}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 18px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .tab{flex:1;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
     border-radius:11px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.01em;
     display:flex;align-items:center;justify-content:center;gap:7px;}
