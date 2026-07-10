@@ -345,6 +345,48 @@
   .scAdmCap{font-size:12px;padding:7px 9px 4px;color:var(--muted);min-height:14px;}
   .scAdm .cpBtn{border:none;border-top:1px solid var(--line);border-radius:0;}
 
+  /* ---------- Bikes admin ---------- */
+  .bkAdmBar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0;}
+  .bkAdmInput{flex:1;min-width:160px;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  .bkAdmList{display:flex;flex-direction:column;gap:8px;}
+  .bkAdmRow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;}
+  .bkAdmRow:active{background:var(--paper);}
+  .bkAdmThumb{width:52px;height:52px;border-radius:9px;background:var(--paper);object-fit:cover;flex-shrink:0;}
+  .bkAdmRowInfo{flex:1;min-width:0;}
+  .bkAdmRowName{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bkAdmRowMeta{font-size:11.5px;color:var(--muted);}
+  .bkAdmBadge{font-size:9.5px;font-weight:800;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--go-soft);color:var(--go);}
+  .bkAdmBadge.draft{background:var(--line);color:var(--muted);}
+  .bkForm{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+  .bkFormSection{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 14px 6px;margin-bottom:2px;}
+  .bkFormSectionTitle{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .bkForm label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;display:block;margin-bottom:4px;}
+  .bkForm input,.bkForm select,.bkForm textarea{width:100%;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;background:var(--surface);}
+  .bkForm textarea{min-height:70px;resize:vertical;}
+  .bkFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .bkFormRow{margin-bottom:2px;}
+  .bkDrop{border:2px dashed var(--line-strong);border-radius:14px;padding:22px 12px;text-align:center;color:var(--muted);font-size:13px;margin-top:10px;cursor:pointer;}
+  .bkDrop.drag{border-color:var(--go);background:var(--go-soft);color:var(--go);}
+  .bkImgGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:12px;}
+  .bkImgCard{position:relative;border-radius:12px;overflow:hidden;background:var(--paper);border:1px solid var(--line);aspect-ratio:1/1;}
+  .bkImgCard img{width:100%;height:100%;object-fit:cover;display:block;}
+  .bkImgCard[draggable=true]{cursor:grab;}
+  .bkImgCard.dragging{opacity:.4;}
+  .bkImgCover{position:absolute;top:6px;left:6px;font-size:9px;font-weight:800;text-transform:uppercase;background:var(--go);color:#fff;padding:2px 6px;border-radius:999px;}
+  .bkImgActions{position:absolute;inset:auto 0 0 0;display:flex;gap:4px;padding:5px;background:linear-gradient(0deg,rgba(0,0,0,.65),transparent);}
+  .bkImgActions button{flex:1;border:none;background:rgba(255,255,255,.92);color:#111;font-size:10px;font-weight:700;border-radius:6px;padding:4px 2px;cursor:pointer;}
+  .bkImgUploading{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);}
+
+  .ctlgVariantTable{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;}
+  .ctlgVariantTable th{text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:800;padding:4px 6px;border-bottom:1px solid var(--line);}
+  .ctlgVariantTable td{padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  .ctlgVariantTable input{width:100%;border:1px solid var(--line-strong);border-radius:7px;padding:5px 6px;font-size:12px;font-family:inherit;}
+  .ctlgVariantTable .rmBtn{border:none;background:none;color:#c0392b;font-weight:800;cursor:pointer;font-size:14px;}
+  .ctlgTotalPreview{font-size:11px;color:var(--muted);white-space:nowrap;}
+  .settingsForm{display:flex;flex-direction:column;gap:12px;max-width:420px;margin-top:14px;}
+  .settingsForm label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;display:block;margin-bottom:4px;}
+  .settingsForm input{width:100%;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:15px;font-family:inherit;}
+
   /* ---------- Tabs ---------- */
   .tabs{display:flex;gap:6px;padding:12px 18px 0;}
   .tab{flex:1;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
@@ -497,7 +539,10 @@
   <button class="tab" data-tab="history">History</button>
   <button class="tab" data-tab="photos">Photos</button>
   <button class="tab" data-tab="prices">Prices</button>
+  <button class="tab" data-tab="bikeadmin">Bikes</button>
   <button class="tab" data-tab="bikes">Bike pricing</button>
+  <button class="tab" data-tab="catalog">Catalog</button>
+  <button class="tab" data-tab="storesettings">Store Settings</button>
   <button class="tab" data-tab="showcase">Showcase</button>
 </div>
 
@@ -683,6 +728,8 @@ const SUPABASE_URL =
 const SUPABASE_ANON_KEY =
 'sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';
 const PHOTO_BUCKET      = 'order-photos';
+const BIKE_PHOTO_BUCKET = 'bike-photos';
+const FUNCTIONS_BASE    = SUPABASE_URL.trim() + '/functions/v1';
 /* ========================================================= */
 
 // stage metadata keyed by stage key. offset = days from the PREVIOUS stage in the route.
@@ -1207,6 +1254,760 @@ function getPriceEntry(cond, model, storage){
   return null;
 }
 
+/* ===== Store Settings: single source of truth for exchange rate + shipping =====
+   Every catalog product's price is computed live from these three numbers.
+   Change one here, every product's displayed total updates automatically. */
+let storeSettings = null;
+
+async function loadStoreSettings(){
+  try{ storeSettings = await bkApi('/store-settings'); }
+  catch(e){ storeSettings = { exchange_rate:208, sea_rate_per_cbm:500000, air_rate_per_kg:20000 }; }
+}
+
+function renderStoreSettingsTab(){
+  if(!storeSettings){ loadStoreSettings().then(render); app.innerHTML = '<p class="sub">Loading…</p>'; return; }
+  const s = storeSettings;
+  app.innerHTML = `
+    <div class="sechead">Store Settings</div>
+    <p class="sub">These three numbers drive every price on the site. Change one here and every product's total recalculates — nothing needs editing per-product.</p>
+    <div class="settingsForm">
+      <div><label>Exchange rate (¥ → ₦)</label><input id="stgExchange" type="number" step="0.01" value="${s.exchange_rate}"></div>
+      <div><label>Sea shipping (₦ per CBM)</label><input id="stgSea" type="number" step="1" value="${s.sea_rate_per_cbm}"></div>
+      <div><label>Air shipping (₦ per kg)</label><input id="stgAir" type="number" step="1" value="${s.air_rate_per_kg}"></div>
+      <button class="cpBtn primary" id="stgSaveBtn" style="width:auto;padding:9px 18px;">Save settings</button>
+    </div>
+    <p class="sub" style="margin-top:18px">Formula: <b>Total = (¥price × exchange rate) + shipping (sea or air, customer's choice) + profit</b>. Profit is set per product/variant in the Catalog tab.</p>
+  `;
+  document.getElementById('stgSaveBtn').onclick = async ()=>{
+    const btn = document.getElementById('stgSaveBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try{
+      storeSettings = await bkApi('/store-settings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+        exchange_rate: parseFloat(document.getElementById('stgExchange').value)||208,
+        sea_rate_per_cbm: parseFloat(document.getElementById('stgSea').value)||500000,
+        air_rate_per_kg: parseFloat(document.getElementById('stgAir').value)||20000,
+      })});
+      toast('✓ Settings saved — every product now reflects these rates');
+    }catch(e){ toast('⚠ '+e.message); }
+    btn.disabled = false; btn.textContent = 'Save settings';
+  };
+}
+
+/* ===== Catalog admin: smartwatches, power banks, speakers, earbuds, and
+   anything else that isn't a bike or an existing phone product. Same
+   architecture as Bikes: talks to catalog-products / catalog-images edge
+   functions, same Supabase Auth session, same drag-drop image manager. */
+let ctlgProducts = [];
+let ctlgSearch = '';
+let ctlgCategoryFilter = '';
+let ctlgOpenId = null;
+let ctlgOpenProduct = null;
+let ctlgOpenImages = [];
+let ctlgCategories = [];
+let ctlgLoading = false;
+
+async function loadCatalogCategories(){
+  try{
+    const res = await fetch(`${SUPABASE_URL.trim()}/rest/v1/catalog_categories?select=id,name,slug&order=position`,
+      { headers: { apikey: SUPABASE_ANON_KEY, ...(await bkAuthHeaders()) } });
+    ctlgCategories = res.ok ? await res.json() : [];
+  }catch(e){ ctlgCategories = []; }
+}
+
+async function loadCatalogList(){
+  ctlgLoading = true; render();
+  try{
+    let q = '/catalog-products?limit=300&status=all';
+    if(ctlgSearch) q += '&q='+encodeURIComponent(ctlgSearch);
+    const j = await bkApi(q.replace('status=all','')); // admin sees all statuses by default
+    ctlgProducts = j.products || [];
+    if(ctlgCategoryFilter) ctlgProducts = ctlgProducts.filter(p=>p.catalog_categories && p.catalog_categories.slug===ctlgCategoryFilter);
+  }catch(e){ toast('⚠ Failed to load catalog: '+e.message); ctlgProducts = []; }
+  ctlgLoading = false; render();
+}
+
+function ctlgCoverUrl(p){
+  const imgs = p.catalog_images || [];
+  const cover = imgs.find(i=>i.is_cover) || imgs[0];
+  if(!cover) return '';
+  return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||'catalog-photos'}/${cover.storage_path}`;
+}
+
+function renderCatalogTab(){
+  if(ctlgOpenId){ renderCatalogForm(); return; }
+  if(!ctlgCategories.length) loadCatalogCategories();
+  if(!ctlgProducts.length && !ctlgLoading) loadCatalogList();
+
+  const catOptions = ['<option value="">All categories</option>'].concat(
+    ctlgCategories.map(c=>`<option value="${c.slug}" ${ctlgCategoryFilter===c.slug?'selected':''}>${esc(c.name)}</option>`)
+  ).join('');
+
+  const rows = ctlgProducts.map(p=>`
+    <div class="bkAdmRow" data-open-product="${p.id}">
+      <img class="bkAdmThumb" src="${ctlgCoverUrl(p)}" onerror="this.style.visibility='hidden'" alt="">
+      <div class="bkAdmRowInfo">
+        <div class="bkAdmRowName">${esc(p.name||'Untitled')}</div>
+        <div class="bkAdmRowMeta">${esc(p.catalog_categories?.name||'Uncategorized')} · ${p.catalog_variants?.length||0} variant(s) · MOQ ${p.moq||100}</div>
+      </div>
+      <span class="bkAdmBadge ${p.status==='published'?'':'draft'}">${esc(p.status||'draft')}</span>
+    </div>`).join('');
+
+  app.innerHTML = `
+    <div class="sechead">Catalog <span class="count">${ctlgProducts.length}</span></div>
+    <p class="sub">Smart watches, power banks, speakers, earbuds — everything imported from supplier catalogs lands here as a draft for you to review, rename, and publish.</p>
+    <div class="bkAdmBar">
+      <input class="bkAdmInput" id="ctlgSearchInput" placeholder="Search by name or supplier id…" value="${esc(ctlgSearch)}">
+      <select class="bkAdmInput" id="ctlgCatFilter" style="flex:0 0 160px;">${catOptions}</select>
+      <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
+    </div>
+    ${ctlgLoading?'<p class="sub">Loading…</p>':''}
+    <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products yet.</p>')}</div>
+  `;
+
+  document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
+  const search = document.getElementById('ctlgSearchInput');
+  let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ ctlgSearch=search.value.trim(); loadCatalogList(); }, 350); };
+  document.getElementById('ctlgCatFilter').onchange = (e)=>{ ctlgCategoryFilter = e.target.value; render(); };
+  app.querySelectorAll('[data-open-product]').forEach(el=>{ el.onclick = ()=> openCatalogForm(el.dataset.openProduct); });
+}
+
+async function openCatalogForm(id){
+  ctlgOpenId = id;
+  ctlgOpenImages = [];
+  if(!ctlgCategories.length) await loadCatalogCategories();
+  if(!storeSettings) await loadStoreSettings();
+  if(id !== 'new'){
+    try{
+      const p = await bkApi('/catalog-products?id='+id);
+      ctlgOpenProduct = p;
+      ctlgOpenImages = p.catalog_images || [];
+    }catch(e){ toast('⚠ '+e.message); ctlgOpenId=null; render(); return; }
+  } else {
+    ctlgOpenProduct = { name:'', category_id:'', brand:'', description:'', moq:100, qty_per_carton:1,
+      sold_by_carton:false, weight_kg:'', cbm:'', status:'draft', featured:false,
+      catalog_variants:[{ spec1:'', spec2:'', variant_label:'', rmb_price:'', profit_ngn:'', moq:'', stock:0 }] };
+  }
+  render();
+}
+
+function ctlgCategoryOptions(selectedId){
+  return ctlgCategories.map(c=>`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${esc(c.name)}</option>`).join('');
+}
+
+function ctlgComputeTotal(product, variant){
+  const s = storeSettings || { exchange_rate:208, sea_rate_per_cbm:500000, air_rate_per_kg:20000 };
+  const rmb = parseFloat(variant.rmb_price)||0;
+  const converted = rmb * Number(s.exchange_rate);
+  const cbm = parseFloat(variant.cbm)||parseFloat(product.cbm)||0;
+  const weight = parseFloat(variant.weight_kg)||parseFloat(product.weight_kg)||0;
+  const sea = cbm * Number(s.sea_rate_per_cbm);
+  const air = weight * Number(s.air_rate_per_kg);
+  const profit = parseFloat(variant.profit_ngn)||0;
+  return { seaTotal: Math.round(converted+sea+profit), airTotal: Math.round(converted+air+profit), noneTotal: Math.round(converted+profit) };
+}
+
+function renderCatalogForm(){
+  const isNew = ctlgOpenId === 'new';
+  const p = ctlgOpenProduct || {};
+  const variants = p.catalog_variants || [];
+
+  const variantRows = variants.map((v,i)=>{
+    const t = ctlgComputeTotal(p, v);
+    return `<tr data-vrow="${i}">
+      <td><input data-vf="spec1" value="${esc(v.spec1||'')}" placeholder="Color"></td>
+      <td><input data-vf="spec2" value="${esc(v.spec2||'')}" placeholder="Capacity/spec"></td>
+      <td><input data-vf="rmb_price" type="number" step="0.01" value="${v.rmb_price??''}" placeholder="¥"></td>
+      <td><input data-vf="profit_ngn" type="number" value="${v.profit_ngn??''}" placeholder="₦ profit"></td>
+      <td><input data-vf="moq" type="number" value="${v.moq??''}" placeholder="${p.moq||100}"></td>
+      <td><input data-vf="stock" type="number" value="${v.stock??0}"></td>
+      <td class="ctlgTotalPreview">₦${t.noneTotal.toLocaleString()} / sea ₦${t.seaTotal.toLocaleString()} / air ₦${t.airTotal.toLocaleString()}</td>
+      <td><button class="rmBtn" data-rmvariant="${i}" title="Remove variant">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="sechead">${isNew?'New product':esc(p.name||'Edit product')}</div>
+    <button class="cpBtn" id="ctlgBack" style="width:auto;padding:7px 14px;margin-bottom:6px;">← Back to list</button>
+
+    <div class="bkForm">
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Basic info</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>Name</label><input id="ctlfName" value="${esc(p.name||'')}"></div>
+          <div class="bkFormRow"><label>Category</label><select id="ctlfCategory">${ctlgCategoryOptions(p.category_id)}</select></div>
+          <div class="bkFormRow"><label>Brand</label><input id="ctlfBrand" value="${esc(p.brand||'')}"></div>
+          <div class="bkFormRow"><label>Status</label>
+            <select id="ctlfStatus"><option value="draft" ${p.status==='draft'?'selected':''}>Draft</option><option value="published" ${p.status==='published'?'selected':''}>Published</option><option value="archived" ${p.status==='archived'?'selected':''}>Archived</option></select>
+          </div>
+        </div>
+        <div class="bkFormRow"><label>Description</label><textarea id="ctlfDescription">${esc(p.description||'')}</textarea></div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Ordering &amp; shipping</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>Minimum order (MOQ)</label><input id="ctlfMoq" type="number" value="${p.moq??100}"></div>
+          <div class="bkFormRow"><label>Qty per carton</label><input id="ctlfQtyCarton" type="number" value="${p.qty_per_carton??1}"></div>
+          <div class="bkFormRow"><label>Weight (kg) — for air shipping</label><input id="ctlfWeight" type="number" step="0.01" value="${p.weight_kg??''}"></div>
+          <div class="bkFormRow"><label>CBM — for sea shipping</label><input id="ctlfCbm" type="number" step="0.001" value="${p.cbm??''}"></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:4px;"><input type="checkbox" id="ctlfCarton" style="width:auto" ${p.sold_by_carton?'checked':''}> Sold by carton (shows per-unit price on the total)</label>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="ctlfFeatured" style="width:auto" ${p.featured?'checked':''}> Featured</label>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Variants &amp; pricing</div>
+        <p class="sub" style="margin:0 0 4px">¥ price and ₦ profit are supplier-side only — customers only ever see the computed total. Preview shows: no-shipping / sea / air totals at current store settings.</p>
+        <div style="overflow-x:auto;">
+        <table class="ctlgVariantTable" id="ctlgVariantTable">
+          <thead><tr><th>Color</th><th>Spec</th><th>¥ price</th><th>₦ profit</th><th>MOQ</th><th>Stock</th><th>Preview</th><th></th></tr></thead>
+          <tbody>${variantRows}</tbody>
+        </table>
+        </div>
+        <button class="cpBtn" id="ctlgAddVariant" style="width:auto;padding:6px 14px;margin-top:8px;">+ Add variant</button>
+      </div>
+
+      <button class="cpBtn primary" id="ctlgSaveBtn">${isNew?'Create product':'Save changes'}</button>
+      ${!isNew?'<button class="cpBtn danger" id="ctlgDeleteBtn">Delete product</button>':''}
+    </div>
+
+    ${isNew ? '<p class="sub" style="margin-top:14px">Save the product first, then you can add photos.</p>' : renderCatalogImageManager()}
+  `;
+
+  document.getElementById('ctlgBack').onclick = ()=>{ ctlgOpenId=null; ctlgOpenProduct=null; ctlgProducts=[]; render(); };
+  document.getElementById('ctlgSaveBtn').onclick = saveCatalogForm;
+  const delBtn = document.getElementById('ctlgDeleteBtn');
+  if(delBtn) delBtn.onclick = deleteCatalogProduct;
+  document.getElementById('ctlgAddVariant').onclick = ()=>{
+    ctlgOpenProduct.catalog_variants = ctlgOpenProduct.catalog_variants || [];
+    ctlgOpenProduct.catalog_variants.push({ spec1:'', spec2:'', rmb_price:'', profit_ngn:'', moq:'', stock:0 });
+    render();
+  };
+  app.querySelectorAll('[data-rmvariant]').forEach(btn=>{
+    btn.onclick = ()=>{ ctlgOpenProduct.catalog_variants.splice(Number(btn.dataset.rmvariant),1); render(); };
+  });
+  // live-update the price preview as ¥/profit are typed, without a full re-render
+  app.querySelectorAll('#ctlgVariantTable input').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const row = inp.closest('tr'); const idx = Number(row.dataset.vrow);
+      const field = inp.dataset.vf; if(!field) return;
+      ctlgOpenProduct.catalog_variants[idx][field] = inp.value;
+      const t = ctlgComputeTotal(ctlgOpenProduct, ctlgOpenProduct.catalog_variants[idx]);
+      row.querySelector('.ctlgTotalPreview').textContent = `₦${t.noneTotal.toLocaleString()} / sea ₦${t.seaTotal.toLocaleString()} / air ₦${t.airTotal.toLocaleString()}`;
+    });
+  });
+
+  if(!isNew) wireCatalogImageManager();
+}
+
+function collectCatalogPayload(){
+  const g = id => document.getElementById(id).value;
+  const variants = Array.from(document.querySelectorAll('#ctlgVariantTable tbody tr')).map((row,i)=>{
+    const existing = (ctlgOpenProduct.catalog_variants||[])[i] || {};
+    return {
+      id: existing.id, spec1: row.querySelector('[data-vf="spec1"]').value, spec2: row.querySelector('[data-vf="spec2"]').value,
+      variant_label: (row.querySelector('[data-vf="spec1"]').value+' '+row.querySelector('[data-vf="spec2"]').value).trim(),
+      rmb_price: parseFloat(row.querySelector('[data-vf="rmb_price"]').value)||null,
+      profit_ngn: row.querySelector('[data-vf="profit_ngn"]').value===''? null : parseFloat(row.querySelector('[data-vf="profit_ngn"]').value),
+      moq: row.querySelector('[data-vf="moq"]').value===''? null : parseInt(row.querySelector('[data-vf="moq"]').value),
+      stock: parseInt(row.querySelector('[data-vf="stock"]').value)||0,
+      position: i,
+    };
+  });
+  return {
+    name: g('ctlfName'), category_id: g('ctlfCategory')||null, brand: g('ctlfBrand'), description: g('ctlfDescription'),
+    moq: parseInt(g('ctlfMoq'))||100, qty_per_carton: parseInt(g('ctlfQtyCarton'))||1,
+    weight_kg: parseFloat(g('ctlfWeight'))||null, cbm: parseFloat(g('ctlfCbm'))||null,
+    sold_by_carton: document.getElementById('ctlfCarton').checked, featured: document.getElementById('ctlfFeatured').checked,
+    status: g('ctlfStatus'), variants,
+  };
+}
+
+async function saveCatalogForm(){
+  const btn = document.getElementById('ctlgSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try{
+    const payload = collectCatalogPayload();
+    if(ctlgOpenId === 'new'){
+      const created = await bkApi('/catalog-products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      toast('✓ Product created — now add photos');
+      ctlgOpenId = created.id;
+      ctlgOpenProduct = await bkApi('/catalog-products?id='+created.id);
+      ctlgOpenImages = ctlgOpenProduct.catalog_images || [];
+    } else {
+      await bkApi('/catalog-products?id='+ctlgOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      toast('✓ Saved');
+      ctlgOpenProduct = await bkApi('/catalog-products?id='+ctlgOpenId);
+    }
+    ctlgProducts = [];
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+  btn.disabled = false;
+}
+
+async function deleteCatalogProduct(){
+  if(!confirm('Delete this product and all its photos? This cannot be undone.')) return;
+  try{
+    await bkApi('/catalog-products?id='+ctlgOpenId, { method:'DELETE' });
+    toast('✓ Deleted');
+    ctlgOpenId = null; ctlgOpenProduct = null; ctlgProducts = [];
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+
+/* ---- catalog image manager: identical pattern to the bike one, pointed at catalog-images ---- */
+
+function ctlgImgUrl(img){ return `${SUPABASE_URL.trim()}/storage/v1/object/public/${img.storage_bucket||'catalog-photos'}/${img.storage_path}`; }
+
+function renderCatalogImageManager(){
+  const cards = ctlgOpenImages.map(img=>`
+    <div class="bkImgCard" draggable="true" data-img-id="${img.id}">
+      <img src="${ctlgImgUrl(img)}" alt="">
+      ${img.is_cover?'<span class="bkImgCover">Cover</span>':''}
+      <div class="bkImgActions">
+        ${!img.is_cover?`<button data-cover="${img.id}">Cover</button>`:''}
+        <button data-delimg="${img.id}">Delete</button>
+      </div>
+    </div>`).join('');
+  return `
+    <div class="sechead" style="margin-top:22px">Photos <span class="count">${ctlgOpenImages.length}</span></div>
+    <p class="sub">Drag to reorder. Tap "Cover" to set the main listing photo.</p>
+    <div class="bkDrop" id="ctlgDropZone">Drop images here, or tap to choose files<br><input type="file" id="ctlgFileInput" accept="image/*" multiple style="display:none"></div>
+    <div class="bkImgGrid" id="ctlgImgGrid">${cards}</div>
+  `;
+}
+
+function wireCatalogImageManager(){
+  const drop = document.getElementById('ctlgDropZone');
+  const input = document.getElementById('ctlgFileInput');
+  if(!drop) return;
+  drop.onclick = ()=> input.click();
+  input.onchange = ()=> uploadCatalogImages(input.files);
+  ['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', e=>{ if(e.dataTransfer.files.length) uploadCatalogImages(e.dataTransfer.files); });
+
+  const grid = document.getElementById('ctlgImgGrid');
+  let dragEl = null;
+  grid.querySelectorAll('.bkImgCard').forEach(card=>{
+    card.addEventListener('dragstart', ()=>{ dragEl = card; card.classList.add('dragging'); });
+    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); dragEl=null; persistCatalogImageOrder(); });
+    card.addEventListener('dragover', e=>{
+      e.preventDefault();
+      if(!dragEl || dragEl===card) return;
+      const rect = card.getBoundingClientRect();
+      const before = (e.clientX - rect.left) < rect.width/2;
+      card.parentNode.insertBefore(dragEl, before ? card : card.nextSibling);
+    });
+    card.querySelector('[data-cover]')?.addEventListener('click', ()=> setCatalogImageCover(card.dataset.imgId));
+    card.querySelector('[data-delimg]')?.addEventListener('click', ()=> deleteCatalogImage(card.dataset.imgId));
+  });
+}
+
+async function uploadCatalogImages(fileList){
+  const files = Array.from(fileList||[]);
+  if(!files.length) return;
+  try{
+    const form = new FormData();
+    form.append('product_id', ctlgOpenId);
+    files.forEach(f=> form.append('files', f));
+    const headers = await bkAuthHeaders();
+    const res = await fetch(FUNCTIONS_BASE + '/catalog-images', { method:'POST', headers, body: form });
+    const j = await res.json();
+    if(!res.ok) throw new Error(j.error || 'upload failed');
+    ctlgOpenImages = ctlgOpenImages.concat(j.images||[]);
+    toast('✓ Uploaded '+(j.images||[]).length+' photo(s)');
+  }catch(e){ toast('⚠ '+e.message); }
+  render();
+}
+
+async function setCatalogImageCover(id){
+  try{ await bkApi('/catalog-images?id='+id+'&action=cover', { method:'PUT' });
+    ctlgOpenImages = ctlgOpenImages.map(i=>({...i, is_cover: i.id===id})); render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+async function deleteCatalogImage(id){
+  if(!confirm('Delete this photo?')) return;
+  try{ await bkApi('/catalog-images?id='+id, { method:'DELETE' });
+    ctlgOpenImages = ctlgOpenImages.filter(i=>i.id!==id); render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+async function persistCatalogImageOrder(){
+  const grid = document.getElementById('ctlgImgGrid'); if(!grid) return;
+  const ids = Array.from(grid.querySelectorAll('.bkImgCard')).map(c=>c.dataset.imgId).filter(Boolean);
+  const payload = ids.map((id,i)=>({ id, position:i }));
+  try{ await bkApi('/catalog-images', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    ctlgOpenImages = ids.map((id,i)=> Object.assign({}, ctlgOpenImages.find(x=>x.id===id), { position:i }));
+  }catch(e){ toast('⚠ Reorder failed: '+e.message); }
+}
+
+/* ===== Bikes admin: product CRUD + image management =====
+   Talks to the `bikes` and `bike-images` Supabase Edge Functions rather than
+   the DB directly, so uploads get server-side thumbnailing and every write
+   goes through one consistent, reusable API (same one a future mobile app
+   could call). Auth = the same Supabase Auth session admin.html already
+   creates via db.auth.signInWithPassword. */
+
+let bkAdmBikes = [];
+let bkAdmSearch = '';
+let bkAdmOpenId = null;      // id of bike currently open in the edit form, or 'new'
+let bkAdmOpenImages = [];
+let bkAdmLoading = false;
+
+async function bkAuthHeaders(){
+  if(!db) return {};
+  const { data } = await db.auth.getSession();
+  const token = data && data.session && data.session.access_token;
+  return token ? { Authorization: 'Bearer ' + token } : {};
+}
+
+async function bkApi(path, opts={}){
+  const headers = Object.assign({}, opts.headers||{}, await bkAuthHeaders());
+  const res = await fetch(FUNCTIONS_BASE + path, Object.assign({}, opts, { headers }));
+  let j = null;
+  try{ j = await res.json(); }catch(e){}
+  if(!res.ok) throw new Error((j && j.error) || ('Request failed: '+res.status));
+  return j;
+}
+
+async function loadBikeAdminList(){
+  bkAdmLoading = true; render();
+  try{
+    const q = bkAdmSearch ? '&q='+encodeURIComponent(bkAdmSearch) : '';
+    const j = await bkApi('/bikes?limit=200'+q);
+    bkAdmBikes = j.bikes || [];
+  }catch(e){ toast('⚠ Failed to load bikes: '+e.message); bkAdmBikes = []; }
+  bkAdmLoading = false; render();
+}
+
+function bkCoverUrl(bike){
+  const imgs = bike.bike_images || bike.images || [];
+  const cover = imgs.find(i=>i.is_cover) || imgs[0];
+  if(!cover) return '';
+  return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||BIKE_PHOTO_BUCKET}/${cover.storage_path}`;
+}
+
+function renderBikeAdminTab(){
+  if(bkAdmOpenId){ renderBikeAdminForm(); return; }
+  if(!bkAdmBikes.length && !bkAdmLoading) loadBikeAdminList();
+
+  const rows = bkAdmBikes.map(b=>`
+    <div class="bkAdmRow" data-open-bike="${b.id}">
+      <img class="bkAdmThumb" src="${bkCoverUrl(b)}" onerror="this.style.visibility='hidden'" alt="">
+      <div class="bkAdmRowInfo">
+        <div class="bkAdmRowName">${esc(b.name||b.model||'Untitled bike')}</div>
+        <div class="bkAdmRowMeta">${esc(b.supplier||'')}${b.model?' · '+esc(b.model):''}${b.customer_price_ngn?' · ₦'+Number(b.customer_price_ngn).toLocaleString():''}</div>
+      </div>
+      <span class="bkAdmBadge ${b.status==='published'?'':'draft'}">${esc(b.status||'draft')}</span>
+    </div>`).join('');
+
+  app.innerHTML = `
+    <div class="sechead">Bikes <span class="count">${bkAdmBikes.length}</span></div>
+    <p class="sub">Every bike, its specs, and its photos live here now — nothing needs editing in HTML or JSON files anymore.</p>
+    <div class="bkAdmBar">
+      <input class="bkAdmInput" id="bkAdmSearchInput" placeholder="Search by name, model, supplier, SKU…" value="${esc(bkAdmSearch)}">
+      <button class="cpBtn primary" id="bkAdmNewBtn">+ New bike</button>
+    </div>
+    ${bkAdmLoading?'<p class="sub">Loading…</p>':''}
+    <div class="bkAdmList">${rows || (bkAdmLoading?'':'<p class="sub">No bikes yet — click "New bike" to add one.</p>')}</div>
+  `;
+
+  document.getElementById('bkAdmNewBtn').onclick = ()=> openBikeAdminForm('new');
+  const search = document.getElementById('bkAdmSearchInput');
+  let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ bkAdmSearch=search.value.trim(); loadBikeAdminList(); }, 350); };
+  app.querySelectorAll('[data-open-bike]').forEach(el=>{
+    el.onclick = ()=> openBikeAdminForm(el.dataset.openBike);
+  });
+}
+
+async function openBikeAdminForm(id){
+  bkAdmOpenId = id;
+  bkAdmOpenImages = [];
+  if(!bkAdmCategories.length) await loadBikeCategories();
+  if(id !== 'new'){
+    try{
+      const bike = await bkApi('/bikes?id='+id);
+      bkAdmOpenImages = bike.images || [];
+      bkAdmBikes = bkAdmBikes.map(b=> b.id===id ? Object.assign({}, b, bike) : b);
+      bkAdmOpenBike = bike;
+    }catch(e){ toast('⚠ '+e.message); bkAdmOpenId=null; render(); return; }
+  } else {
+    bkAdmOpenBike = { name:'', model:'', supplier:'', description:'', fob_price:'', fob_currency:'USD',
+      customer_price_ngn:'', stock:0, sku:'', slug:'', warranty:'', shipping_notes:'', status:'draft',
+      category_id:'', featured:false, show_on_homepage:false, specs:{}, seo:{} };
+  }
+  render();
+}
+
+let bkAdmOpenBike = null;
+let bkAdmCategories = [];
+
+async function loadBikeCategories(){
+  try{
+    const res = await fetch(`${SUPABASE_URL.trim()}/rest/v1/bike_categories?select=id,name,parent_id&order=position`,
+      { headers: { apikey: SUPABASE_ANON_KEY, ...(await bkAuthHeaders()) } });
+    bkAdmCategories = res.ok ? await res.json() : [];
+  }catch(e){ bkAdmCategories = []; }
+}
+
+function specField(specs, key){ return (specs && specs[key]!=null) ? specs[key] : ''; }
+
+function categoryOptionsHTML(selectedId){
+  const parents = bkAdmCategories.filter(c=>!c.parent_id);
+  const childrenOf = pid => bkAdmCategories.filter(c=>c.parent_id===pid);
+  let out = '<option value="">— No category —</option>';
+  parents.forEach(p=>{
+    out += `<option value="${p.id}" ${p.id===selectedId?'selected':''}>${esc(p.name)}</option>`;
+    childrenOf(p.id).forEach(c=>{
+      out += `<option value="${c.id}" ${c.id===selectedId?'selected':''}>&nbsp;&nbsp;↳ ${esc(c.name)}</option>`;
+    });
+  });
+  return out;
+}
+
+function renderBikeAdminForm(){
+  const isNew = bkAdmOpenId === 'new';
+  const b = bkAdmOpenBike || {};
+  const specs = b.specs || {};
+  const seo = b.seo || {};
+
+  app.innerHTML = `
+    <div class="sechead">${isNew?'New bike':esc(b.name||'Edit bike')}</div>
+    <button class="cpBtn" id="bkAdmBack" style="width:auto;padding:7px 14px;margin-bottom:6px;">← Back to list</button>
+
+    <div class="bkForm">
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Basic info</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>Name</label><input id="bkfName" value="${esc(b.name||'')}" placeholder="e.g. KUAILUZX SL"></div>
+          <div class="bkFormRow"><label>SKU</label><input id="bkfSku" value="${esc(b.sku||'')}"></div>
+          <div class="bkFormRow"><label>Model</label><input id="bkfModel" value="${esc(b.model||'')}"></div>
+          <div class="bkFormRow"><label>Supplier / brand</label><input id="bkfSupplier" value="${esc(b.supplier||'')}"></div>
+          <div class="bkFormRow"><label>Category</label><select id="bkfCategory">${categoryOptionsHTML(b.category_id)}</select></div>
+          <div class="bkFormRow"><label>URL slug</label><input id="bkfSlug" value="${esc(b.slug||'')}" placeholder="auto-generated if left blank"></div>
+        </div>
+        <div class="bkFormRow"><label>Description</label><textarea id="bkfDescription">${esc(b.description||'')}</textarea></div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Pricing &amp; stock</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>FOB price</label><input id="bkfFob" type="number" value="${b.fob_price??''}"></div>
+          <div class="bkFormRow"><label>FOB currency</label>
+            <select id="bkfCurrency"><option ${b.fob_currency==='USD'?'selected':''}>USD</option><option ${b.fob_currency==='RMB'?'selected':''}>RMB</option></select>
+          </div>
+          <div class="bkFormRow"><label>Customer price (₦)</label><input id="bkfPriceNgn" type="number" value="${b.customer_price_ngn??''}"></div>
+          <div class="bkFormRow"><label>Stock</label><input id="bkfStock" type="number" value="${b.stock??0}"></div>
+        </div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Specifications</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>Motor</label><input id="bkfMotor" value="${esc(specField(specs,'motor'))}"></div>
+          <div class="bkFormRow"><label>Battery</label><input id="bkfBattery" value="${esc(specField(specs,'battery_type'))}"></div>
+          <div class="bkFormRow"><label>Voltage</label><input id="bkfVoltage" value="${esc(specField(specs,'voltage'))}"></div>
+          <div class="bkFormRow"><label>Top speed</label><input id="bkfTopSpeed" value="${esc(specField(specs,'top_speed'))}"></div>
+          <div class="bkFormRow"><label>Range</label><input id="bkfRange" value="${esc(specField(specs,'range'))}"></div>
+          <div class="bkFormRow"><label>Frame / weight</label><input id="bkfWeight" value="${esc(specField(specs,'weight'))}"></div>
+        </div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Logistics</div>
+        <div class="bkFormRow"><label>Warranty</label><input id="bkfWarranty" value="${esc(b.warranty||'')}"></div>
+        <div class="bkFormRow"><label>Shipping notes</label><input id="bkfShipping" value="${esc(b.shipping_notes||'')}"></div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">SEO</div>
+        <div class="bkFormRow"><label>Page title</label><input id="bkfSeoTitle" value="${esc(seo.title||'')}" placeholder="defaults to name if left blank"></div>
+        <div class="bkFormRow"><label>Meta description</label><textarea id="bkfSeoDesc">${esc(seo.description||'')}</textarea></div>
+      </div>
+
+      <div class="bkFormSection">
+        <div class="bkFormSectionTitle">Publishing</div>
+        <div class="bkFormGrid">
+          <div class="bkFormRow"><label>Status</label>
+            <select id="bkfStatus"><option value="draft" ${b.status==='draft'?'selected':''}>Draft</option><option value="published" ${b.status==='published'?'selected':''}>Published</option><option value="archived" ${b.status==='archived'?'selected':''}>Archived</option></select>
+          </div>
+          <div class="bkFormRow">
+            <label style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="bkfFeatured" style="width:auto" ${b.featured?'checked':''}> Featured</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="bkfHomepage" style="width:auto" ${b.show_on_homepage?'checked':''}> Show on homepage</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="cpBtn primary" id="bkAdmSaveBtn">${isNew?'Create bike':'Save changes'}</button>
+      ${!isNew?'<button class="cpBtn danger" id="bkAdmDeleteBtn">Delete bike</button>':''}
+    </div>
+
+    ${isNew ? '<p class="sub" style="margin-top:14px">Save the bike first, then you can add photos.</p>' : renderBikeImageManager()}
+  `;
+
+  document.getElementById('bkAdmBack').onclick = ()=>{ bkAdmOpenId=null; bkAdmOpenBike=null; render(); };
+  document.getElementById('bkAdmSaveBtn').onclick = saveBikeAdminForm;
+  const delBtn = document.getElementById('bkAdmDeleteBtn');
+  if(delBtn) delBtn.onclick = deleteBikeAdmin;
+
+  if(!isNew) wireBikeImageManager();
+}
+
+function collectBikeFormPayload(){
+  const g = id => document.getElementById(id).value;
+  const catSel = document.getElementById('bkfCategory').value;
+  return {
+    name: g('bkfName'), sku: g('bkfSku') || null, model: g('bkfModel'), supplier: g('bkfSupplier'),
+    category_id: catSel || null, slug: g('bkfSlug') || null,
+    description: g('bkfDescription'), fob_price: parseFloat(g('bkfFob'))||null, fob_currency: g('bkfCurrency'),
+    customer_price_ngn: parseFloat(g('bkfPriceNgn'))||null, stock: parseInt(g('bkfStock'))||0,
+    warranty: g('bkfWarranty'), shipping_notes: g('bkfShipping'), status: g('bkfStatus'),
+    featured: document.getElementById('bkfFeatured').checked,
+    show_on_homepage: document.getElementById('bkfHomepage').checked,
+    seo: { title: g('bkfSeoTitle') || null, description: g('bkfSeoDesc') || null },
+    specs: {
+      motor: g('bkfMotor'), battery_type: g('bkfBattery'), voltage: g('bkfVoltage'),
+      top_speed: g('bkfTopSpeed'), range: g('bkfRange'), weight: g('bkfWeight'),
+    },
+  };
+}
+
+async function saveBikeAdminForm(){
+  const btn = document.getElementById('bkAdmSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try{
+    const payload = collectBikeFormPayload();
+    if(bkAdmOpenId === 'new'){
+      const created = await bkApi('/bikes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      toast('✓ Bike created — now add photos');
+      bkAdmOpenId = created.id; bkAdmOpenBike = created; bkAdmOpenImages = [];
+    } else {
+      const updated = await bkApi('/bikes?id='+bkAdmOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      toast('✓ Saved');
+      bkAdmOpenBike = Object.assign({}, bkAdmOpenBike, updated);
+    }
+    bkAdmBikes = []; // force list refresh next time we go back
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+  btn.disabled = false;
+}
+
+async function deleteBikeAdmin(){
+  if(!confirm('Delete this bike and all of its photos? This cannot be undone.')) return;
+  try{
+    await bkApi('/bikes?id='+bkAdmOpenId, { method:'DELETE' });
+    toast('✓ Deleted');
+    bkAdmOpenId = null; bkAdmOpenBike = null; bkAdmBikes = [];
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+
+/* ---- image manager (upload / reorder / cover / delete) ---- */
+
+function bkImgUrl(img){
+  return `${SUPABASE_URL.trim()}/storage/v1/object/public/${img.storage_bucket||BIKE_PHOTO_BUCKET}/${img.storage_path}`;
+}
+
+function renderBikeImageManager(){
+  const cards = bkAdmOpenImages.map(img=>`
+    <div class="bkImgCard" draggable="true" data-img-id="${img.id}">
+      <img src="${bkImgUrl(img)}" alt="">
+      ${img.is_cover?'<span class="bkImgCover">Cover</span>':''}
+      <div class="bkImgActions">
+        ${!img.is_cover?`<button data-cover="${img.id}">Cover</button>`:''}
+        <button data-delimg="${img.id}">Delete</button>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="sechead" style="margin-top:22px">Photos <span class="count">${bkAdmOpenImages.length}</span></div>
+    <p class="sub">Drag to reorder. Tap "Cover" to set the main listing photo. Drop or select multiple files to upload at once.</p>
+    <div class="bkDrop" id="bkDropZone">Drop images here, or tap to choose files<br><input type="file" id="bkFileInput" accept="image/*" multiple style="display:none"></div>
+    <div class="bkImgGrid" id="bkImgGrid">${cards}</div>
+  `;
+}
+
+function wireBikeImageManager(){
+  const drop = document.getElementById('bkDropZone');
+  const input = document.getElementById('bkFileInput');
+  if(!drop) return;
+
+  drop.onclick = ()=> input.click();
+  input.onchange = ()=> uploadBikeImages(input.files);
+
+  ['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', e=>{ if(e.dataTransfer.files.length) uploadBikeImages(e.dataTransfer.files); });
+
+  // reorder via native HTML5 drag & drop on the thumbnail grid
+  const grid = document.getElementById('bkImgGrid');
+  let dragEl = null;
+  grid.querySelectorAll('.bkImgCard').forEach(card=>{
+    card.addEventListener('dragstart', ()=>{ dragEl = card; card.classList.add('dragging'); });
+    card.addEventListener('dragend', ()=>{ card.classList.remove('dragging'); dragEl=null; persistBikeImageOrder(); });
+    card.addEventListener('dragover', e=>{
+      e.preventDefault();
+      if(!dragEl || dragEl===card) return;
+      const rect = card.getBoundingClientRect();
+      const before = (e.clientX - rect.left) < rect.width/2;
+      card.parentNode.insertBefore(dragEl, before ? card : card.nextSibling);
+    });
+    card.querySelector('[data-cover]')?.addEventListener('click', ()=> setBikeImageCover(card.dataset.imgId));
+    card.querySelector('[data-delimg]')?.addEventListener('click', ()=> deleteBikeImage(card.dataset.imgId));
+  });
+}
+
+async function uploadBikeImages(fileList){
+  const files = Array.from(fileList||[]);
+  if(!files.length) return;
+  const grid = document.getElementById('bkImgGrid');
+  const placeholder = document.createElement('div');
+  placeholder.className = 'bkImgCard bkImgUploading';
+  placeholder.textContent = `Uploading ${files.length} photo${files.length>1?'s':''}…`;
+  grid && grid.prepend(placeholder);
+
+  try{
+    const form = new FormData();
+    form.append('bike_id', bkAdmOpenId);
+    files.forEach(f=> form.append('files', f));
+    const headers = await bkAuthHeaders();
+    const res = await fetch(FUNCTIONS_BASE + '/bike-images', { method:'POST', headers, body: form });
+    const j = await res.json();
+    if(!res.ok) throw new Error(j.error || 'upload failed');
+    bkAdmOpenImages = bkAdmOpenImages.concat(j.images||[]);
+    toast('✓ Uploaded '+(j.images||[]).length+' photo(s)');
+  }catch(e){ toast('⚠ '+e.message); }
+  render();
+}
+
+async function setBikeImageCover(id){
+  try{
+    await bkApi('/bike-images?id='+id+'&action=cover', { method:'PUT' });
+    bkAdmOpenImages = bkAdmOpenImages.map(i=>({...i, is_cover: i.id===id}));
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+
+async function deleteBikeImage(id){
+  if(!confirm('Delete this photo?')) return;
+  try{
+    await bkApi('/bike-images?id='+id, { method:'DELETE' });
+    bkAdmOpenImages = bkAdmOpenImages.filter(i=>i.id!==id);
+    render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+
+async function persistBikeImageOrder(){
+  const grid = document.getElementById('bkImgGrid');
+  if(!grid) return;
+  const ids = Array.from(grid.querySelectorAll('.bkImgCard')).map(c=>c.dataset.imgId).filter(Boolean);
+  const payload = ids.map((id,i)=>({ id, position:i }));
+  try{
+    await bkApi('/bike-images', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    bkAdmOpenImages = ids.map((id,i)=> Object.assign({}, bkAdmOpenImages.find(x=>x.id===id), { position:i }));
+  }catch(e){ toast('⚠ Reorder failed: '+e.message); }
+}
+
 /* ===== Bike pricing config (editable rates + fees for the bikes page) ===== */
 const BIKE_CONFIG_DEFAULT = { shipping_per_cbm_ngn:500000, logistics_service_ngn:70000, rmb_to_ngn:208, usd_to_rmb:7.2 };
 let BIKE_CONFIG = {...BIKE_CONFIG_DEFAULT};
@@ -1528,6 +2329,21 @@ function render(){
     app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
       <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
       ${renderCatalogPhotos()}`;
+    return;
+  }
+
+  if(tab==='catalog'){
+    renderCatalogTab();
+    return;
+  }
+
+  if(tab==='storesettings'){
+    renderStoreSettingsTab();
+    return;
+  }
+
+  if(tab==='bikeadmin'){
+    renderBikeAdminTab();
     return;
   }
 
