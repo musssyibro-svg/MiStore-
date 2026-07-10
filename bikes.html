@@ -31,7 +31,9 @@
     --shadow-lg:0 24px 70px rgba(0,0,0,.65);
     --hdr:rgba(20,20,22,.72); --tint:#0A84FF; color-scheme:dark;
   }
-  :root[data-theme="dark"] .bmedia,:root[data-theme="dark"] .dmedia .main{background:#0E0E10;}
+  /* product images sit on white so their own white backgrounds blend away
+     (mix-blend multiply); the media stays white even in dark mode */
+  .bmedia,.dmedia,.dmedia .main,.dthumbs button{background:#fff!important;}
   .bmedia,.dmedia .main{position:relative;}
   .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--tint);animation:ringspin .75s linear infinite;}
   @keyframes ringspin{to{transform:translate(-50%,-50%) rotate(360deg);}}
@@ -105,24 +107,25 @@
   .sechead h2{font-size:24px;letter-spacing:-.03em;margin:0;font-weight:800;}
   .sechead p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
 
-  /* bike grid — image-first, minimal */
+  /* bike grid — modern product cards */
   .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:18px;}
-  .bcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .18s,box-shadow .22s;}
+  .bcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer;transition:transform .18s,box-shadow .22s,border-color .18s;}
   .bcard:active{transform:scale(.99);}
-  @media (hover:hover){ .bcard:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(0,0,0,.13);} }
-  .bmedia{aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .bmedia img{width:100%;height:100%;object-fit:contain;padding:8px;}
-  .binfo{padding:14px 15px 16px;display:flex;flex-direction:column;gap:3px;flex:1;}
-  .bname{font-size:16px;font-weight:700;letter-spacing:-.02em;}
-  .bspec{font-size:12.5px;color:var(--faint);font-weight:600;}
-  .bbadges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  @media (hover:hover){ .bcard:hover{transform:translateY(-4px);box-shadow:0 26px 60px rgba(0,0,0,.13);border-color:var(--line2);} .bcard:hover .bmedia img{transform:scale(1.05);} .bcard:hover .bview{background:var(--ink);color:#fff;border-color:var(--ink);} }
+  .bmedia{position:relative;aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .bmedia img{width:100%;height:100%;object-fit:contain;padding:12px;mix-blend-mode:multiply;transition:transform .3s cubic-bezier(.2,.8,.2,1);}
+  .bstockpill{position:absolute;top:10px;left:10px;z-index:2;display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--green);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 9px 4px 8px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .bstockpill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .binfo{padding:13px 15px 15px;display:flex;flex-direction:column;flex:1;}
+  .bkicker{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px;}
+  .bname{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.1;}
+  .bspec{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:3px;}
+  .bbadges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
   .bbadge{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px 8px;}
-  .bfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;}
+  .bfoot{display:flex;align-items:baseline;gap:8px;margin-top:12px;}
   .bprice{font-size:18px;font-weight:800;letter-spacing:-.02em;}
-  .bprice small{font-size:11.5px;color:var(--muted);font-weight:600;}
-  .bstock{font-size:11px;font-weight:700;color:var(--green);display:inline-flex;align-items:center;gap:5px;}
-  .bstock::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);}
-  .bview{margin-top:12px;border:1px solid var(--line2);background:var(--bg);border-radius:12px;padding:10px;font-weight:700;font-size:13px;text-align:center;}
+  .bprice .pfrom{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:0;}
+  .bview{margin-top:12px;border:1px solid var(--line2);background:var(--bg);color:var(--ink);border-radius:12px;padding:11px;font-weight:700;font-size:13px;text-align:center;font-family:inherit;cursor:pointer;transition:.18s;}
 
   .comingsoon{text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line2);border-radius:var(--r);padding:46px 20px;box-shadow:var(--shadow);}
   .comingsoon .big{font-size:40px;margin-bottom:10px;}
@@ -146,12 +149,12 @@
   .sbody{padding:16px 20px 0;max-width:640px;margin:0 auto;width:100%;}
   .dmedia{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#fff;}
   .dmedia .main{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
-  .dmedia .main img{width:100%;height:100%;object-fit:contain;padding:12px;}
+  .dmedia .main img{width:100%;height:100%;object-fit:contain;padding:12px;mix-blend-mode:multiply;}
   .dthumbs{display:flex;gap:8px;overflow-x:auto;padding:10px;scrollbar-width:none;}
   .dthumbs::-webkit-scrollbar{display:none;}
   .dthumbs button{flex:0 0 auto;width:56px;height:48px;border-radius:10px;border:2px solid transparent;background:#fff;overflow:hidden;padding:0;}
   .dthumbs button.on{border-color:var(--red);}
-  .dthumbs img{width:100%;height:100%;object-fit:contain;padding:3px;}
+  .dthumbs img{width:100%;height:100%;object-fit:contain;padding:3px;mix-blend-mode:multiply;}
   .dtitle{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:16px 0 2px;}
   .dsub{font-size:13px;color:var(--muted);}
   .flabel{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px;}
@@ -312,13 +315,14 @@ function optionsOf(p){
 function motorW(p){ const m=(p.motor||'').match(/(\d+)\s*W/i); return m?+m[1]:0; }
 
 function activeList(){
-  let list = PRODUCTS.filter(p=>p.is_primary!==false);
+  let list = PRODUCTS.filter(p=>p.is_primary!==false && !p.hidden);
   if(cat==='e-bikes') list=list.filter(p=>p.category==='Electric Bikes');
   else if(cat==='e-motorcycles') list=list.filter(p=>p.category==='Electric Motorcycles');
   else if(cat==='high-performance') list=list.filter(p=>p.category==='Electric Motorcycles' && motorW(p)>=1500);
   if(sort==='plow') list=[...list].sort((a,b)=>priceOf(a)-priceOf(b));
   else if(sort==='phigh') list=[...list].sort((a,b)=>priceOf(b)-priceOf(a));
   else if(sort==='power') list=[...list].sort((a,b)=>motorW(b)-motorW(a));
+  else list=[...list].sort((a,b)=>(a._r||0)-(b._r||0));   /* "Newest" = a stable random mix */
   return list;
 }
 
@@ -336,17 +340,23 @@ function renderCats(){
   $('cats').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; renderCats(); renderView(); });
 }
 
+function kickerFor(p){
+  if(p.category==='Electric Motorcycles') return motorW(p)>=1500?'Sport Motorcycle':'Electric Motorcycle';
+  if(p.category==='Electric Bikes') return 'Electric Bike';
+  return p.category||'Electric Mobility';
+}
 function cardHTML(p){
-  const spec=[p.motor,(p.voltage||'').split('/')[0].trim().toUpperCase(),(p.top_speed||'')].filter(Boolean).join(' · ');
+  const spec=[p.motor,(p.voltage||'').split('/')[0].trim().toUpperCase(),(p.top_speed||'').split('/')[0].trim()].filter(Boolean).join(' · ');
   const badges=[p.range?('🔋 '+p.range.split('/')[0].trim()):'',p.brake?('🛑 '+(p.brake.includes('Disc')?'Disc brake':'Drum brake')):''].filter(Boolean);
   return `<article class="bcard" data-open="${esc(p.id)}">
-    <div class="bmedia"><span class="ring"></span><img class="fadein" loading="lazy" src="${esc(imgUrl(p.image))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
+    <div class="bmedia"><span class="bstockpill">In stock</span><span class="ring"></span><img class="fadein" loading="lazy" src="${esc(imgUrl(p.image))}" alt="${esc(p.model)}" onload="this.classList.add('ready');var r=this.parentElement.querySelector('.ring');if(r)r.remove();" onerror="this.style.opacity=.25;var r=this.parentElement.querySelector('.ring');if(r)r.remove();"></div>
     <div class="binfo">
+      <div class="bkicker">${esc(kickerFor(p))}</div>
       <div class="bname">${esc(p.model)}</div>
       <div class="bspec">${esc(spec)}</div>
       <div class="bbadges">${badges.map(b=>`<span class="bbadge">${esc(b)}</span>`).join('')}</div>
-      <div class="bfoot"><span class="bprice">${fmt(priceOf(p))}</span><span class="bstock">In stock</span></div>
-      <div class="bview">View details</div>
+      <div class="bfoot"><span class="bprice"><span class="pfrom">From</span> ${fmt(priceOf(p))}</span></div>
+      <button class="bview">View details</button>
     </div>
   </article>`;
 }
@@ -390,14 +400,7 @@ function renderView(){
   const list=activeList();
   $('count').textContent=list.length+' model'+(list.length===1?'':'s');
   const hero=catHero(list);
-  if(cat==='all'){
-    const groups=[['Electric Bikes',list.filter(p=>p.category==='Electric Bikes')],['Electric Motorcycles',list.filter(p=>p.category==='Electric Motorcycles')]];
-    v.innerHTML=hero+groups.filter(g=>g[1].length).map(g=>`
-      <section><div class="sechead"><h2>${g[0]}</h2><p>${g[1].length} model${g[1].length===1?'':'s'} · tap any to see full specs</p></div>
-      <div class="bgrid">${g[1].map(cardHTML).join('')}</div></section>`).join('');
-  } else {
-    v.innerHTML=hero+`<section><div class="bgrid">${list.map(cardHTML).join('')}</div></section>`;
-  }
+  v.innerHTML=hero+`<section><div class="bgrid">${list.map(cardHTML).join('')}</div></section>`;
   v.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openBike(el.dataset.open));
 }
 
@@ -459,8 +462,7 @@ function renderBreak(){
   const rate=rateFor(cur);
   const shipping=(p.cbm||0)*CONFIG.shipping_per_cbm_ngn;
   const cost=(fob||0)*rate;
-  const calc = cur==='RMB' ? `¥${fob} × ${CONFIG.rmb_to_ngn}` : `$${fob} × ${CONFIG.usd_to_rmb} × ${CONFIG.rmb_to_ngn}`;
-  $('dBreak').innerHTML=`Product cost: <b>${fmtExact(cost)}</b> (${calc})<br>Shipping (${(p.cbm||0).toFixed(3)} CBM): <b>${fmtExact(shipping)}</b><br>Logistics &amp; services: <b>${fmtExact(logServ())}</b>`;
+  $('dBreak').innerHTML=`Product &amp; import: <b>${fmt(cost)}</b><br>Shipping: <b>${fmt(shipping)}</b><br>Logistics &amp; services: <b>${fmt(logServ())}</b>`;
 }
 function orderWhatsApp(){
   const p=sel; const opts=optionsOf(p);
@@ -508,6 +510,7 @@ Promise.all([
   if(cfg) CONFIG={...CONFIG,...cfg};
   else if(pj&&pj.config) CONFIG={...CONFIG,...pj.config};
   PRODUCTS=(pj.products||pj||[]).slice();
+  PRODUCTS.forEach(p=>p._r=Math.random());   /* stable random order for the "All" mix */
   renderCats(); renderView();
   loadRemoteConfig();   /* apply admin overrides if present */
 }).catch(e=>{
