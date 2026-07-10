@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Orders">
+<meta name="apple-mobile-web-app-title" content="MiStore Admin">
 <meta name="theme-color" content="#0E7C66">
-<title>Order Tracker</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>MiStore Admin</title>
 <style>
   :root{
     --paper:#FBFAF7;
@@ -388,10 +390,10 @@
   .settingsForm input{width:100%;border:1px solid var(--line-strong);border-radius:9px;padding:9px 11px;font-size:15px;font-family:inherit;}
 
   /* ---------- Tabs ---------- */
-  .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 18px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .tab{flex:1;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
-    border-radius:11px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-.01em;
-    display:flex;align-items:center;justify-content:center;gap:7px;}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 4px;}
+  .tab{flex:0 0 auto;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
+    border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer;letter-spacing:-.01em;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
   .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
   .tabbadge{min-width:18px;height:18px;border-radius:9px;background:var(--late);color:#fff;font-size:11px;
     display:none;align-items:center;justify-content:center;padding:0 5px;font-family:ui-monospace,monospace;}
@@ -541,7 +543,7 @@
 
 <header>
   <div class="brandrow">
-    <div class="brand"><span class="pin">📦</span>Order Tracker</div>
+    <div class="brand"><span class="pin">🛍️</span>MiStore Admin</div>
     <div style="display:flex;align-items:center;gap:6px;">
       <button class="iconbtn" id="insightsBtn" aria-label="Insights" title="Insights">📊</button>
       <button class="iconbtn" id="compactToggle" aria-label="Toggle compact view" title="Compact view">⊟</button>
@@ -559,15 +561,15 @@
 <div class="banner" id="cloudBanner"></div>
 
 <div class="tabs" id="tabs">
-  <button class="tab active" data-tab="active">On the way <span class="tabbadge" id="activeBadge"></span></button>
-  <button class="tab" data-tab="history">History</button>
-  <button class="tab" data-tab="photos">Photos</button>
-  <button class="tab" data-tab="prices">Prices</button>
-  <button class="tab" data-tab="bikeadmin">Bikes</button>
-  <button class="tab" data-tab="bikes">Bike pricing</button>
-  <button class="tab" data-tab="catalog">Catalog</button>
-  <button class="tab" data-tab="storesettings">Store Settings</button>
-  <button class="tab" data-tab="showcase">Showcase</button>
+  <button class="tab active" data-tab="active">📦 On the way <span class="tabbadge" id="activeBadge"></span></button>
+  <button class="tab" data-tab="history">🕘 History</button>
+  <button class="tab" data-tab="bikeadmin">🏍 Bikes</button>
+  <button class="tab" data-tab="catalog">🎧 Accessories</button>
+  <button class="tab" data-tab="prices">📱 Phone prices</button>
+  <button class="tab" data-tab="photos">🖼 Phone photos</button>
+  <button class="tab" data-tab="showcase">⭐ Customer stories</button>
+  <button class="tab" data-tab="bikes">💰 Bike pricing</button>
+  <button class="tab" data-tab="storesettings">⚙️ Store settings</button>
 </div>
 
 <main id="app"></main>
