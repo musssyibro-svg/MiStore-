@@ -1,0 +1,3 @@
+# Keep this directory in git
+
+This file ensures the `images/` directory is tracked even when empty.
