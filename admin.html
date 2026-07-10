@@ -511,6 +511,30 @@
   .bkrow input{width:130px;border:1px solid var(--line,rgba(0,0,0,.14));border-radius:9px;padding:9px 11px;font-size:15px;font-family:inherit;text-align:right;}
   .bkprev{background:var(--card,#fff);border:1px dashed var(--line,rgba(0,0,0,.18));border-radius:12px;padding:12px 14px;font-size:13px;color:var(--muted,#666);display:flex;flex-direction:column;gap:5px;}
   .bkprev b{color:var(--ink,#111);}
+  /* bike admin: filters, badges, buttons, duplicate warning */
+  .bkAdmChips{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px;}
+  .bkAdmChip{border:1px solid var(--line,rgba(0,0,0,.12));background:var(--card,#fff);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--muted,#666);cursor:pointer;}
+  .bkAdmChip.on{background:var(--ink,#111);color:#fff;border-color:var(--ink,#111);}
+  .bkAdmBadge.out{background:#FDECEA;color:#C0392B;border:1px solid #f5c6c0;}
+  .bkAdmBadge.arch{background:#eee;color:#888;}
+  .bkDupWarn{background:#FFF6E5;border:1px solid #F0D089;color:#8a6d1a;border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:600;margin:6px 0 2px;}
+  .bkFormBtns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;}
+  /* preview modal */
+  .bkPvModal{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;}
+  .bkPvModal.show{display:flex;}
+  .bkPvSheet{background:var(--card,#fff);border-radius:18px;max-width:420px;width:100%;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,.3);}
+  .bkPvHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .bkPvCard{border:1px solid var(--line,rgba(0,0,0,.1));border-radius:16px;overflow:hidden;}
+  .bkPvMedia{aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .bkPvMedia img{width:100%;height:100%;object-fit:contain;padding:12px;mix-blend-mode:multiply;}
+  .bkPvInfo{padding:13px 15px 15px;}
+  .bkPvKicker{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#999;}
+  .bkPvName{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-top:2px;}
+  .bkPvSpec{font-size:13px;color:#666;margin-top:3px;}
+  .bkPvPrice{font-size:18px;font-weight:800;margin-top:10px;}
+  .bkPvStatus{margin-top:8px;font-size:12px;font-weight:700;}
+  .bkPvStatus.in{color:#1F9D5B;} .bkPvStatus.out{color:#C0392B;}
+  .bkPvDesc{font-size:13px;color:#555;margin-top:12px;line-height:1.5;}
 </style>
 </head>
 <body>
@@ -713,6 +737,12 @@
 
 <div class="toast" id="toast"></div>
 <div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+<div class="bkPvModal" id="bkPreviewModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="bkPvSheet">
+    <div class="bkPvHead"><b>Customer preview</b><button class="cpBtn" style="width:auto;padding:6px 12px;" onclick="document.getElementById('bkPreviewModal').classList.remove('show')">Close</button></div>
+    <div id="bkPreviewBody"></div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
         onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s);"></script>
@@ -1650,6 +1680,7 @@ async function persistCatalogImageOrder(){
 
 let bkAdmBikes = [];
 let bkAdmSearch = '';
+let bkAdmStatusFilter = 'all';   // all | published | draft | archived
 let bkAdmOpenId = null;      // id of bike currently open in the edit form, or 'new'
 let bkAdmOpenImages = [];
 let bkAdmLoading = false;
@@ -1691,15 +1722,24 @@ function renderBikeAdminTab(){
   if(bkAdmOpenId){ renderBikeAdminForm(); return; }
   if(!bkAdmBikes.length && !bkAdmLoading) loadBikeAdminList();
 
-  const rows = bkAdmBikes.map(b=>`
+  const shown = bkAdmStatusFilter==='all' ? bkAdmBikes : bkAdmBikes.filter(b=>(b.status||'draft')===bkAdmStatusFilter);
+  const rows = shown.map(b=>{
+    const soldout = b.availability==='sold_out';
+    return `
     <div class="bkAdmRow" data-open-bike="${b.id}">
       <img class="bkAdmThumb" src="${bkCoverUrl(b)}" onerror="this.style.visibility='hidden'" alt="">
       <div class="bkAdmRowInfo">
         <div class="bkAdmRowName">${esc(b.name||b.model||'Untitled bike')}</div>
         <div class="bkAdmRowMeta">${esc(b.supplier||'')}${b.model?' · '+esc(b.model):''}${b.customer_price_ngn?' · ₦'+Number(b.customer_price_ngn).toLocaleString():''}</div>
       </div>
-      <span class="bkAdmBadge ${b.status==='published'?'':'draft'}">${esc(b.status||'draft')}</span>
-    </div>`).join('');
+      ${soldout?'<span class="bkAdmBadge out">sold out</span>':''}
+      <span class="bkAdmBadge ${b.status==='published'?'':(b.status==='archived'?'arch':'draft')}">${esc(b.status||'draft')}</span>
+    </div>`; }).join('');
+
+  const counts = { all:bkAdmBikes.length, published:0, draft:0, archived:0 };
+  bkAdmBikes.forEach(b=>{ const s=b.status||'draft'; if(counts[s]!=null) counts[s]++; });
+  const filters = ['all','published','draft','archived'].map(f=>
+    `<button class="bkAdmChip ${f===bkAdmStatusFilter?'on':''}" data-filter="${f}">${f==='archived'?'Trash':f[0].toUpperCase()+f.slice(1)} (${counts[f]})</button>`).join('');
 
   app.innerHTML = `
     <div class="sechead">Bikes <span class="count">${bkAdmBikes.length}</span></div>
@@ -1708,13 +1748,15 @@ function renderBikeAdminTab(){
       <input class="bkAdmInput" id="bkAdmSearchInput" placeholder="Search by name, model, supplier, SKU…" value="${esc(bkAdmSearch)}">
       <button class="cpBtn primary" id="bkAdmNewBtn">+ New bike</button>
     </div>
+    <div class="bkAdmChips">${filters}</div>
     ${bkAdmLoading?'<p class="sub">Loading…</p>':''}
-    <div class="bkAdmList">${rows || (bkAdmLoading?'':'<p class="sub">No bikes yet — click "New bike" to add one.</p>')}</div>
+    <div class="bkAdmList">${rows || (bkAdmLoading?'':'<p class="sub">No bikes in this view.</p>')}</div>
   `;
 
   document.getElementById('bkAdmNewBtn').onclick = ()=> openBikeAdminForm('new');
   const search = document.getElementById('bkAdmSearchInput');
   let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ bkAdmSearch=search.value.trim(); loadBikeAdminList(); }, 350); };
+  app.querySelectorAll('[data-filter]').forEach(el=>{ el.onclick=()=>{ bkAdmStatusFilter=el.dataset.filter; render(); }; });
   app.querySelectorAll('[data-open-bike]').forEach(el=>{
     el.onclick = ()=> openBikeAdminForm(el.dataset.openBike);
   });
@@ -1734,7 +1776,7 @@ async function openBikeAdminForm(id){
   } else {
     bkAdmOpenBike = { name:'', model:'', supplier:'', description:'', fob_price:'', fob_currency:'USD',
       customer_price_ngn:'', stock:0, sku:'', slug:'', warranty:'', shipping_notes:'', status:'draft',
-      category_id:'', featured:false, show_on_homepage:false, specs:{}, seo:{} };
+      availability:'in_stock', category_id:'', featured:false, show_on_homepage:false, specs:{}, seo:{} };
   }
   render();
 }
@@ -1786,6 +1828,7 @@ function renderBikeAdminForm(){
           <div class="bkFormRow"><label>Category</label><select id="bkfCategory">${categoryOptionsHTML(b.category_id)}</select></div>
           <div class="bkFormRow"><label>URL slug</label><input id="bkfSlug" value="${esc(b.slug||'')}" placeholder="auto-generated if left blank"></div>
         </div>
+        <div id="bkfDupWarn" class="bkDupWarn" style="display:none"></div>
         <div class="bkFormRow"><label>Description</label><textarea id="bkfDescription">${esc(b.description||'')}</textarea></div>
       </div>
 
@@ -1829,7 +1872,10 @@ function renderBikeAdminForm(){
         <div class="bkFormSectionTitle">Publishing</div>
         <div class="bkFormGrid">
           <div class="bkFormRow"><label>Status</label>
-            <select id="bkfStatus"><option value="draft" ${b.status==='draft'?'selected':''}>Draft</option><option value="published" ${b.status==='published'?'selected':''}>Published</option><option value="archived" ${b.status==='archived'?'selected':''}>Archived</option></select>
+            <select id="bkfStatus"><option value="draft" ${b.status==='draft'?'selected':''}>Draft</option><option value="published" ${b.status==='published'?'selected':''}>Published</option><option value="archived" ${b.status==='archived'?'selected':''}>Archived (trash)</option></select>
+          </div>
+          <div class="bkFormRow"><label>Availability</label>
+            <select id="bkfAvailability"><option value="in_stock" ${(b.availability||'in_stock')==='in_stock'?'selected':''}>In stock</option><option value="sold_out" ${b.availability==='sold_out'?'selected':''}>Sold out</option><option value="preorder" ${b.availability==='preorder'?'selected':''}>Pre-order</option></select>
           </div>
           <div class="bkFormRow">
             <label style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="bkfFeatured" style="width:auto" ${b.featured?'checked':''}> Featured</label>
@@ -1838,8 +1884,13 @@ function renderBikeAdminForm(){
         </div>
       </div>
 
-      <button class="cpBtn primary" id="bkAdmSaveBtn">${isNew?'Create bike':'Save changes'}</button>
-      ${!isNew?'<button class="cpBtn danger" id="bkAdmDeleteBtn">Delete bike</button>':''}
+      <div class="bkFormBtns">
+        <button class="cpBtn primary" id="bkAdmSaveBtn">${isNew?'Create bike':'Save changes'}</button>
+        <button class="cpBtn" id="bkAdmPreviewBtn" style="width:auto;">👁 Preview</button>
+        ${!isNew?'<button class="cpBtn" id="bkAdmDupBtn" style="width:auto;">⧉ Duplicate</button>':''}
+        ${!isNew?`<button class="cpBtn danger" id="bkAdmDeleteBtn" style="width:auto;">${b.status==='archived'?'Delete permanently':'Move to trash'}</button>`:''}
+        ${(!isNew&&b.status==='archived')?'<button class="cpBtn" id="bkAdmRestoreBtn" style="width:auto;">↩ Restore</button>':''}
+      </div>
     </div>
 
     ${isNew ? '<p class="sub" style="margin-top:14px">Save the bike first, then you can add photos.</p>' : renderBikeImageManager()}
@@ -1847,8 +1898,20 @@ function renderBikeAdminForm(){
 
   document.getElementById('bkAdmBack').onclick = ()=>{ bkAdmOpenId=null; bkAdmOpenBike=null; render(); };
   document.getElementById('bkAdmSaveBtn').onclick = saveBikeAdminForm;
-  const delBtn = document.getElementById('bkAdmDeleteBtn');
-  if(delBtn) delBtn.onclick = deleteBikeAdmin;
+  document.getElementById('bkAdmPreviewBtn').onclick = previewBikeAdmin;
+  const dupBtn = document.getElementById('bkAdmDupBtn'); if(dupBtn) dupBtn.onclick = duplicateBikeAdmin;
+  const delBtn = document.getElementById('bkAdmDeleteBtn'); if(delBtn) delBtn.onclick = deleteBikeAdmin;
+  const restBtn = document.getElementById('bkAdmRestoreBtn'); if(restBtn) restBtn.onclick = restoreBikeAdmin;
+  // live duplicate detection on name / model
+  const dupWarn = ()=>{ const el=document.getElementById('bkfDupWarn'); if(!el) return;
+    const name=(document.getElementById('bkfName').value||'').trim().toLowerCase();
+    const model=(document.getElementById('bkfModel').value||'').trim().toLowerCase();
+    const hit=bkAdmBikes.find(x=> x.id!==bkAdmOpenId && ((name&&(x.name||'').toLowerCase()===name)||(model&&(x.model||'').toLowerCase()===model)) );
+    el.style.display = hit ? 'block' : 'none';
+    if(hit) el.textContent = '⚠ A bike with this name/model already exists: '+(hit.name||hit.model)+'. Check for a duplicate before saving.';
+  };
+  ['bkfName','bkfModel'].forEach(id=>{ const e=document.getElementById(id); if(e) e.addEventListener('input',dupWarn); });
+  dupWarn();
 
   if(!isNew) wireBikeImageManager();
 }
@@ -1862,6 +1925,7 @@ function collectBikeFormPayload(){
     description: g('bkfDescription'), fob_price: parseFloat(g('bkfFob'))||null, fob_currency: g('bkfCurrency'),
     customer_price_ngn: parseFloat(g('bkfPriceNgn'))||null, stock: parseInt(g('bkfStock'))||0,
     warranty: g('bkfWarranty'), shipping_notes: g('bkfShipping'), status: g('bkfStatus'),
+    availability: g('bkfAvailability'),
     featured: document.getElementById('bkfFeatured').checked,
     show_on_homepage: document.getElementById('bkfHomepage').checked,
     seo: { title: g('bkfSeoTitle') || null, description: g('bkfSeoDesc') || null },
@@ -1893,13 +1957,70 @@ async function saveBikeAdminForm(){
 }
 
 async function deleteBikeAdmin(){
-  if(!confirm('Delete this bike and all of its photos? This cannot be undone.')) return;
+  const b = bkAdmOpenBike || {};
+  // Soft delete first: a "delete" archives the bike (recoverable). Only a bike
+  // that is already archived can be permanently removed.
+  if(b.status === 'archived'){
+    if(!confirm('Permanently delete this bike and all of its photos? This cannot be undone.')) return;
+    try{
+      await bkApi('/bikes?id='+bkAdmOpenId, { method:'DELETE' });
+      toast('✓ Deleted permanently');
+      bkAdmOpenId = null; bkAdmOpenBike = null; bkAdmBikes = [];
+      render();
+    }catch(e){ toast('⚠ '+e.message); }
+    return;
+  }
+  const prev = b.status || 'draft';
   try{
-    await bkApi('/bikes?id='+bkAdmOpenId, { method:'DELETE' });
-    toast('✓ Deleted');
+    await bkApi('/bikes?id='+bkAdmOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'archived' }) });
+    const id = bkAdmOpenId;
     bkAdmOpenId = null; bkAdmOpenBike = null; bkAdmBikes = [];
+    bkAdmStatusFilter = 'archived';   // jump to trash so Restore is one tap away
+    render();
+    toast('Moved to trash — use Restore to undo');
+  }catch(e){ toast('⚠ '+e.message); }
+}
+async function restoreBike(id, toStatus){
+  try{
+    await bkApi('/bikes?id='+id, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status: toStatus||'draft' }) });
+    bkAdmBikes = []; toast('✓ Restored'); render();
+  }catch(e){ toast('⚠ '+e.message); }
+}
+async function restoreBikeAdmin(){ await restoreBike(bkAdmOpenId, 'draft'); bkAdmOpenId=null; bkAdmOpenBike=null; render(); }
+
+async function duplicateBikeAdmin(){
+  try{
+    const payload = collectBikeFormPayload();
+    payload.name = (payload.name||'Bike') + ' (copy)';
+    payload.sku = null; payload.slug = null;   // must stay unique
+    payload.status = 'draft';
+    const created = await bkApi('/bikes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    toast('✓ Duplicated as draft — photos are not copied');
+    bkAdmBikes = []; bkAdmOpenId = created.id; bkAdmOpenBike = created; bkAdmOpenImages = [];
     render();
   }catch(e){ toast('⚠ '+e.message); }
+}
+
+/* Customer-facing preview built from the live form values (no save needed). */
+function previewBikeAdmin(){
+  const p = collectBikeFormPayload();
+  const cover = bkAdmOpenImages && bkAdmOpenImages.length ? bkImgUrl(bkAdmOpenImages.find(i=>i.is_cover)||bkAdmOpenImages[0]) : '';
+  const price = p.customer_price_ngn ? '₦'+Number(p.customer_price_ngn).toLocaleString() : 'Price TBD';
+  const spec = [p.specs.motor, p.specs.voltage, p.specs.top_speed].filter(Boolean).join(' · ');
+  const soldout = p.availability==='sold_out';
+  document.getElementById('bkPreviewBody').innerHTML = `
+    <div class="bkPvCard">
+      <div class="bkPvMedia">${cover?`<img src="${cover}" alt="">`:'<span style="color:#999">No cover photo yet</span>'}</div>
+      <div class="bkPvInfo">
+        <div class="bkPvKicker">${esc(p.specs.motor && parseInt(p.specs.motor)>=1500 ? 'Sport Motorcycle':'Electric Mobility')}</div>
+        <div class="bkPvName">${esc(p.name||'Untitled')}</div>
+        <div class="bkPvSpec">${esc(spec||'—')}</div>
+        <div class="bkPvPrice">From <b>${esc(price)}</b></div>
+        <div class="bkPvStatus ${soldout?'out':'in'}">${soldout?'Sold out':(p.status==='published'?'In stock · Published':'Draft — not visible to customers')}</div>
+      </div>
+    </div>
+    ${p.description?`<p class="bkPvDesc">${esc(p.description)}</p>`:''}`;
+  document.getElementById('bkPreviewModal').classList.add('show');
 }
 
 /* ---- image manager (upload / reorder / cover / delete) ---- */
