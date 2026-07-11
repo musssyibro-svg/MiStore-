@@ -571,6 +571,23 @@
   .morecard .cattag{font-size:11px;color:var(--faint);font-weight:600;}
   @media (max-width:560px){ .moregrid{grid-template-columns:repeat(2,1fr);} }
 
+  /* ---- live catalog sections ---- */
+  .catgroup{margin-top:22px;}
+  .catgrouphead{display:flex;align-items:center;gap:8px;margin:0 0 4px;}
+  .catgrouphead .caticon{font-size:20px;}
+  .catgrouphead h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0;}
+  .catgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
+  .catcard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .16s,box-shadow .2s;display:flex;flex-direction:column;}
+  .catcard:active{transform:scale(.98);}
+  @media (hover:hover){ .catcard:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.10);} }
+  .catcard .catmedia{aspect-ratio:1/1;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .catcard .catmedia img{width:100%;height:100%;object-fit:contain;padding:12px;mix-blend-mode:multiply;}
+  .catcard .catmedia .ph{font-size:38px;opacity:.8;}
+  .catcard .cattx{padding:11px 12px 13px;display:flex;flex-direction:column;gap:3px;}
+  .catcard .cattl{font-size:13px;font-weight:700;letter-spacing:-.01em;line-height:1.25;}
+  .catcard .catpr{font-size:12.5px;color:var(--red,#e0245e);font-weight:800;}
+  @media (max-width:560px){ .catgrid{grid-template-columns:repeat(2,1fr);} }
+
   /* ---- why MiStore band ---- */
   .whyband{background:var(--ink);color:#fff;border-radius:22px;padding:22px 20px;margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
   :root[data-theme="dark"] .whyband{background:var(--card);border:1px solid var(--line);}
@@ -710,6 +727,12 @@
   <section id="more">
     <div class="morehead"><h2>Shop More Categories</h2><a href="bikes.html" id="moreViewAll">View all</a></div>
     <div class="moregrid" id="moreGrid"></div>
+  </section>
+
+  <!-- ===== live catalog (accessories, kitchen, electronics, …) from admin ===== -->
+  <section id="catalog" style="display:none;">
+    <div class="sechead"><div><h2>More from MiStore</h2><p>Accessories, kitchen, electronics and more — tap any item to order on WhatsApp.</p></div></div>
+    <div id="catalogSections"></div>
   </section>
 
   <section id="how">
@@ -2103,8 +2126,53 @@ loadLive=async function(){
   }
 };
 
+/* ---------- live catalog (accessories/kitchen/electronics/…) ---------- */
+function catStoreImg(p){
+  const imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)));
+  const cover=imgs[0];
+  if(cover&&cover.storage_path) return `${SUPABASE_URL}/storage/v1/object/public/${cover.storage_bucket||'catalog-photos'}/${cover.storage_path}`;
+  if(p.metadata&&p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
+  return '';
+}
+function catStoreCard(p){
+  const img=catStoreImg(p);
+  const price = p.price_from_ngn ? ('From '+fmtK(p.price_from_ngn)) : 'Tap to enquire';
+  const media = img ? `<img src="${img}" loading="lazy" alt="${esc(p.name||'')}" onerror="this.parentNode.innerHTML='<span class=&quot;ph&quot;>📦</span>'">` : '<span class="ph">📦</span>';
+  return `<div class="catcard" data-order="${esc(p.name||'Item')}">
+    <div class="catmedia">${media}</div>
+    <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div></div>
+  </div>`;
+}
+async function loadStorefrontCatalog(){
+  const c = (typeof getClient==='function') ? getClient() : null; if(!c) return;
+  let rows;
+  try{
+    const { data, error } = await c.from('catalog_products')
+      .select('id,name,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
+      .eq('status','published').limit(400);
+    if(error) throw error; rows = data||[];
+  }catch(e){ return; }            /* fail silent — rest of storefront unaffected */
+  if(!rows.length) return;
+  const groups = {};
+  rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
+    const k=cat.slug||'more'; (groups[k]=groups[k]||{cat,items:[]}).items.push(p); });
+  const ordered = Object.values(groups).sort((a,b)=>((a.cat.position||99)-(b.cat.position||99)));
+  const html = ordered.map(g=>`
+    <div class="catgroup">
+      <div class="catgrouphead"><span class="caticon">${esc(g.cat.icon||'📦')}</span><h3>${esc(g.cat.name||'More')}</h3></div>
+      <div class="catgrid">${g.items.map(catStoreCard).join('')}</div>
+    </div>`).join('');
+  const host=document.getElementById('catalogSections'); if(!host) return;
+  host.innerHTML = html;
+  const sec=document.getElementById('catalog'); if(sec) sec.style.display='';
+  host.querySelectorAll('[data-order]').forEach(el=>{ el.onclick=()=>{
+    const nm=el.getAttribute('data-order');
+    window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to order: '+nm),'_blank','noopener');
+  }; });
+}
+
 (function waitSb(tries){
-  if(window.supabase){ loadLive(); loadShowcase(); }
+  if(window.supabase){ loadLive(); loadShowcase(); loadStorefrontCatalog(); }
   else if(tries>0){ setTimeout(()=>waitSb(tries-1),150); }
 })(40);
 </script>

@@ -1481,6 +1481,7 @@ async function importExistingCatalog(){
   const btn=document.getElementById('ctlgImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
   try{
     await loadCatalogCategories();
+    if(!storeSettings) await loadStoreSettings();
     const catBySlug = {}; ctlgCategories.forEach(c=>catBySlug[c.slug]=c.id);
     const { data:existing } = await db.from('catalog_products').select('supplier_id');
     const have = new Set((existing||[]).map(x=>String(x.supplier_id)).filter(Boolean));
@@ -1504,6 +1505,7 @@ async function importExistingCatalog(){
           variant_label: v.variant_label||null, rmb_price: v.rmb_price??null,
           moq: v.moq??null, position:i, is_default:i===0 }));
         for(let i=0;i<vrows.length;i+=50){ const { error:ve } = await db.from('catalog_variants').insert(vrows.slice(i,i+50)); if(ve) throw ve; }
+        await persistCatalogPriceFrom(created.id, {}, p.variants||[]);
         have.add(String(p.supplier_id)); n++;
       }
     }
@@ -1668,6 +1670,20 @@ function ctlgComputeTotal(product, variant){
            autoMargin: !hasProfit, pct: Number(s.default_profit_pct!=null ? s.default_profit_pct : DEFAULT_PROFIT_PCT) };
 }
 
+/* Customer-facing "from" price = cheapest variant total (no shipping, incl.
+   margin). This is what the storefront shows — never the supplier ¥ cost. */
+function catalogPriceFrom(product, variants){
+  const totals = (variants||[]).map(v=>ctlgComputeTotal(product||{}, v).noneTotal).filter(n=>n>0);
+  return totals.length ? Math.min.apply(null, totals) : null;
+}
+async function persistCatalogPriceFrom(productId, product, variants){
+  try{
+    const pf = catalogPriceFrom(product, variants);
+    await db.from('catalog_products').update({ price_from_ngn: pf }).eq('id', productId);
+    return pf;
+  }catch(e){ return null; }
+}
+
 function renderCatalogForm(){
   const isNew = ctlgOpenId === 'new';
   const p = ctlgOpenProduct || {};
@@ -1825,6 +1841,8 @@ async function saveCatalogForm(){
     const { data:fresh } = await db.from('catalog_products').select('*, catalog_variants(*), catalog_images(*)').eq('id',productId).single();
     if(fresh){
       fresh.catalog_variants = (fresh.catalog_variants||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
+      // refresh the customer-facing "from" price from the saved variants
+      fresh.price_from_ngn = await persistCatalogPriceFrom(productId, fresh, fresh.catalog_variants);
       ctlgOpenProduct = fresh;
       ctlgOpenImages = (fresh.catalog_images||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
     }

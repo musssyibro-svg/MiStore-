@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS catalog_products (
   featured boolean DEFAULT false,
   show_on_homepage boolean DEFAULT false,
   status text DEFAULT 'draft',
+  price_from_ngn numeric,       -- customer-facing "from" price (computed in admin; NO supplier cost)
   seo jsonb DEFAULT '{}'::jsonb,
   metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamptz DEFAULT now(),
@@ -88,6 +89,7 @@ CREATE INDEX IF NOT EXISTS idx_catalog_products_category ON catalog_products(cat
 CREATE INDEX IF NOT EXISTS idx_catalog_products_supplier_id ON catalog_products(supplier_id);
 CREATE INDEX IF NOT EXISTS idx_catalog_products_status ON catalog_products(status);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_catalog_products_supplier_cat ON catalog_products(supplier_id, category_id);
+ALTER TABLE catalog_products ADD COLUMN IF NOT EXISTS price_from_ngn numeric;   -- for older installs
 
 -- ---------------------------------------------------------------------------
 -- catalog_variants: color/capacity/spec combos, each independently priced.
@@ -160,6 +162,12 @@ CREATE POLICY "catalog_categories_admin_write" ON catalog_categories FOR ALL USI
 -- Admin (authenticated) can do everything, including read supplier pricing.
 DROP POLICY IF EXISTS "catalog_products_admin_all" ON catalog_products;
 CREATE POLICY "catalog_products_admin_all" ON catalog_products FOR ALL USING (auth.uid() IS NOT NULL);
+-- Customers may read ONLY published products, and only safe columns exist here
+-- (name, price_from_ngn, images) — supplier ¥ pricing lives in catalog_variants,
+-- which stays admin-only below, so it can never be read by the storefront.
+DROP POLICY IF EXISTS "catalog_products_public_read" ON catalog_products;
+CREATE POLICY "catalog_products_public_read" ON catalog_products FOR SELECT USING (status = 'published');
+
 DROP POLICY IF EXISTS "catalog_variants_admin_all" ON catalog_variants;
 CREATE POLICY "catalog_variants_admin_all" ON catalog_variants FOR ALL USING (auth.uid() IS NOT NULL);
 
