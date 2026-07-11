@@ -588,6 +588,24 @@
   .catcard .catpr{font-size:12.5px;color:var(--red,#e0245e);font-weight:800;}
   @media (max-width:560px){ .catgrid{grid-template-columns:repeat(3,1fr);gap:8px;} .catcard .cattl{font-size:11.5px;} .catcard .catpr{font-size:11px;} .catcard .cattx{padding:8px 8px 10px;} }
 
+  /* ---- category tiles ---- */
+  .cattiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px;}
+  @media (min-width:700px){ .cattiles{grid-template-columns:repeat(4,1fr);} }
+  .cattile{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .16s,box-shadow .2s;}
+  .cattile:active{transform:scale(.98);}
+  @media (hover:hover){ .cattile:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.10);} }
+  .cattilemedia{aspect-ratio:16/11;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .cattilemedia img{width:100%;height:100%;object-fit:contain;padding:14px;mix-blend-mode:multiply;}
+  .cattilemedia .ph{font-size:42px;}
+  .cattiletx{padding:11px 13px 13px;}
+  .cattilename{font-size:14.5px;font-weight:800;letter-spacing:-.01em;}
+  .cattilecount{font-size:11.5px;color:var(--faint);font-weight:600;margin-top:2px;}
+  .catblurb{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0 0 12px;}
+  .catmoq{font-size:10.5px;color:var(--faint);font-weight:700;margin-top:1px;}
+  .perpc{font-size:10px;color:var(--faint);font-weight:700;}
+  .csmoqbox{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:0 0 12px;background:var(--card);}
+  .csspecshead{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 6px;}
+
   /* ---- catalog product sheet ---- */
   .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
   .csmedia img{width:100%;height:100%;object-fit:contain;padding:16px;mix-blend-mode:multiply;}
@@ -741,7 +759,7 @@
 
   <!-- ===== live catalog (accessories, kitchen, electronics, …) from admin ===== -->
   <section id="catalog" style="display:none;">
-    <div class="sechead"><div><h2>More from MiStore</h2><p>Accessories, kitchen, electronics and more — tap any item to order on WhatsApp.</p></div></div>
+    <div class="sechead"><div><h2>Shop by Category</h2><p>Wholesale accessories &amp; gadgets — open a category, pick a product, order in bulk on WhatsApp.</p></div></div>
     <div id="catalogSections"></div>
   </section>
 
@@ -828,6 +846,12 @@
   <div class="grab"></div>
   <div class="shead"><h2>Product</h2><button class="xbtn" id="csClose">✕</button></div>
   <div class="sbody" id="catSheetBody"></div>
+</div>
+
+<div class="sheet" id="catListSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="catListTitle">Category</h2><button class="xbtn" id="clClose">✕</button></div>
+  <div class="sbody" id="catListBody"></div>
 </div>
 
 <div class="sheet" id="wishSheet">
@@ -1818,8 +1842,8 @@ function setBackgroundActive(active){
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
-scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets;
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet'),$('catListSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets; if($('clClose')) $('clClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
 $('cartbar').onclick=openCart;
@@ -1913,7 +1937,7 @@ async function loadShowcase(){
     const k=b.dataset.bn;
     if(k==='home') window.scrollTo({top:0,behavior:'smooth'});
     else if(k==='shop') document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'});
-    else if(k==='cats') document.getElementById('deptBar').scrollIntoView({behavior:'smooth',block:'start'});
+    else if(k==='cats'){ const cs=document.getElementById('catalog'); (cs&&cs.style.display!=='none'?cs:document.getElementById('deptBar')).scrollIntoView({behavior:'smooth',block:'start'}); }
     else if(k==='wish') openWish();
     else if(k==='account') toast('Accounts are coming soon.');
   });
@@ -2163,57 +2187,139 @@ function catStoreImg(p){
   if(p.metadata&&p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
   return '';
 }
-/* Catalog price display: accessories can cost ₦3,000 — rounding those up to the
-   nearest ₦5k (the phone/bike rule) would overstate them badly. Under ₦50k we
-   show the near-exact figure (rounded UP to the next ₦100); above ₦50k we keep
-   the store-wide 5k rule. */
+/* Catalog price display: accessories can cost ₦3,000 — under ₦50k we show the
+   near-exact figure (rounded UP to the next ₦100); above ₦50k the 5k house rule. */
 function fmtCatalog(n){
   const v = +n||0;
   if(v >= 50000) return fmtK(v);
   return '₦' + (Math.ceil(v/100)*100).toLocaleString();
 }
-const CAT_STORE = {};   /* id -> product, for the detail sheet */
+
+/* ---- Chinese supplier text → English ---- */
+const ZH_MAP = [
+  ['毫安','mAh'],['跨境款','Global version'],['跨境','Global'],['国内升级版','Upgraded version'],['国内款','Standard version'],['升级版','Upgraded'],['顶配版','Top spec'],['顶配','Top spec'],['高配','High spec'],['标配','Standard'],['套装','Set'],['数显','LED display'],['快充','Fast charge'],['无线充','Wireless charging'],['无线','Wireless'],['蓝牙','Bluetooth'],['充电宝','Power Bank'],['耳机','Earbuds'],['手表','Watch'],['音响','Speaker'],['音箱','Speaker'],['大屏','Large screen'],['表带','strap'],['钢带','Steel strap'],['皮带','Leather strap'],['硅胶','Silicone'],
+  ['玫瑰金','Rose Gold'],['星光色','Starlight'],['粉红色','Pink'],['深蓝色','Navy'],['天蓝色','Sky Blue'],['黑色','Black'],['白色','White'],['粉色','Pink'],['蓝色','Blue'],['绿色','Green'],['紫色','Purple'],['红色','Red'],['黄色','Yellow'],['灰色','Gray'],['银色','Silver'],['金色','Gold'],['橙色','Orange'],['棕色','Brown'],['米色','Beige'],['透明','Clear'],['迷彩','Camo'],['卡其','Khaki'],
+  ['黑','Black'],['白','White'],['粉','Pink'],['蓝','Blue'],['绿','Green'],['紫','Purple'],['红','Red'],['黄','Yellow'],['灰','Gray'],['银','Silver'],['金','Gold'],['（','('],['）',')'],['，',', '],['、',', '],['：',': '],
+];
+function zhT(str){
+  let t=String(str||'');
+  for(const pair of ZH_MAP) t=t.split(pair[0]).join(pair[1]);
+  t=t.replace(/[㐀-鿿豈-﫿]+/g,'').replace(/\s{2,}/g,' ').replace(/\(\s*\)/g,'').trim();
+  return t;
+}
+
+const CAT_BLURBS = {
+  smartwatch:'Full-touch smart watches with fitness tracking, notifications and call support. Wholesale stock — perfect for resellers and shops.',
+  powerbank:'Portable chargers from 5,000mAh to 20,000mAh, fast-charge ready. Wholesale stock — perfect for resellers and shops.',
+  speaker:'Portable Bluetooth speakers with punchy bass and long battery life. Wholesale stock — perfect for resellers and shops.',
+  earphone:'Bluetooth wireless earbuds with charging case. Wholesale stock — perfect for resellers and shops.',
+};
+
+const CAT_STORE = {};        /* id -> product */
+const BUNDLED_BY_SID = {};   /* supplier_id -> bundled row */
+function coverUrl(catSlug,sid){ return 'catalog-import/covers/'+catSlug+'-'+sid+'.jpg'; }
+
+function catProductImg(p){
+  const imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)));
+  if(imgs[0]&&imgs[0].storage_path) return `${SUPABASE_URL}/storage/v1/object/public/${imgs[0].storage_bucket||'catalog-photos'}/${imgs[0].storage_path}`;
+  const slug=(p.catalog_categories&&p.catalog_categories.slug)||'';
+  if(p.supplier_id&&slug) return coverUrl(slug,p.supplier_id);
+  if(p.metadata&&p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
+  return '';
+}
+function catFallbackImg(p){
+  if(p.metadata&&p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
+  return '';
+}
+
 function catStoreCard(p){
-  const img=catStoreImg(p);
-  const price = p.price_from_ngn ? ('From '+fmtCatalog(p.price_from_ngn)) : 'Tap to enquire';
-  const media = img ? `<img src="${img}" loading="lazy" alt="${esc(p.name||'')}" onerror="this.parentNode.innerHTML='<span class=&quot;ph&quot;>📦</span>'">` : '<span class="ph">📦</span>';
+  const img=catProductImg(p), alt=catFallbackImg(p);
+  const price = p.price_from_ngn ? (fmtCatalog(p.price_from_ngn)+'<span class="perpc">/pc</span>') : 'Ask price';
+  const moq = p._moq || (p._bundled&&p._bundled._moq) || p.moq || 100;
+  const media = img ? `<img src="${img}" loading="lazy" alt="${esc(p.name||'')}" data-alt="${esc(alt)}" onerror="if(this.dataset.alt&&this.src.indexOf(this.dataset.alt)<0){this.src=this.dataset.alt}else{this.parentNode.innerHTML='<span class=&quot;ph&quot;>📦</span>'}">` : '<span class="ph">📦</span>';
   return `<div class="catcard" data-catid="${p.id}">
     <div class="catmedia">${media}</div>
-    <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div></div>
+    <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div><div class="catmoq">Min. order ${moq} pcs</div></div>
   </div>`;
 }
 
-/* Product detail sheet — same premium sheet pattern as phones, so tapping a
-   catalog item feels native to the store instead of bouncing straight out. */
+/* ---- view 1: category tiles ---- */
+function renderCatalogTiles(rows){
+  rows.forEach(p=>{ CAT_STORE[p.id]=p; });
+  const groups={};
+  rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
+    const k=cat.slug||'more'; (groups[k]=groups[k]||{cat,items:[]}).items.push(p); });
+  window._catGroups=groups;
+  const ordered=Object.values(groups).sort((a,b)=>((a.cat.position||99)-(b.cat.position||99)));
+  const tiles=ordered.map(g=>{
+    const first=g.items.find(p=>catProductImg(p));
+    const img=first?catProductImg(first):'';
+    return `<div class="cattile" data-catslug="${esc(g.cat.slug)}">
+      <div class="cattilemedia">${img?`<img src="${img}" loading="lazy" alt="" data-alt="${esc(first?catFallbackImg(first):'')}" onerror="if(this.dataset.alt&&this.src.indexOf(this.dataset.alt)<0){this.src=this.dataset.alt}else{this.remove()}">`:`<span class="ph">${esc(g.cat.icon||'📦')}</span>`}</div>
+      <div class="cattiletx"><div class="cattilename">${esc(g.cat.icon||'')} ${esc(g.cat.name)}</div><div class="cattilecount">${g.items.length} products</div></div>
+    </div>`;}).join('');
+  const host=document.getElementById('catalogSections'); if(!host) return;
+  host.innerHTML=`<div class="cattiles">${tiles}</div>`;
+  const sec=document.getElementById('catalog'); if(sec) sec.style.display='';
+  host.querySelectorAll('[data-catslug]').forEach(el=>{ el.onclick=()=>openCatListSheet(el.dataset.catslug); });
+}
+
+/* ---- view 2: one category's products ---- */
+function openCatListSheet(slug){
+  const g=(window._catGroups||{})[slug]; if(!g) return;
+  const sheet=$('catListSheet'); if(!sheet) return;
+  $('catListTitle').textContent=(g.cat.icon?g.cat.icon+' ':'')+g.cat.name;
+  $('catListBody').innerHTML=
+    (CAT_BLURBS[slug]?`<p class="catblurb">${esc(CAT_BLURBS[slug])}</p>`:'')+
+    `<div class="catgrid">${g.items.map(catStoreCard).join('')}</div>`;
+  $('catListBody').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
+  showSheet(sheet);
+}
+
+/* ---- view 3: single product (wholesale details) ---- */
 function openCatSheet(id){
   const p = CAT_STORE[id]; if(!p) return;
   const sheet = $('catSheet'); if(!sheet) return;
-  let imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)))
+  const b = p._bundled || BUNDLED_BY_SID[String(p.supplier_id||'')] || p;
+  let imgs=(p.catalog_images||[]).slice().sort((a,b2)=>((b2.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b2.position||0)))
     .map(i=>`${SUPABASE_URL}/storage/v1/object/public/${i.storage_bucket||'catalog-photos'}/${i.storage_path}`);
-  if(!imgs.length && p._localImgs && p._localImgs.length) imgs = p._localImgs.slice(0,6);
-  if(!imgs.length && p.metadata && p.metadata.legacy_image) imgs.push('catalog-import/'+p.metadata.legacy_image);
-  const cat = p.catalog_categories||{};
-  const attrs = (p.metadata&&p.metadata.attributes)||{};
-  const attrRows = Object.keys(attrs).filter(k=>String(attrs[k]||'').trim()!=='')
-    .map(k=>`<div class="csrow"><span>${esc(k.replace(/-/g,' '))}</span><b>${esc(attrs[k])}</b></div>`).join('');
-  const price = p.price_from_ngn ? ('From '+fmtCatalog(p.price_from_ngn)) : 'Price on request';
-  const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${i===0?'on':''}" alt="">`).join('')}</div>` : '';
+  if(!imgs.length){
+    const cov=catProductImg(p); if(cov) imgs.push(cov);
+    (b._localImgs||[]).forEach(u=>{ if(imgs.indexOf(u)<0) imgs.push(u); });
+  }
+  imgs=imgs.slice(0,6);
+  const cat=p.catalog_categories||{};
+  const moq = p._moq || b._moq || p.moq || 100;
+  const unit = p.price_from_ngn||b.price_from_ngn;
+  const minTotal = unit? unit*moq : null;
+  const variants=(b._variants||[]).slice(0,8);
+  const vRows=variants.map(v=>`<div class="csrow"><span>${esc(v.label||'Option')}</span><b>${v.unit?fmtCatalog(v.unit)+'/pc':'—'}</b></div>`).join('');
+  const attrs=(p.metadata&&p.metadata.attributes)||{};
+  const aRows=Object.keys(attrs).filter(k=>String(attrs[k]||'').trim()!=='').map(k=>`<div class="csrow"><span>${esc(k.replace(/-/g,' '))}</span><b>${esc(attrs[k])}</b></div>`).join('');
+  const desc = p.description || CAT_BLURBS[cat.slug] || '';
+  const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${i===0?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>` : '';
   $('catSheetBody').innerHTML = `
     <div class="csmedia"><img id="csMainImg" src="${imgs[0]||''}" alt="${esc(p.name||'')}" onerror="this.style.display='none'" onload="if(this.naturalWidth&&this.naturalWidth<300){this.parentNode.style.maxHeight='230px';this.style.padding='28px';}"></div>
     ${thumbs}
-    <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')}</div>
+    <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')} · Wholesale</div>
     <h3 class="csname">${esc(p.name||'Item')}</h3>
-    <div class="csprice">${price}</div>
-    ${p.description?`<p class="csdesc">${esc(p.description)}</p>`:''}
-    ${attrRows?`<div class="csspecs">${attrRows}</div>`:''}
-    <button class="addbtn" id="csOrderBtn">Order on WhatsApp</button>
-    <p class="csnote">We confirm colour, model and availability with you on WhatsApp before you pay.</p>`;
+    <div class="csprice">${unit?fmtCatalog(unit)+' <span class="perpc">per piece</span>':'Price on request'}</div>
+    <div class="csmoqbox">
+      <div class="csrow"><span>Minimum order</span><b>${moq} pieces</b></div>
+      ${minTotal?`<div class="csrow"><span>Min. order total (approx.)</span><b>${fmtCatalog(minTotal)}</b></div>`:''}
+      <div class="csrow"><span>Shipping</span><b>Sea or air — quoted on WhatsApp</b></div>
+    </div>
+    ${desc?`<p class="csdesc">${esc(desc)}</p>`:''}
+    ${vRows?`<div class="csspecshead">Options &amp; unit prices</div><div class="csspecs">${vRows}</div>${(b._variants||[]).length>8?'<p class="csnote">More colours/options — ask on WhatsApp.</p>':''}`:''}
+    ${aRows?`<div class="csspecshead">Details</div><div class="csspecs">${aRows}</div>`:''}
+    <button class="addbtn" id="csOrderBtn">Order ${moq}+ pcs on WhatsApp</button>
+    <p class="csnote">Bulk/wholesale item. We confirm colours, exact quantity and shipping (sea or air) with you on WhatsApp before you pay.</p>`;
   $('csOrderBtn').onclick = ()=>{
-    const msg = 'Hi MiStore, I want to order: '+(p.name||'Item')+(p.price_from_ngn?(' ('+fmtCatalog(p.price_from_ngn)+')'):'');
+    const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+' — minimum '+moq+' pcs'+(unit?(' at '+fmtCatalog(unit)+'/pc'):'')+'. Please give me the total with shipping.';
     window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
   };
   sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{
-    $('csMainImg').src = t.src;
+    $('csMainImg').src=t.src;
     sheet.querySelectorAll('[data-csidx]').forEach(x=>x.classList.remove('on')); t.classList.add('on');
   };});
   showSheet(sheet);
@@ -2225,53 +2331,32 @@ async function loadStorefrontCatalog(){
   let rows;
   try{
     const { data, error } = await c.from('catalog_products')
-      .select('id,name,brand,description,supplier_id,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
+      .select('id,name,brand,description,supplier_id,moq,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
       .eq('status','published').limit(400);
     if(error) throw error; rows = data||[];
   }catch(e){ console.warn('[MiStore catalog] DB fetch failed — using bundled catalog:', e && (e.message||e)); return loadBundledCatalog(); }
-  /* Merge: admin-managed products win; the bundled catalog fills in everything
-     not (yet) managed in the admin, so ALL products always show. */
   const bundled = await fetchBundledRows();
   const have = new Set(rows.map(r=>String(r.supplier_id||'')).filter(Boolean));
-  const merged = rows.concat(bundled.filter(b=>!have.has(String(b.supplier_id))));
+  rows.forEach(r=>{ r._bundled=BUNDLED_BY_SID[String(r.supplier_id||'')]; });
+  const merged = rows.concat(bundled.filter(b2=>!have.has(String(b2.supplier_id))));
   if(!merged.length){ console.info('[MiStore catalog] no products anywhere'); return; }
-  console.info('[MiStore catalog] showing '+rows.length+' admin + '+(merged.length-rows.length)+' bundled products');
-  renderCatalogRows(merged);
+  console.info('[MiStore catalog] '+rows.length+' admin + '+(merged.length-rows.length)+' bundled products');
+  renderCatalogTiles(merged);
 }
 
-function renderCatalogRows(rows){
-  rows.forEach(p=>{ CAT_STORE[p.id]=p; });
-  const groups = {};
-  rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
-    const k=cat.slug||'more'; (groups[k]=groups[k]||{cat,items:[]}).items.push(p); });
-  const ordered = Object.values(groups).sort((a,b)=>((a.cat.position||99)-(b.cat.position||99)));
-  const html = ordered.map(g=>`
-    <div class="catgroup">
-      <div class="catgrouphead"><span class="caticon">${esc(g.cat.icon||'📦')}</span><h3>${esc(g.cat.name||'More')}</h3></div>
-      <div class="catgrid">${g.items.map(catStoreCard).join('')}</div>
-    </div>`).join('');
-  const host=document.getElementById('catalogSections'); if(!host) return;
-  host.innerHTML = html;
-  const sec=document.getElementById('catalog'); if(sec) sec.style.display='';
-  host.querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=> openCatSheet(el.dataset.catid); });
+async function loadBundledCatalog(){
+  const rows = await fetchBundledRows();
+  if(rows.length){ console.info('[MiStore catalog] showing '+rows.length+' bundled products'); renderCatalogTiles(rows); }
 }
-
-/* BUNDLED CATALOG FALLBACK — the supplier catalog ships inside the site itself
-   (catalog-import/), so customers see the new products even before the
-   database is set up. The moment the admin publishes products in Supabase,
-   that version takes over automatically. */
 const BUNDLED_CATS = {
   smartwatch:{name:'Smart Watches',slug:'smartwatch',icon:'⌚',position:1,label:'Smart Watch'},
   powerbank:{name:'Power Banks',slug:'powerbank',icon:'🔋',position:2,label:'Power Bank'},
-  speaker:{name:'Speakers',slug:'speaker',icon:'🔊',position:3,label:'Speaker'},
+  speaker:{name:'Speakers',slug:'speaker',icon:'🔊',position:3,label:'Bluetooth Speaker'},
   earphone:{name:'Earbuds',slug:'earphone',icon:'🎧',position:4,label:'Wireless Earbuds'},
 };
-async function loadBundledCatalog(){
-  const rows = await fetchBundledRows();
-  if(rows.length){ console.info('[MiStore catalog] showing '+rows.length+' bundled products'); renderCatalogRows(rows); }
-}
+let _bundledCache=null;
 async function fetchBundledRows(){
-  /* live rates if reachable, house defaults otherwise */
+  if(_bundledCache) return _bundledCache;
   let rate=208, margin=15;
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=exchange_rate,default_profit_pct`,
@@ -2289,16 +2374,24 @@ async function fetchBundledRows(){
       const min=vs.length? Math.min.apply(null,vs.map(v=>v.rmb_price)) : 0;
       const priceFrom = min? Math.round(min*rate*(1+margin/100)) : null;
       const imgs=[...new Set((p.variants||[]).map(v=>v.image).filter(Boolean))].map(u=>'catalog-import/'+u);
-      /* friendlier name: pull a capacity like 10000毫安 out of the specs when present */
+      const moq = (p.variants||[]).reduce((m,v)=>Math.min(m, v.moq||1e9), 1e9);
+      const variants=(p.variants||[]).map(v=>({
+        label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
+        unit: v.rmb_price? Math.round(v.rmb_price*rate*(1+margin/100)) : null }));
       let nm=cat.label;
       const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
       if(cap) nm=cap[1]+'mAh '+cat.label;
       nm+=' · '+String(p.supplier_id).slice(-4);
-      rows.push({ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'', supplier_id:String(p.supplier_id),
+      const row={ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'', supplier_id:String(p.supplier_id),
         price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
-        _localImgs:imgs, catalog_categories:cat, catalog_images:[] });
+        _localImgs:imgs, _moq:(moq===1e9?100:moq), _variants:variants,
+        catalog_categories:cat, catalog_images:[] };
+      row._bundled=row;
+      BUNDLED_BY_SID[row.supplier_id]=row;
+      rows.push(row);
     });
   }
+  _bundledCache=rows;
   return rows;
 }
 
