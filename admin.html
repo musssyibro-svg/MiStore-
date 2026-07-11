@@ -1524,8 +1524,9 @@ function ctlgCoverUrl(p){
 }
 
 /* English display name for an imported supplier product, e.g. "10000mAh Power Bank · 2912" */
-const CATALOG_LABELS={smartwatch:'Smart Watch',powerbank:'Power Bank',speaker:'Bluetooth Speaker',earphone:'Wireless Earbuds'};
+const CATALOG_LABELS={smartwatch:'Smart Watch',powerbank:'Power Bank',speaker:'Bluetooth Speaker',earphone:'Wireless Earbuds','kitchen-appliances':'Kitchen Appliance'};
 function friendlyCatalogName(p){
+  if(p.name_en) return p.name_en;
   let nm=CATALOG_LABELS[p.category]||p.category||'Product';
   const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
   if(cap) nm=cap[1]+'mAh '+nm;
@@ -1542,7 +1543,7 @@ async function importExistingCatalog(publishNow, skipConfirm){
     const { data:existing } = await db.from('catalog_products').select('supplier_id');
     const have = new Set((existing||[]).map(x=>String(x.supplier_id)).filter(Boolean));
     let n=0;
-    for(const cat of ['earphone','powerbank','smartwatch','speaker']){
+    for(const cat of ['earphone','powerbank','smartwatch','speaker','kitchen-appliances']){
       let arr;
       try{ arr = await (await fetch('catalog-import/data/'+cat+'_products.json',{cache:'no-store'})).json(); }
       catch(e){ continue; }

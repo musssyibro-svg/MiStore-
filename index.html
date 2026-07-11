@@ -2209,6 +2209,7 @@ function zhT(str){
 }
 
 const CAT_BLURBS = {
+  'kitchen-appliances':'Air fryers, blenders, kettles, cookers and more — factory-direct kitchen appliances. Wholesale stock, sold by the carton.',
   smartwatch:'Full-touch smart watches with fitness tracking, notifications and call support. Wholesale stock — perfect for resellers and shops.',
   powerbank:'Portable chargers from 5,000mAh to 20,000mAh, fast-charge ready. Wholesale stock — perfect for resellers and shops.',
   speaker:'Portable Bluetooth speakers with punchy bass and long battery life. Wholesale stock — perfect for resellers and shops.',
@@ -2353,6 +2354,7 @@ const BUNDLED_CATS = {
   powerbank:{name:'Power Banks',slug:'powerbank',icon:'🔋',position:2,label:'Power Bank'},
   speaker:{name:'Speakers',slug:'speaker',icon:'🔊',position:3,label:'Bluetooth Speaker'},
   earphone:{name:'Earbuds',slug:'earphone',icon:'🎧',position:4,label:'Wireless Earbuds'},
+  'kitchen-appliances':{name:'Kitchen Appliances',slug:'kitchen-appliances',icon:'🍳',position:5,label:'Kitchen Appliance'},
 };
 let _bundledCache=null;
 async function fetchBundledRows(){
@@ -2378,11 +2380,15 @@ async function fetchBundledRows(){
       const variants=(p.variants||[]).map(v=>({
         label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
         unit: v.rmb_price? Math.round(v.rmb_price*rate*(1+margin/100)) : null }));
-      let nm=cat.label;
-      const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
-      if(cap) nm=cap[1]+'mAh '+cat.label;
-      nm+=' · '+String(p.supplier_id).slice(-4);
-      const row={ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'', supplier_id:String(p.supplier_id),
+      let nm;
+      if(p.name_en){ nm=p.name_en; }
+      else{
+        nm=cat.label;
+        const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
+        if(cap) nm=cap[1]+'mAh '+nm;
+        nm+=' · '+String(p.supplier_id).slice(-4);
+      }
+      const row={ id:'local-'+key+'-'+p.supplier_id, name:nm, description:(p.description_en||''), supplier_id:String(p.supplier_id),
         price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
         _localImgs:imgs, _moq:(moq===1e9?100:moq), _variants:variants,
         catalog_categories:cat, catalog_images:[] };
