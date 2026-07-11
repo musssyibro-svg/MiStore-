@@ -1344,13 +1344,110 @@ let ctlgOpenProduct = null;
 let ctlgOpenImages = [];
 let ctlgCategories = [];
 let ctlgLoading = false;
+let ctlgView = 'products';   // 'products' | 'categories'
 const CATALOG_PHOTO_BUCKET2 = 'catalog-photos';
 
 async function loadCatalogCategories(){
   try{
-    const { data, error } = await db.from('catalog_categories').select('id,name,slug').order('position');
+    const { data, error } = await db.from('catalog_categories').select('id,name,slug,position,hidden,icon,metadata').order('position');
     ctlgCategories = (!error && data) ? data : [];
   }catch(e){ ctlgCategories = []; }
+}
+
+function catalogCategoryById(id){ return ctlgCategories.find(c=>c.id===id); }
+function catalogSlugify(s){ return (s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+
+/* ---- reusable Category Manager: add/rename/reorder/hide/delete any store
+   section + define its custom spec fields, all from the UI. No code per
+   category — every section runs on the same product engine. ---- */
+function renderCategoryManager(){
+  const cats = ctlgCategories.slice().sort((a,b)=>(a.position||0)-(b.position||0));
+  const rows = cats.map((c,i)=>`
+    <div class="bkAdmRow" style="align-items:center;gap:6px;flex-wrap:wrap">
+      <div class="bkAdmRowInfo" style="min-width:150px">
+        <div class="bkAdmRowName">${esc(c.icon||'📦')} ${esc(c.name)} ${c.hidden?'<span class="bkAdmBadge arch">hidden</span>':''}</div>
+        <div class="bkAdmRowMeta">/${esc(c.slug)} · ${((c.metadata&&c.metadata.fields)||[]).length} custom field(s)</div>
+      </div>
+      <button class="cpBtn" data-catup="${c.id}" style="width:auto;padding:4px 8px" ${i===0?'disabled':''}>▲</button>
+      <button class="cpBtn" data-catdown="${c.id}" style="width:auto;padding:4px 8px" ${i===cats.length-1?'disabled':''}>▼</button>
+      <button class="cpBtn" data-catedit="${c.id}" style="width:auto;padding:4px 10px">Rename</button>
+      <button class="cpBtn" data-catfields="${c.id}" style="width:auto;padding:4px 10px">Fields</button>
+      <button class="cpBtn" data-cathide="${c.id}" style="width:auto;padding:4px 10px">${c.hidden?'Show':'Hide'}</button>
+      <button class="cpBtn danger" data-catdel="${c.id}" style="width:auto;padding:4px 10px">✕</button>
+    </div>`).join('');
+  app.innerHTML = `
+    <div class="sechead">Categories <span class="count">${cats.length}</span></div>
+    <p class="sub">Add any store section here — Kitchen, Electronics, Laptops, anything. Every category uses the same product engine, so no new code is needed. "Fields" gives a category its own spec inputs (e.g. Laptops → CPU, RAM, Screen).</p>
+    <button class="cpBtn" id="ctlgBackToProducts" style="width:auto;padding:7px 14px;margin-bottom:8px;">← Back to products</button>
+    <div class="bkAdmBar">
+      <input class="bkAdmInput" id="newCatName" placeholder="New category name (e.g. Laptops)">
+      <input class="bkAdmInput" id="newCatIcon" style="flex:0 0 64px" placeholder="💻" maxlength="2">
+      <button class="cpBtn primary" id="addCatBtn">+ Add</button>
+    </div>
+    <div class="bkAdmList">${rows||'<p class="sub">No categories yet — add one above.</p>'}</div>`;
+  document.getElementById('ctlgBackToProducts').onclick = ()=>{ ctlgView='products'; render(); };
+  document.getElementById('addCatBtn').onclick = addCatalogCategory;
+  app.querySelectorAll('[data-catup]').forEach(b=>b.onclick=()=>moveCatalogCategory(b.dataset.catup,-1));
+  app.querySelectorAll('[data-catdown]').forEach(b=>b.onclick=()=>moveCatalogCategory(b.dataset.catdown,1));
+  app.querySelectorAll('[data-catedit]').forEach(b=>b.onclick=()=>editCatalogCategory(b.dataset.catedit));
+  app.querySelectorAll('[data-catfields]').forEach(b=>b.onclick=()=>editCatalogCategoryFields(b.dataset.catfields));
+  app.querySelectorAll('[data-cathide]').forEach(b=>b.onclick=()=>toggleCatalogCategoryHidden(b.dataset.cathide));
+  app.querySelectorAll('[data-catdel]').forEach(b=>b.onclick=()=>deleteCatalogCategory(b.dataset.catdel));
+}
+
+async function addCatalogCategory(){
+  const name=(document.getElementById('newCatName').value||'').trim();
+  const icon=(document.getElementById('newCatIcon').value||'').trim()||null;
+  if(!name){ toast('Enter a category name'); return; }
+  const slug=catalogSlugify(name)||('cat-'+Date.now());
+  const pos=(ctlgCategories.reduce((m,c)=>Math.max(m,c.position||0),0))+1;
+  try{
+    const { error } = await db.from('catalog_categories').insert({ name, slug, icon, position:pos });
+    if(error) throw error;
+    await loadCatalogCategories(); toast('✓ Category added'); render();
+  }catch(e){ toast('⚠ '+(e.message||e)); }
+}
+async function moveCatalogCategory(id,dir){
+  const cats=ctlgCategories.slice().sort((a,b)=>(a.position||0)-(b.position||0));
+  const i=cats.findIndex(c=>c.id===id), j=i+dir;
+  if(i<0||j<0||j>=cats.length) return;
+  const a=cats[i], b=cats[j], pa=a.position||0, pb=b.position||0;
+  try{
+    await db.from('catalog_categories').update({position:pb}).eq('id',a.id);
+    await db.from('catalog_categories').update({position:pa}).eq('id',b.id);
+    await loadCatalogCategories(); render();
+  }catch(e){ toast('⚠ '+(e.message||e)); }
+}
+async function editCatalogCategory(id){
+  const c=catalogCategoryById(id); if(!c) return;
+  const name=prompt('Category name:',c.name); if(name===null) return;
+  const icon=prompt('Icon emoji (optional):',c.icon||'');
+  try{
+    const { error } = await db.from('catalog_categories').update({ name:(name.trim()||c.name), icon:((icon||'').trim()||null) }).eq('id',id);
+    if(error) throw error;
+    await loadCatalogCategories(); toast('✓ Updated'); render();
+  }catch(e){ toast('⚠ '+(e.message||e)); }
+}
+async function toggleCatalogCategoryHidden(id){
+  const c=catalogCategoryById(id); if(!c) return;
+  try{ const { error } = await db.from('catalog_categories').update({hidden:!c.hidden}).eq('id',id); if(error) throw error; await loadCatalogCategories(); render(); }
+  catch(e){ toast('⚠ '+(e.message||e)); }
+}
+async function deleteCatalogCategory(id){
+  if(!confirm('Delete this category? Products in it stay but become uncategorized.')) return;
+  try{ const { error } = await db.from('catalog_categories').delete().eq('id',id); if(error) throw error; await loadCatalogCategories(); toast('✓ Deleted'); render(); }
+  catch(e){ toast('⚠ '+(e.message||e)); }
+}
+async function editCatalogCategoryFields(id){
+  const c=catalogCategoryById(id); if(!c) return;
+  const fields=((c.metadata&&c.metadata.fields)||[]);
+  const current=fields.map(f=>f.label||f.key).join(', ');
+  const input=prompt('Custom spec fields for "'+c.name+'" — comma-separated labels.\nExample: CPU, RAM, Screen, Storage', current);
+  if(input===null) return;
+  const newFields=input.split(',').map(s=>s.trim()).filter(Boolean).map(label=>({ key:(catalogSlugify(label)||label), label }));
+  const meta=Object.assign({}, c.metadata||{}, { fields:newFields });
+  try{ const { error } = await db.from('catalog_categories').update({ metadata:meta }).eq('id',id); if(error) throw error; await loadCatalogCategories(); toast('✓ Fields saved'); render(); }
+  catch(e){ toast('⚠ '+(e.message||e)); }
 }
 
 async function loadCatalogList(){
@@ -1416,6 +1513,7 @@ async function importExistingCatalog(){
 function renderCatalogTab(){
   if(ctlgOpenId){ renderCatalogForm(); return; }
   if(!ctlgCategories.length) loadCatalogCategories();
+  if(ctlgView==='categories'){ renderCategoryManager(); return; }
   if(!ctlgProducts.length && !ctlgLoading) loadCatalogList();
 
   const catOptions = ['<option value="">All categories</option>'].concat(
@@ -1434,10 +1532,11 @@ function renderCatalogTab(){
 
   app.innerHTML = `
     <div class="sechead">Catalog <span class="count">${ctlgProducts.length}</span></div>
-    <p class="sub">Smart watches, power banks, speakers, earbuds — everything imported from supplier catalogs lands here as a draft for you to review, rename, and publish.</p>
+    <p class="sub">One engine for every store section — accessories, kitchen, electronics, laptops, and any category you add. Tap <b>⚙ Categories</b> to create a new section (no code needed); each product just picks its category.</p>
     <div class="bkAdmBar">
       <input class="bkAdmInput" id="ctlgSearchInput" placeholder="Search by name or supplier id…" value="${esc(ctlgSearch)}">
       <select class="bkAdmInput" id="ctlgCatFilter" style="flex:0 0 160px;">${catOptions}</select>
+      <button class="cpBtn" id="ctlgManageCatsBtn" style="width:auto;">⚙ Categories</button>
       <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
     </div>
     ${ctlgProducts.length===0 && !ctlgLoading ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;margin-bottom:10px;">⬇ Import accessories catalog</button>' : ''}
@@ -1446,6 +1545,7 @@ function renderCatalogTab(){
   `;
 
   document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
+  document.getElementById('ctlgManageCatsBtn').onclick = ()=>{ ctlgView='categories'; loadCatalogCategories().then(render); };
   const impBtn = document.getElementById('ctlgImportBtn'); if(impBtn) impBtn.onclick = importExistingCatalog;
   const search = document.getElementById('ctlgSearchInput');
   let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ ctlgSearch=search.value.trim(); loadCatalogList(); }, 350); };
@@ -1475,7 +1575,44 @@ async function openCatalogForm(id){
 }
 
 function ctlgCategoryOptions(selectedId){
-  return ctlgCategories.map(c=>`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${esc(c.name)}</option>`).join('');
+  return '<option value="">— Choose category —</option>' +
+    ctlgCategories.map(c=>`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${esc(c.icon||'')} ${esc(c.name)}</option>`).join('');
+}
+
+/* Custom, per-category spec fields — rendered from the selected category's
+   schema so Laptops (CPU/RAM), Kitchen (capacity/power), etc. differ only by
+   configuration, never by code. Values live in product.metadata.attributes. */
+function renderCatalogAttrFields(p){
+  const cat = catalogCategoryById(p.category_id);
+  const fields = (cat && cat.metadata && Array.isArray(cat.metadata.fields)) ? cat.metadata.fields : [];
+  if(!fields.length) return '';
+  const attrs = (p.metadata && p.metadata.attributes) || {};
+  const rows = fields.map(f=>`<div class="bkFormRow"><label>${esc(f.label||f.key)}</label><input data-attr="${esc(f.key)}" value="${esc(attrs[f.key]!=null?attrs[f.key]:'')}"></div>`).join('');
+  return `<div class="bkFormSection"><div class="bkFormSectionTitle">${esc(cat.icon||'')} ${esc(cat.name)} details</div><div class="bkFormGrid">${rows}</div></div>`;
+}
+
+/* Read the live form back into ctlgOpenProduct so a re-render (category change,
+   add/remove variant) never loses what was typed. */
+function readCatalogFormIntoState(){
+  const p = ctlgOpenProduct; if(!p || !document.getElementById('ctlfName')) return;
+  const g = id => { const e=document.getElementById(id); return e?e.value:undefined; };
+  p.name=g('ctlfName'); p.category_id=g('ctlfCategory')||null; p.brand=g('ctlfBrand');
+  p.description=g('ctlfDescription'); p.status=g('ctlfStatus');
+  p.moq=g('ctlfMoq'); p.qty_per_carton=g('ctlfQtyCarton'); p.weight_kg=g('ctlfWeight'); p.cbm=g('ctlfCbm');
+  const carton=document.getElementById('ctlfCarton'); if(carton) p.sold_by_carton=carton.checked;
+  const feat=document.getElementById('ctlfFeatured'); if(feat) p.featured=feat.checked;
+  p.catalog_variants = Array.from(document.querySelectorAll('#ctlgVariantTable tbody tr')).map((row,i)=>{
+    const ex=(p.catalog_variants||[])[i]||{}; const q=s=>row.querySelector('[data-vf="'+s+'"]');
+    return { id:ex.id, spec1:q('spec1').value, spec2:q('spec2').value, rmb_price:q('rmb_price').value,
+      profit_ngn:q('profit_ngn').value, moq:q('moq').value, stock:q('stock').value, position:i };
+  });
+  p.metadata = p.metadata || {}; p.metadata.attributes = p.metadata.attributes || {};
+  document.querySelectorAll('[data-attr]').forEach(inp=>{ p.metadata.attributes[inp.dataset.attr]=inp.value; });
+}
+function collectCatalogAttributes(){
+  const attrs = Object.assign({}, (ctlgOpenProduct.metadata&&ctlgOpenProduct.metadata.attributes)||{});
+  document.querySelectorAll('[data-attr]').forEach(inp=>{ attrs[inp.dataset.attr]=inp.value; });
+  return attrs;
 }
 
 function ctlgComputeTotal(product, variant){
@@ -1539,6 +1676,8 @@ function renderCatalogForm(){
         <label style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="ctlfFeatured" style="width:auto" ${p.featured?'checked':''}> Featured</label>
       </div>
 
+      ${renderCatalogAttrFields(p)}
+
       <div class="bkFormSection">
         <div class="bkFormSectionTitle">Variants &amp; pricing</div>
         <p class="sub" style="margin:0 0 4px">¥ price and ₦ profit are supplier-side only — customers only ever see the computed total. Preview shows: no-shipping / sea / air totals at current store settings.</p>
@@ -1562,13 +1701,16 @@ function renderCatalogForm(){
   document.getElementById('ctlgSaveBtn').onclick = saveCatalogForm;
   const delBtn = document.getElementById('ctlgDeleteBtn');
   if(delBtn) delBtn.onclick = deleteCatalogProduct;
+  // changing category swaps in that category's custom spec fields (keep typed data)
+  document.getElementById('ctlfCategory').onchange = ()=>{ readCatalogFormIntoState(); render(); };
   document.getElementById('ctlgAddVariant').onclick = ()=>{
+    readCatalogFormIntoState();
     ctlgOpenProduct.catalog_variants = ctlgOpenProduct.catalog_variants || [];
     ctlgOpenProduct.catalog_variants.push({ spec1:'', spec2:'', rmb_price:'', profit_ngn:'', moq:'', stock:0 });
     render();
   };
   app.querySelectorAll('[data-rmvariant]').forEach(btn=>{
-    btn.onclick = ()=>{ ctlgOpenProduct.catalog_variants.splice(Number(btn.dataset.rmvariant),1); render(); };
+    btn.onclick = ()=>{ readCatalogFormIntoState(); ctlgOpenProduct.catalog_variants.splice(Number(btn.dataset.rmvariant),1); render(); };
   });
   // live-update the price preview as ¥/profit are typed, without a full re-render
   app.querySelectorAll('#ctlgVariantTable input').forEach(inp=>{
@@ -1598,12 +1740,13 @@ function collectCatalogPayload(){
       position: i,
     };
   });
+  const metadata = Object.assign({}, ctlgOpenProduct.metadata||{}, { attributes: collectCatalogAttributes() });
   return {
     name: g('ctlfName'), category_id: g('ctlfCategory')||null, brand: g('ctlfBrand'), description: g('ctlfDescription'),
     moq: parseInt(g('ctlfMoq'))||100, qty_per_carton: parseInt(g('ctlfQtyCarton'))||1,
     weight_kg: parseFloat(g('ctlfWeight'))||null, cbm: parseFloat(g('ctlfCbm'))||null,
     sold_by_carton: document.getElementById('ctlfCarton').checked, featured: document.getElementById('ctlfFeatured').checked,
-    status: g('ctlfStatus'), variants,
+    status: g('ctlfStatus'), metadata, variants,
   };
 }
 

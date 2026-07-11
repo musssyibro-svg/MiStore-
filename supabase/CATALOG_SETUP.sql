@@ -35,16 +35,24 @@ CREATE TABLE IF NOT EXISTS catalog_categories (
   position integer DEFAULT 0,
   featured boolean DEFAULT false,
   hidden boolean DEFAULT false,
+  icon text,                              -- emoji shown in the store section header
+  metadata jsonb DEFAULT '{}'::jsonb,     -- { fields:[{key,label,type}] } custom spec schema, editable in admin
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
-INSERT INTO catalog_categories (name, slug, position) VALUES
-  ('Smart Watches', 'smartwatch', 1),
-  ('Power Banks', 'powerbank', 2),
-  ('Speakers', 'speaker', 3),
-  ('Earbuds', 'earphone', 4),
-  ('Kitchen Appliances', 'kitchen-appliances', 5),
-  ('Kitchen Utensils', 'kitchen-utensils', 6)
+-- for installs created before these columns existed:
+ALTER TABLE catalog_categories ADD COLUMN IF NOT EXISTS icon text;
+ALTER TABLE catalog_categories ADD COLUMN IF NOT EXISTS metadata jsonb DEFAULT '{}'::jsonb;
+
+INSERT INTO catalog_categories (name, slug, position, icon) VALUES
+  ('Smart Watches', 'smartwatch', 1, '⌚'),
+  ('Power Banks', 'powerbank', 2, '🔋'),
+  ('Speakers', 'speaker', 3, '🔊'),
+  ('Earbuds', 'earphone', 4, '🎧'),
+  ('Kitchen Appliances', 'kitchen-appliances', 5, '🍳'),
+  ('Kitchen Utensils', 'kitchen-utensils', 6, '🍴'),
+  ('Electronics', 'electronics', 7, '💡'),
+  ('Laptops', 'laptops', 8, '💻')
 ON CONFLICT (slug) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
