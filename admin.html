@@ -1543,14 +1543,34 @@ function ctlgListInnerHTML(){
     <div class="bkAdmChips">${statusChips}</div>
     <div class="bkAdmBar" style="margin-top:6px;">
       ${ctlgProducts.length===0 && ctlgLoaded ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import accessories catalog</button>' : ''}
+      <button class="cpBtn" id="ctlgPublishAllBtn" style="width:auto;">✓ Publish all shown</button>
       <button class="cpBtn" id="ctlgExportBtn" style="width:auto;">⬆ Export JSON</button>
     </div>
     ${ctlgLoading?'<p class="sub">Loading…</p>':''}
     <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products in this view.</p>')}</div>`;
 }
 
+async function publishAllShown(){
+  const drafts = ctlgFilteredBase().filter(p=>(p.status||'draft')!=='published');
+  if(!drafts.length){ toast('Everything shown is already published'); return; }
+  const where = ctlgCategoryFilter ? 'in this category' : 'in this view';
+  if(!confirm('Publish '+drafts.length+' product(s) '+where+' so customers can see them?')) return;
+  const btn=document.getElementById('ctlgPublishAllBtn'); if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
+  try{
+    const ids = drafts.map(p=>p.id);
+    for(let i=0;i<ids.length;i+=100){ const { error } = await db.from('catalog_products').update({status:'published'}).in('id', ids.slice(i,i+100)); if(error) throw error; }
+    // make sure every newly-published product has a customer "from" price to show
+    if(!storeSettings) await loadStoreSettings();
+    for(const p of drafts){
+      if(p.price_from_ngn==null){ const pf=catalogPriceFrom(p, p.catalog_variants||[]); if(pf!=null) await db.from('catalog_products').update({price_from_ngn:pf}).eq('id',p.id); }
+    }
+    toast('✓ Published '+ids.length+' product(s)'); ctlgProducts=[]; ctlgLoaded=false; render();
+  }catch(e){ toast('⚠ '+(e.message||e)); if(btn){ btn.disabled=false; btn.textContent='✓ Publish all shown'; } }
+}
+
 function bindCtlgListEvents(){
   const imp=document.getElementById('ctlgImportBtn'); if(imp) imp.onclick=importExistingCatalog;
+  const pub=document.getElementById('ctlgPublishAllBtn'); if(pub) pub.onclick=publishAllShown;
   const exp=document.getElementById('ctlgExportBtn'); if(exp) exp.onclick=exportCatalog;
   app.querySelectorAll('[data-ctlgfilter]').forEach(el=>{ el.onclick=()=>{ ctlgStatusFilter=el.dataset.ctlgfilter; refreshCtlgList(); }; });
   app.querySelectorAll('[data-open-product]').forEach(el=>{ el.onclick=()=>openCatalogForm(el.dataset.openProduct); });
