@@ -564,7 +564,7 @@
   <button class="tab active" data-tab="active">📦 On the way <span class="tabbadge" id="activeBadge"></span></button>
   <button class="tab" data-tab="history">🕘 History</button>
   <button class="tab" data-tab="bikeadmin">🏍 Bikes</button>
-  <button class="tab" data-tab="catalog">🎧 Accessories</button>
+  <button class="tab" data-tab="catalog">🛒 Products</button>
   <button class="tab" data-tab="prices">📱 Phone prices</button>
   <button class="tab" data-tab="photos">🖼 Phone photos</button>
   <button class="tab" data-tab="showcase">⭐ Customer stories</button>
@@ -1347,6 +1347,7 @@ let ctlgCategories = [];
 let ctlgLoading = false;
 let ctlgView = 'products';   // 'products' | 'categories'
 let ctlgStatusFilter = 'all';   // all | published | draft | archived
+let ctlgLoaded = false;   // true once the list has loaded — stops an empty list re-loading forever
 const CATALOG_PHOTO_BUCKET2 = 'catalog-photos';
 
 async function loadCatalogCategories(){
@@ -1459,11 +1460,9 @@ async function loadCatalogList(){
       .select('*, catalog_categories(name,slug), catalog_variants(*), catalog_images(*)')
       .order('updated_at',{ascending:false}).limit(500);
     if(error) throw error;
-    let list = data || [];
-    if(ctlgSearch){ const s=ctlgSearch.toLowerCase(); list = list.filter(p=>[p.name,p.supplier_id,p.brand].some(v=>(v||'').toLowerCase().includes(s))); }
-    if(ctlgCategoryFilter) list = list.filter(p=>p.catalog_categories && p.catalog_categories.slug===ctlgCategoryFilter);
-    ctlgProducts = list;
-  }catch(e){ toast('⚠ Failed to load catalog: '+(e.message||e)); ctlgProducts = []; }
+    ctlgProducts = data || [];
+    ctlgLoaded = true;
+  }catch(e){ toast('⚠ Failed to load catalog: '+(e.message||e)); ctlgProducts = []; ctlgLoaded = true; }
   ctlgLoading = false; render();
 }
 
@@ -1509,22 +1508,26 @@ async function importExistingCatalog(){
         have.add(String(p.supplier_id)); n++;
       }
     }
-    toast('✓ Imported '+n+' products as drafts — review and publish them'); ctlgProducts=[]; render();
+    toast('✓ Imported '+n+' products as drafts — review and publish them'); ctlgProducts=[]; ctlgLoaded=false; render();
   }catch(e){ toast('⚠ Import failed: '+(e.message||e)); }
   if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
 }
 
-function renderCatalogTab(){
-  if(ctlgOpenId){ renderCatalogForm(); return; }
-  if(!ctlgCategories.length) loadCatalogCategories();
-  if(ctlgView==='categories'){ renderCategoryManager(); return; }
-  if(!ctlgProducts.length && !ctlgLoading) loadCatalogList();
+/* Products matching the current search + category (before the status chip). */
+function ctlgFilteredBase(){
+  let base = ctlgProducts;
+  if(ctlgSearch){ const s=ctlgSearch.toLowerCase(); base = base.filter(p=>[p.name,p.supplier_id,p.brand].some(v=>(v||'').toLowerCase().includes(s))); }
+  if(ctlgCategoryFilter) base = base.filter(p=>p.catalog_categories && p.catalog_categories.slug===ctlgCategoryFilter);
+  return base;
+}
 
-  const catOptions = ['<option value="">All categories</option>'].concat(
-    ctlgCategories.map(c=>`<option value="${c.slug}" ${ctlgCategoryFilter===c.slug?'selected':''}>${esc(c.name)}</option>`)
-  ).join('');
-
-  const shown = ctlgStatusFilter==='all' ? ctlgProducts : ctlgProducts.filter(p=>(p.status||'draft')===ctlgStatusFilter);
+/* Just the chips + list — re-rendered on filter/search changes WITHOUT rebuilding
+   the search box or category dropdown, so neither loses focus or closes. */
+function ctlgListInnerHTML(){
+  const base = ctlgFilteredBase();
+  const counts = { all:base.length, published:0, draft:0, archived:0 };
+  base.forEach(p=>{ const s=p.status||'draft'; if(counts[s]!=null) counts[s]++; });
+  const shown = ctlgStatusFilter==='all' ? base : base.filter(p=>(p.status||'draft')===ctlgStatusFilter);
   const rows = shown.map(p=>`
     <div class="bkAdmRow" data-open-product="${p.id}">
       <img class="bkAdmThumb" src="${ctlgCoverUrl(p)}" onerror="this.style.visibility='hidden'" alt="">
@@ -1534,14 +1537,38 @@ function renderCatalogTab(){
       </div>
       <span class="bkAdmBadge ${p.status==='published'?'':(p.status==='archived'?'arch':'draft')}">${esc(p.status||'draft')}</span>
     </div>`).join('');
-
-  const counts = { all:ctlgProducts.length, published:0, draft:0, archived:0 };
-  ctlgProducts.forEach(p=>{ const s=p.status||'draft'; if(counts[s]!=null) counts[s]++; });
   const statusChips = ['all','published','draft','archived'].map(f=>
     `<button class="bkAdmChip ${f===ctlgStatusFilter?'on':''}" data-ctlgfilter="${f}">${f==='archived'?'Trash':f[0].toUpperCase()+f.slice(1)} (${counts[f]})</button>`).join('');
+  return `
+    <div class="bkAdmChips">${statusChips}</div>
+    <div class="bkAdmBar" style="margin-top:6px;">
+      ${ctlgProducts.length===0 && ctlgLoaded ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import accessories catalog</button>' : ''}
+      <button class="cpBtn" id="ctlgExportBtn" style="width:auto;">⬆ Export JSON</button>
+    </div>
+    ${ctlgLoading?'<p class="sub">Loading…</p>':''}
+    <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products in this view.</p>')}</div>`;
+}
+
+function bindCtlgListEvents(){
+  const imp=document.getElementById('ctlgImportBtn'); if(imp) imp.onclick=importExistingCatalog;
+  const exp=document.getElementById('ctlgExportBtn'); if(exp) exp.onclick=exportCatalog;
+  app.querySelectorAll('[data-ctlgfilter]').forEach(el=>{ el.onclick=()=>{ ctlgStatusFilter=el.dataset.ctlgfilter; refreshCtlgList(); }; });
+  app.querySelectorAll('[data-open-product]').forEach(el=>{ el.onclick=()=>openCatalogForm(el.dataset.openProduct); });
+}
+function refreshCtlgList(){ const w=document.getElementById('ctlgListWrap'); if(w){ w.innerHTML=ctlgListInnerHTML(); bindCtlgListEvents(); } }
+
+function renderCatalogTab(){
+  if(ctlgOpenId){ renderCatalogForm(); return; }
+  if(!ctlgCategories.length) loadCatalogCategories();
+  if(ctlgView==='categories'){ renderCategoryManager(); return; }
+  if(!ctlgLoaded && !ctlgLoading){ loadCatalogList(); }   // load once — never loop on an empty result
+
+  const catOptions = ['<option value="">All categories</option>'].concat(
+    ctlgCategories.map(c=>`<option value="${c.slug}" ${ctlgCategoryFilter===c.slug?'selected':''}>${esc(c.icon||'')} ${esc(c.name)}</option>`)
+  ).join('');
 
   app.innerHTML = `
-    <div class="sechead">Catalog <span class="count">${ctlgProducts.length}</span></div>
+    <div class="sechead">Products <span class="count">${ctlgProducts.length}</span></div>
     <p class="sub">One engine for every store section — accessories, kitchen, electronics, laptops, and any category you add. Tap <b>⚙ Categories</b> to create a new section (no code needed); each product just picks its category.</p>
     <div class="bkAdmBar">
       <input class="bkAdmInput" id="ctlgSearchInput" placeholder="Search by name or supplier id…" value="${esc(ctlgSearch)}">
@@ -1549,24 +1576,15 @@ function renderCatalogTab(){
       <button class="cpBtn" id="ctlgManageCatsBtn" style="width:auto;">⚙ Categories</button>
       <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
     </div>
-    <div class="bkAdmChips">${statusChips}</div>
-    <div class="bkAdmBar" style="margin-top:6px;">
-      ${ctlgProducts.length===0 && !ctlgLoading ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import accessories catalog</button>' : ''}
-      <button class="cpBtn" id="ctlgExportBtn" style="width:auto;">⬆ Export JSON</button>
-    </div>
-    ${ctlgLoading?'<p class="sub">Loading…</p>':''}
-    <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products in this view.</p>')}</div>
+    <div id="ctlgListWrap">${ctlgListInnerHTML()}</div>
   `;
 
   document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
   document.getElementById('ctlgManageCatsBtn').onclick = ()=>{ ctlgView='categories'; loadCatalogCategories().then(render); };
-  const impBtn = document.getElementById('ctlgImportBtn'); if(impBtn) impBtn.onclick = importExistingCatalog;
-  document.getElementById('ctlgExportBtn').onclick = exportCatalog;
   const search = document.getElementById('ctlgSearchInput');
-  let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ ctlgSearch=search.value.trim(); loadCatalogList(); }, 350); };
-  document.getElementById('ctlgCatFilter').onchange = (e)=>{ ctlgCategoryFilter = e.target.value; render(); };
-  app.querySelectorAll('[data-ctlgfilter]').forEach(el=>{ el.onclick=()=>{ ctlgStatusFilter=el.dataset.ctlgfilter; render(); }; });
-  app.querySelectorAll('[data-open-product]').forEach(el=>{ el.onclick = ()=> openCatalogForm(el.dataset.openProduct); });
+  search.oninput = ()=>{ ctlgSearch = search.value.trim(); refreshCtlgList(); };            // list-only refresh keeps focus
+  document.getElementById('ctlgCatFilter').onchange = (e)=>{ ctlgCategoryFilter = e.target.value; refreshCtlgList(); };
+  bindCtlgListEvents();
 }
 
 /* Reusable export: downloads the full catalog (products + variants, incl.
@@ -1754,7 +1772,7 @@ function renderCatalogForm(){
     ${isNew ? '<p class="sub" style="margin-top:14px">Save the product first, then you can add photos.</p>' : renderCatalogImageManager()}
   `;
 
-  document.getElementById('ctlgBack').onclick = ()=>{ ctlgOpenId=null; ctlgOpenProduct=null; ctlgProducts=[]; render(); };
+  document.getElementById('ctlgBack').onclick = ()=>{ ctlgOpenId=null; ctlgOpenProduct=null; ctlgProducts=[]; ctlgLoaded=false; render(); };
   document.getElementById('ctlgSaveBtn').onclick = saveCatalogForm;
   const delBtn = document.getElementById('ctlgDeleteBtn');
   if(delBtn) delBtn.onclick = deleteCatalogProduct;
@@ -1846,7 +1864,7 @@ async function saveCatalogForm(){
       ctlgOpenProduct = fresh;
       ctlgOpenImages = (fresh.catalog_images||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
     }
-    ctlgProducts = [];
+    ctlgProducts = []; ctlgLoaded = false;
     render();
   }catch(e){ toast('⚠ '+(e.message||e)); }
   btn.disabled = false;
@@ -1860,7 +1878,7 @@ async function deleteCatalogProduct(){
     if(error) throw error;
     if(imgs.length){ db.storage.from(CATALOG_PHOTO_BUCKET2).remove(imgs.map(i=>i.storage_path)).catch(()=>{}); }
     toast('✓ Deleted');
-    ctlgOpenId = null; ctlgOpenProduct = null; ctlgProducts = [];
+    ctlgOpenId = null; ctlgOpenProduct = null; ctlgProducts = []; ctlgLoaded = false;
     render();
   }catch(e){ toast('⚠ '+(e.message||e)); }
 }
