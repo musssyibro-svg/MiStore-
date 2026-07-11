@@ -2209,6 +2209,7 @@ function zhT(str){
 }
 
 const CAT_BLURBS = {
+  'kitchen-utensils':'Pressure cookers, pots, pans, flasks and kitchen tools — factory-direct. Wholesale stock, sold by the carton.',
   'kitchen-appliances':'Air fryers, blenders, kettles, cookers and more — factory-direct kitchen appliances. Wholesale stock, sold by the carton.',
   smartwatch:'Full-touch smart watches with fitness tracking, notifications and call support. Wholesale stock — perfect for resellers and shops.',
   powerbank:'Portable chargers from 5,000mAh to 20,000mAh, fast-charge ready. Wholesale stock — perfect for resellers and shops.',
@@ -2236,11 +2237,11 @@ function catFallbackImg(p){
 function catStoreCard(p){
   const img=catProductImg(p), alt=catFallbackImg(p);
   const price = p.price_from_ngn ? (fmtCatalog(p.price_from_ngn)+'<span class="perpc">/pc</span>') : 'Ask price';
-  const moq = p._moq || (p._bundled&&p._bundled._moq) || p.moq || 100;
+  const moq = (p._moq!=null)?p._moq:((p._bundled&&p._bundled._moq!=null)?p._bundled._moq:null);
   const media = img ? `<img src="${img}" loading="lazy" alt="${esc(p.name||'')}" data-alt="${esc(alt)}" onerror="if(this.dataset.alt&&this.src.indexOf(this.dataset.alt)<0){this.src=this.dataset.alt}else{this.parentNode.innerHTML='<span class=&quot;ph&quot;>📦</span>'}">` : '<span class="ph">📦</span>';
   return `<div class="catcard" data-catid="${p.id}">
     <div class="catmedia">${media}</div>
-    <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div><div class="catmoq">Min. order ${moq} pcs</div></div>
+    <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div><div class="catmoq">${moq!=null?('Min. order '+moq+' pcs'):'Bulk · sold by carton'}</div></div>
   </div>`;
 }
 
@@ -2290,9 +2291,9 @@ function openCatSheet(id){
   }
   imgs=imgs.slice(0,6);
   const cat=p.catalog_categories||{};
-  const moq = p._moq || b._moq || p.moq || 100;
+  const moq = (p._moq!=null)?p._moq:((b._moq!=null)?b._moq:null);
   const unit = p.price_from_ngn||b.price_from_ngn;
-  const minTotal = unit? unit*moq : null;
+  const minTotal = (unit&&moq)? unit*moq : null;
   const variants=(b._variants||[]).slice(0,8);
   const vRows=variants.map(v=>`<div class="csrow"><span>${esc(v.label||'Option')}</span><b>${v.unit?fmtCatalog(v.unit)+'/pc':'—'}</b></div>`).join('');
   const attrs=(p.metadata&&p.metadata.attributes)||{};
@@ -2306,17 +2307,17 @@ function openCatSheet(id){
     <h3 class="csname">${esc(p.name||'Item')}</h3>
     <div class="csprice">${unit?fmtCatalog(unit)+' <span class="perpc">per piece</span>':'Price on request'}</div>
     <div class="csmoqbox">
-      <div class="csrow"><span>Minimum order</span><b>${moq} pieces</b></div>
+      <div class="csrow"><span>Minimum order</span><b>${moq!=null?(moq+' pieces'):'By the carton — confirmed on WhatsApp'}</b></div>
       ${minTotal?`<div class="csrow"><span>Min. order total (approx.)</span><b>${fmtCatalog(minTotal)}</b></div>`:''}
       <div class="csrow"><span>Shipping</span><b>Sea or air — quoted on WhatsApp</b></div>
     </div>
     ${desc?`<p class="csdesc">${esc(desc)}</p>`:''}
     ${vRows?`<div class="csspecshead">Options &amp; unit prices</div><div class="csspecs">${vRows}</div>${(b._variants||[]).length>8?'<p class="csnote">More colours/options — ask on WhatsApp.</p>':''}`:''}
     ${aRows?`<div class="csspecshead">Details</div><div class="csspecs">${aRows}</div>`:''}
-    <button class="addbtn" id="csOrderBtn">Order ${moq}+ pcs on WhatsApp</button>
+    <button class="addbtn" id="csOrderBtn">${moq!=null?('Order '+moq+'+ pcs on WhatsApp'):'Order in bulk on WhatsApp'}</button>
     <p class="csnote">Bulk/wholesale item. We confirm colours, exact quantity and shipping (sea or air) with you on WhatsApp before you pay.</p>`;
   $('csOrderBtn').onclick = ()=>{
-    const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+' — minimum '+moq+' pcs'+(unit?(' at '+fmtCatalog(unit)+'/pc'):'')+'. Please give me the total with shipping.';
+    const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+(moq!=null?(' — minimum '+moq+' pcs'):' — bulk order')+(unit?(' at '+fmtCatalog(unit)+'/pc'):'')+'. Please give me the total with shipping.';
     window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
   };
   sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{
@@ -2355,6 +2356,7 @@ const BUNDLED_CATS = {
   speaker:{name:'Speakers',slug:'speaker',icon:'🔊',position:3,label:'Bluetooth Speaker'},
   earphone:{name:'Earbuds',slug:'earphone',icon:'🎧',position:4,label:'Wireless Earbuds'},
   'kitchen-appliances':{name:'Kitchen Appliances',slug:'kitchen-appliances',icon:'🍳',position:5,label:'Kitchen Appliance'},
+  'kitchen-utensils':{name:'Kitchen Utensils',slug:'kitchen-utensils',icon:'🍴',position:6,label:'Kitchen Utensil'},
 };
 let _bundledCache=null;
 async function fetchBundledRows(){
@@ -2376,7 +2378,8 @@ async function fetchBundledRows(){
       const min=vs.length? Math.min.apply(null,vs.map(v=>v.rmb_price)) : 0;
       const priceFrom = min? Math.round(min*rate*(1+margin/100)) : null;
       const imgs=[...new Set((p.variants||[]).map(v=>v.image).filter(Boolean))].map(u=>'catalog-import/'+u);
-      const moq = (p.variants||[]).reduce((m,v)=>Math.min(m, v.moq||1e9), 1e9);
+      const moqs=(p.variants||[]).map(v=>v.moq).filter(x=>x!=null);
+      const moq = moqs.length? Math.min.apply(null,moqs) : null;
       const variants=(p.variants||[]).map(v=>({
         label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
         unit: v.rmb_price? Math.round(v.rmb_price*rate*(1+margin/100)) : null }));
@@ -2390,7 +2393,7 @@ async function fetchBundledRows(){
       }
       const row={ id:'local-'+key+'-'+p.supplier_id, name:nm, description:(p.description_en||''), supplier_id:String(p.supplier_id),
         price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
-        _localImgs:imgs, _moq:(moq===1e9?100:moq), _variants:variants,
+        _localImgs:imgs, _moq:moq, _variants:variants,
         catalog_categories:cat, catalog_images:[] };
       row._bundled=row;
       BUNDLED_BY_SID[row.supplier_id]=row;
