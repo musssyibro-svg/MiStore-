@@ -20,8 +20,11 @@ CREATE TABLE IF NOT EXISTS store_settings (
   exchange_rate numeric NOT NULL DEFAULT 208,
   sea_rate_per_cbm numeric NOT NULL DEFAULT 500000,
   air_rate_per_kg numeric NOT NULL DEFAULT 20000,
+  default_profit_pct numeric NOT NULL DEFAULT 15,   -- temporary margin for goods with no explicit profit
   updated_at timestamptz DEFAULT now()
 );
+-- for installs created before this column existed:
+ALTER TABLE store_settings ADD COLUMN IF NOT EXISTS default_profit_pct numeric NOT NULL DEFAULT 15;
 INSERT INTO store_settings (id) VALUES ('default') ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
