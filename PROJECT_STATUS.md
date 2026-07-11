@@ -133,8 +133,13 @@ images/                  # phone product photos
 - **Export** full catalog to JSON (admin backup).
 - **Category Manager**: add / rename / reorder / hide / delete any store section
   from the UI — no SQL, no code.
-- **Per-category custom fields**: define a category's spec inputs (e.g. Laptops →
-  CPU, RAM); the product form renders them generically.
+- **Per-category custom fields (dynamic attribute system):** the admin defines
+  which fields belong to each category (⚙ Categories → Fields, e.g. Laptops →
+  CPU/RAM/Screen; Kitchen → Capacity/Material/Size; Phones → RAM/Storage/Color).
+  The product form renders them generically and stores values in
+  `catalog_products.metadata.attributes`; the schema lives in
+  `catalog_categories.metadata.fields`. **Adding a category or its fields needs
+  no code.**
 
 **Bikes engine:** full CRUD, images, categories, soft-delete/trash/restore,
 duplicate, preview, duplicate-detection, availability, import-from-JSON, price
@@ -161,6 +166,19 @@ hero, GitHub Pages deploy from `main` with `.nojekyll`.
 - **Delete the legacy `supabase/functions/` edge functions** once confirmed
   unused by any remaining tab (Phone prices' optional fallback still references a
   price table, not an edge function).
+- **Extended pricing model (designed, deferred until QA passes).** Grow the per-
+  variant pricing beyond cost/shipping/profit/selling-price to add:
+  `min_price`, `suggested_price`, `discount_price`, `sale_start`, `sale_end`,
+  `wholesale_price`, `dealer_price`. Design: add nullable columns to
+  `catalog_variants` (all optional); the storefront shows `discount_price` when a
+  sale window (`sale_start`/`sale_end`) is active, else the computed selling
+  price; `wholesale_price`/`dealer_price` gate behind a future buyer role;
+  `min_price` guards against selling below cost. **Not built yet** — per the
+  QA-first sequence, this ships only after `TEST_PLAN.md` passes on a real device.
+- **Attribute field types (enhancement).** Custom fields are currently free-text,
+  which covers every current product type. A later enhancement can add field
+  types (number / select-dropdown / boolean) to `catalog_categories.metadata.fields`
+  without changing the storage model.
 
 ---
 
