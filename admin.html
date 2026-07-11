@@ -761,7 +761,6 @@ const SUPABASE_ANON_KEY =
 'sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';
 const PHOTO_BUCKET      = 'order-photos';
 const BIKE_PHOTO_BUCKET = 'bike-photos';
-const FUNCTIONS_BASE    = SUPABASE_URL.trim() + '/functions/v1';
 /* ========================================================= */
 
 // stage metadata keyed by stage key. offset = days from the PREVIOUS stage in the route.
@@ -1345,6 +1344,7 @@ let ctlgOpenImages = [];
 let ctlgCategories = [];
 let ctlgLoading = false;
 let ctlgView = 'products';   // 'products' | 'categories'
+let ctlgStatusFilter = 'all';   // all | published | draft | archived
 const CATALOG_PHOTO_BUCKET2 = 'catalog-photos';
 
 async function loadCatalogCategories(){
@@ -1520,15 +1520,21 @@ function renderCatalogTab(){
     ctlgCategories.map(c=>`<option value="${c.slug}" ${ctlgCategoryFilter===c.slug?'selected':''}>${esc(c.name)}</option>`)
   ).join('');
 
-  const rows = ctlgProducts.map(p=>`
+  const shown = ctlgStatusFilter==='all' ? ctlgProducts : ctlgProducts.filter(p=>(p.status||'draft')===ctlgStatusFilter);
+  const rows = shown.map(p=>`
     <div class="bkAdmRow" data-open-product="${p.id}">
       <img class="bkAdmThumb" src="${ctlgCoverUrl(p)}" onerror="this.style.visibility='hidden'" alt="">
       <div class="bkAdmRowInfo">
         <div class="bkAdmRowName">${esc(p.name||'Untitled')}</div>
         <div class="bkAdmRowMeta">${esc(p.catalog_categories?.name||'Uncategorized')} · ${p.catalog_variants?.length||0} variant(s) · MOQ ${p.moq||100}</div>
       </div>
-      <span class="bkAdmBadge ${p.status==='published'?'':'draft'}">${esc(p.status||'draft')}</span>
+      <span class="bkAdmBadge ${p.status==='published'?'':(p.status==='archived'?'arch':'draft')}">${esc(p.status||'draft')}</span>
     </div>`).join('');
+
+  const counts = { all:ctlgProducts.length, published:0, draft:0, archived:0 };
+  ctlgProducts.forEach(p=>{ const s=p.status||'draft'; if(counts[s]!=null) counts[s]++; });
+  const statusChips = ['all','published','draft','archived'].map(f=>
+    `<button class="bkAdmChip ${f===ctlgStatusFilter?'on':''}" data-ctlgfilter="${f}">${f==='archived'?'Trash':f[0].toUpperCase()+f.slice(1)} (${counts[f]})</button>`).join('');
 
   app.innerHTML = `
     <div class="sechead">Catalog <span class="count">${ctlgProducts.length}</span></div>
@@ -1539,18 +1545,44 @@ function renderCatalogTab(){
       <button class="cpBtn" id="ctlgManageCatsBtn" style="width:auto;">⚙ Categories</button>
       <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
     </div>
-    ${ctlgProducts.length===0 && !ctlgLoading ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;margin-bottom:10px;">⬇ Import accessories catalog</button>' : ''}
+    <div class="bkAdmChips">${statusChips}</div>
+    <div class="bkAdmBar" style="margin-top:6px;">
+      ${ctlgProducts.length===0 && !ctlgLoading ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import accessories catalog</button>' : ''}
+      <button class="cpBtn" id="ctlgExportBtn" style="width:auto;">⬆ Export JSON</button>
+    </div>
     ${ctlgLoading?'<p class="sub">Loading…</p>':''}
-    <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products yet.</p>')}</div>
+    <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products in this view.</p>')}</div>
   `;
 
   document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
   document.getElementById('ctlgManageCatsBtn').onclick = ()=>{ ctlgView='categories'; loadCatalogCategories().then(render); };
   const impBtn = document.getElementById('ctlgImportBtn'); if(impBtn) impBtn.onclick = importExistingCatalog;
+  document.getElementById('ctlgExportBtn').onclick = exportCatalog;
   const search = document.getElementById('ctlgSearchInput');
   let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ ctlgSearch=search.value.trim(); loadCatalogList(); }, 350); };
   document.getElementById('ctlgCatFilter').onchange = (e)=>{ ctlgCategoryFilter = e.target.value; render(); };
+  app.querySelectorAll('[data-ctlgfilter]').forEach(el=>{ el.onclick=()=>{ ctlgStatusFilter=el.dataset.ctlgfilter; render(); }; });
   app.querySelectorAll('[data-open-product]').forEach(el=>{ el.onclick = ()=> openCatalogForm(el.dataset.openProduct); });
+}
+
+/* Reusable export: downloads the full catalog (products + variants, incl.
+   supplier ¥ price) as JSON — an admin-side backup / re-import artifact.
+   This file is generated locally to the admin's device and never exposed to
+   customers, so it may include supplier pricing. */
+async function exportCatalog(){
+  const btn=document.getElementById('ctlgExportBtn'); if(btn){ btn.disabled=true; btn.textContent='Exporting…'; }
+  try{
+    const { data, error } = await db.from('catalog_products')
+      .select('name,supplier_id,brand,status,moq,qty_per_carton,weight_kg,cbm,metadata,catalog_categories(slug,name),catalog_variants(spec1,spec2,variant_label,rmb_price,profit_ngn,moq,stock,position)')
+      .order('updated_at',{ascending:false});
+    if(error) throw error;
+    const blob = new Blob([JSON.stringify({ exported_at:new Date().toISOString(), products:data||[] }, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='mistore-catalog-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast('✓ Exported '+((data||[]).length)+' products');
+  }catch(e){ toast('⚠ Export failed: '+(e.message||e)); }
+  if(btn){ btn.disabled=false; btn.textContent='⬆ Export JSON'; }
 }
 
 async function openCatalogForm(id){
@@ -1924,22 +1956,6 @@ let bkAdmStatusFilter = 'all';   // all | published | draft | archived
 let bkAdmOpenId = null;      // id of bike currently open in the edit form, or 'new'
 let bkAdmOpenImages = [];
 let bkAdmLoading = false;
-
-async function bkAuthHeaders(){
-  if(!db) return {};
-  const { data } = await db.auth.getSession();
-  const token = data && data.session && data.session.access_token;
-  return token ? { Authorization: 'Bearer ' + token } : {};
-}
-
-async function bkApi(path, opts={}){
-  const headers = Object.assign({}, opts.headers||{}, await bkAuthHeaders());
-  const res = await fetch(FUNCTIONS_BASE + path, Object.assign({}, opts, { headers }));
-  let j = null;
-  try{ j = await res.json(); }catch(e){}
-  if(!res.ok) throw new Error((j && j.error) || ('Request failed: '+res.status));
-  return j;
-}
 
 async function loadBikeAdminList(){
   bkAdmLoading = true; render();
