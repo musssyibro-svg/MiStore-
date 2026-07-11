@@ -1292,8 +1292,11 @@ function getPriceEntry(cond, model, storage){
 let storeSettings = null;
 
 async function loadStoreSettings(){
-  try{ storeSettings = await bkApi('/store-settings'); }
-  catch(e){ storeSettings = { exchange_rate:208, sea_rate_per_cbm:500000, air_rate_per_kg:20000 }; }
+  try{
+    const { data, error } = await db.from('store_settings').select('exchange_rate,sea_rate_per_cbm,air_rate_per_kg').eq('id','default').maybeSingle();
+    if(error) throw error;
+    storeSettings = data || { exchange_rate:208, sea_rate_per_cbm:500000, air_rate_per_kg:20000 };
+  }catch(e){ storeSettings = { exchange_rate:208, sea_rate_per_cbm:500000, air_rate_per_kg:20000 }; }
 }
 
 function renderStoreSettingsTab(){
@@ -1314,21 +1317,25 @@ function renderStoreSettingsTab(){
     const btn = document.getElementById('stgSaveBtn');
     btn.disabled = true; btn.textContent = 'Saving…';
     try{
-      storeSettings = await bkApi('/store-settings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+      const row = { id:'default',
         exchange_rate: parseFloat(document.getElementById('stgExchange').value)||208,
         sea_rate_per_cbm: parseFloat(document.getElementById('stgSea').value)||500000,
         air_rate_per_kg: parseFloat(document.getElementById('stgAir').value)||20000,
-      })});
+        updated_at: new Date().toISOString() };
+      const { error } = await db.from('store_settings').upsert(row, { onConflict:'id' });
+      if(error) throw error;
+      storeSettings = row;
       toast('✓ Settings saved — every product now reflects these rates');
-    }catch(e){ toast('⚠ '+e.message); }
+    }catch(e){ toast('⚠ '+(e.message||e)); }
     btn.disabled = false; btn.textContent = 'Save settings';
   };
 }
 
-/* ===== Catalog admin: smartwatches, power banks, speakers, earbuds, and
-   anything else that isn't a bike or an existing phone product. Same
-   architecture as Bikes: talks to catalog-products / catalog-images edge
-   functions, same Supabase Auth session, same drag-drop image manager. */
+/* ===== Catalog admin: smartwatches, power banks, speakers, earbuds, kitchen,
+   and anything else that isn't a bike or an existing phone product. Talks to
+   Supabase directly (db.from) using the admin's auth session — no edge
+   functions to deploy, so everything works straight from a phone, exactly
+   like the Bikes tab. */
 let ctlgProducts = [];
 let ctlgSearch = '';
 let ctlgCategoryFilter = '';
@@ -1337,32 +1344,73 @@ let ctlgOpenProduct = null;
 let ctlgOpenImages = [];
 let ctlgCategories = [];
 let ctlgLoading = false;
+const CATALOG_PHOTO_BUCKET2 = 'catalog-photos';
 
 async function loadCatalogCategories(){
   try{
-    const res = await fetch(`${SUPABASE_URL.trim()}/rest/v1/catalog_categories?select=id,name,slug&order=position`,
-      { headers: { apikey: SUPABASE_ANON_KEY, ...(await bkAuthHeaders()) } });
-    ctlgCategories = res.ok ? await res.json() : [];
+    const { data, error } = await db.from('catalog_categories').select('id,name,slug').order('position');
+    ctlgCategories = (!error && data) ? data : [];
   }catch(e){ ctlgCategories = []; }
 }
 
 async function loadCatalogList(){
   ctlgLoading = true; render();
   try{
-    let q = '/catalog-products?limit=300&status=all';
-    if(ctlgSearch) q += '&q='+encodeURIComponent(ctlgSearch);
-    const j = await bkApi(q.replace('status=all','')); // admin sees all statuses by default
-    ctlgProducts = j.products || [];
-    if(ctlgCategoryFilter) ctlgProducts = ctlgProducts.filter(p=>p.catalog_categories && p.catalog_categories.slug===ctlgCategoryFilter);
-  }catch(e){ toast('⚠ Failed to load catalog: '+e.message); ctlgProducts = []; }
+    const { data, error } = await db.from('catalog_products')
+      .select('*, catalog_categories(name,slug), catalog_variants(*), catalog_images(*)')
+      .order('updated_at',{ascending:false}).limit(500);
+    if(error) throw error;
+    let list = data || [];
+    if(ctlgSearch){ const s=ctlgSearch.toLowerCase(); list = list.filter(p=>[p.name,p.supplier_id,p.brand].some(v=>(v||'').toLowerCase().includes(s))); }
+    if(ctlgCategoryFilter) list = list.filter(p=>p.catalog_categories && p.catalog_categories.slug===ctlgCategoryFilter);
+    ctlgProducts = list;
+  }catch(e){ toast('⚠ Failed to load catalog: '+(e.message||e)); ctlgProducts = []; }
   ctlgLoading = false; render();
 }
 
 function ctlgCoverUrl(p){
   const imgs = p.catalog_images || [];
   const cover = imgs.find(i=>i.is_cover) || imgs[0];
-  if(!cover) return '';
-  return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||'catalog-photos'}/${cover.storage_path}`;
+  if(cover) return `${SUPABASE_URL.trim()}/storage/v1/object/public/${cover.storage_bucket||'catalog-photos'}/${cover.storage_path}`;
+  // imported products keep their original supplier photo until a new one is uploaded
+  if(p.metadata && p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
+  return '';
+}
+
+async function importExistingCatalog(){
+  if(!confirm('Import accessories (earbuds, power banks, speakers, smart watches) from the supplier catalog as drafts? Safe to run — it skips products already imported.')) return;
+  const btn=document.getElementById('ctlgImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
+  try{
+    await loadCatalogCategories();
+    const catBySlug = {}; ctlgCategories.forEach(c=>catBySlug[c.slug]=c.id);
+    const { data:existing } = await db.from('catalog_products').select('supplier_id');
+    const have = new Set((existing||[]).map(x=>String(x.supplier_id)).filter(Boolean));
+    let n=0;
+    for(const cat of ['earphone','powerbank','smartwatch','speaker']){
+      let arr;
+      try{ arr = await (await fetch('catalog-import/data/'+cat+'_products.json',{cache:'no-store'})).json(); }
+      catch(e){ continue; }
+      const products = arr.products || arr || [];
+      for(const p of products){
+        if(have.has(String(p.supplier_id))) continue;
+        const firstImg = (p.variants||[]).find(v=>v.image)?.image || null;
+        const { data:created, error } = await db.from('catalog_products').insert({
+          category_id: catBySlug[p.category]||null, supplier_id: String(p.supplier_id),
+          name: p.name_guess || (p.category+'-'+p.supplier_id), status:'draft',
+          metadata:{ legacy_image:firstImg, variant_count:p.variant_count||((p.variants||[]).length) }
+        }).select('id').single();
+        if(error) throw error;
+        const vrows = (p.variants||[]).map((v,i)=>({
+          product_id: created.id, spec1: v.spec1||null, spec2: v.spec2||null,
+          variant_label: v.variant_label||null, rmb_price: v.rmb_price??null,
+          moq: v.moq??null, position:i, is_default:i===0 }));
+        for(let i=0;i<vrows.length;i+=50){ const { error:ve } = await db.from('catalog_variants').insert(vrows.slice(i,i+50)); if(ve) throw ve; }
+        have.add(String(p.supplier_id)); n++;
+      }
+    }
+    toast('✓ Imported '+n+' products as drafts — review and publish them'); ctlgProducts=[]; render();
+  }catch(e){ toast('⚠ Import failed: '+(e.message||e)); }
+  if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
 }
 
 function renderCatalogTab(){
@@ -1392,11 +1440,13 @@ function renderCatalogTab(){
       <select class="bkAdmInput" id="ctlgCatFilter" style="flex:0 0 160px;">${catOptions}</select>
       <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
     </div>
+    ${ctlgProducts.length===0 && !ctlgLoading ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;margin-bottom:10px;">⬇ Import accessories catalog</button>' : ''}
     ${ctlgLoading?'<p class="sub">Loading…</p>':''}
     <div class="bkAdmList">${rows || (ctlgLoading?'':'<p class="sub">No products yet.</p>')}</div>
   `;
 
   document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
+  const impBtn = document.getElementById('ctlgImportBtn'); if(impBtn) impBtn.onclick = importExistingCatalog;
   const search = document.getElementById('ctlgSearchInput');
   let t; search.oninput = ()=>{ clearTimeout(t); t=setTimeout(()=>{ ctlgSearch=search.value.trim(); loadCatalogList(); }, 350); };
   document.getElementById('ctlgCatFilter').onchange = (e)=>{ ctlgCategoryFilter = e.target.value; render(); };
@@ -1410,10 +1460,12 @@ async function openCatalogForm(id){
   if(!storeSettings) await loadStoreSettings();
   if(id !== 'new'){
     try{
-      const p = await bkApi('/catalog-products?id='+id);
+      const { data:p, error } = await db.from('catalog_products').select('*, catalog_variants(*), catalog_images(*)').eq('id',id).single();
+      if(error) throw error;
+      p.catalog_variants = (p.catalog_variants||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
       ctlgOpenProduct = p;
-      ctlgOpenImages = p.catalog_images || [];
-    }catch(e){ toast('⚠ '+e.message); ctlgOpenId=null; render(); return; }
+      ctlgOpenImages = (p.catalog_images||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
+    }catch(e){ toast('⚠ '+(e.message||e)); ctlgOpenId=null; render(); return; }
   } else {
     ctlgOpenProduct = { name:'', category_id:'', brand:'', description:'', moq:100, qty_per_carton:1,
       sold_by_carton:false, weight_kg:'', cbm:'', status:'draft', featured:false,
@@ -1555,36 +1607,60 @@ function collectCatalogPayload(){
   };
 }
 
+async function syncCatalogVariants(productId, variants){
+  const { data:existing } = await db.from('catalog_variants').select('id').eq('product_id',productId);
+  const keep = new Set(variants.filter(v=>v.id).map(v=>v.id));
+  const toDelete = (existing||[]).filter(e=>!keep.has(e.id)).map(e=>e.id);
+  if(toDelete.length){ const { error } = await db.from('catalog_variants').delete().in('id',toDelete); if(error) throw error; }
+  for(const v of variants){
+    const row = { product_id:productId, spec1:v.spec1||null, spec2:v.spec2||null, variant_label:v.variant_label||null,
+      rmb_price:v.rmb_price, profit_ngn:v.profit_ngn, moq:v.moq, stock:v.stock, position:v.position };
+    if(v.id){ const { error } = await db.from('catalog_variants').update(row).eq('id',v.id); if(error) throw error; }
+    else { const { error } = await db.from('catalog_variants').insert(row); if(error) throw error; }
+  }
+}
+
 async function saveCatalogForm(){
   const btn = document.getElementById('ctlgSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try{
     const payload = collectCatalogPayload();
+    const variants = payload.variants; delete payload.variants;
+    let productId = ctlgOpenId;
     if(ctlgOpenId === 'new'){
-      const created = await bkApi('/catalog-products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const { data:created, error } = await db.from('catalog_products').insert(payload).select().single();
+      if(error) throw error;
+      productId = created.id; ctlgOpenId = created.id;
       toast('✓ Product created — now add photos');
-      ctlgOpenId = created.id;
-      ctlgOpenProduct = await bkApi('/catalog-products?id='+created.id);
-      ctlgOpenImages = ctlgOpenProduct.catalog_images || [];
     } else {
-      await bkApi('/catalog-products?id='+ctlgOpenId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const { error } = await db.from('catalog_products').update(payload).eq('id',ctlgOpenId);
+      if(error) throw error;
       toast('✓ Saved');
-      ctlgOpenProduct = await bkApi('/catalog-products?id='+ctlgOpenId);
+    }
+    await syncCatalogVariants(productId, variants);
+    const { data:fresh } = await db.from('catalog_products').select('*, catalog_variants(*), catalog_images(*)').eq('id',productId).single();
+    if(fresh){
+      fresh.catalog_variants = (fresh.catalog_variants||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
+      ctlgOpenProduct = fresh;
+      ctlgOpenImages = (fresh.catalog_images||[]).slice().sort((a,b)=>(a.position||0)-(b.position||0));
     }
     ctlgProducts = [];
     render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
   btn.disabled = false;
 }
 
 async function deleteCatalogProduct(){
   if(!confirm('Delete this product and all its photos? This cannot be undone.')) return;
   try{
-    await bkApi('/catalog-products?id='+ctlgOpenId, { method:'DELETE' });
+    const imgs = (ctlgOpenImages||[]).filter(i=>i.storage_path);
+    const { error } = await db.from('catalog_products').delete().eq('id',ctlgOpenId);
+    if(error) throw error;
+    if(imgs.length){ db.storage.from(CATALOG_PHOTO_BUCKET2).remove(imgs.map(i=>i.storage_path)).catch(()=>{}); }
     toast('✓ Deleted');
     ctlgOpenId = null; ctlgOpenProduct = null; ctlgProducts = [];
     render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
 }
 
 /* ---- catalog image manager: identical pattern to the bike one, pointed at catalog-images ---- */
@@ -1639,38 +1715,57 @@ function wireCatalogImageManager(){
 async function uploadCatalogImages(fileList){
   const files = Array.from(fileList||[]);
   if(!files.length) return;
+  const grid = document.getElementById('ctlgImgGrid');
+  const placeholder = document.createElement('div');
+  placeholder.className = 'bkImgCard bkImgUploading';
+  placeholder.textContent = `Uploading ${files.length} photo${files.length>1?'s':''}…`;
+  grid && grid.prepend(placeholder);
   try{
-    const form = new FormData();
-    form.append('product_id', ctlgOpenId);
-    files.forEach(f=> form.append('files', f));
-    const headers = await bkAuthHeaders();
-    const res = await fetch(FUNCTIONS_BASE + '/catalog-images', { method:'POST', headers, body: form });
-    const j = await res.json();
-    if(!res.ok) throw new Error(j.error || 'upload failed');
-    ctlgOpenImages = ctlgOpenImages.concat(j.images||[]);
-    toast('✓ Uploaded '+(j.images||[]).length+' photo(s)');
-  }catch(e){ toast('⚠ '+e.message); }
+    const newImgs = [];
+    for(const f of files){
+      const blob = await compressImage(f);
+      const path = 'catalog/'+ctlgOpenId+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.jpg';
+      const { error:upErr } = await db.storage.from(CATALOG_PHOTO_BUCKET2).upload(path, blob, { contentType:'image/jpeg', upsert:true });
+      if(upErr) throw upErr;
+      const isCover = (ctlgOpenImages.length + newImgs.length) === 0;
+      const { data:row, error } = await db.from('catalog_images').insert({
+        product_id: ctlgOpenId, storage_bucket: CATALOG_PHOTO_BUCKET2, storage_path: path,
+        filename: f.name, mime:'image/jpeg', is_cover: isCover, position: ctlgOpenImages.length + newImgs.length
+      }).select().single();
+      if(error) throw error;
+      newImgs.push(row);
+    }
+    ctlgOpenImages = ctlgOpenImages.concat(newImgs);
+    toast('✓ Uploaded '+newImgs.length+' photo(s)');
+  }catch(e){ toast('⚠ '+(e.message||e)); }
   render();
 }
 
 async function setCatalogImageCover(id){
-  try{ await bkApi('/catalog-images?id='+id+'&action=cover', { method:'PUT' });
+  try{
+    await db.from('catalog_images').update({ is_cover:false }).eq('product_id', ctlgOpenId);
+    const { error } = await db.from('catalog_images').update({ is_cover:true }).eq('id', id);
+    if(error) throw error;
     ctlgOpenImages = ctlgOpenImages.map(i=>({...i, is_cover: i.id===id})); render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
 }
 async function deleteCatalogImage(id){
   if(!confirm('Delete this photo?')) return;
-  try{ await bkApi('/catalog-images?id='+id, { method:'DELETE' });
+  try{
+    const img = ctlgOpenImages.find(i=>i.id===id);
+    const { error } = await db.from('catalog_images').delete().eq('id', id);
+    if(error) throw error;
+    if(img && img.storage_path){ db.storage.from(img.storage_bucket||CATALOG_PHOTO_BUCKET2).remove([img.storage_path]).catch(()=>{}); }
     ctlgOpenImages = ctlgOpenImages.filter(i=>i.id!==id); render();
-  }catch(e){ toast('⚠ '+e.message); }
+  }catch(e){ toast('⚠ '+(e.message||e)); }
 }
 async function persistCatalogImageOrder(){
   const grid = document.getElementById('ctlgImgGrid'); if(!grid) return;
   const ids = Array.from(grid.querySelectorAll('.bkImgCard')).map(c=>c.dataset.imgId).filter(Boolean);
-  const payload = ids.map((id,i)=>({ id, position:i }));
-  try{ await bkApi('/catalog-images', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  try{
+    for(let i=0;i<ids.length;i++){ await db.from('catalog_images').update({ position:i }).eq('id', ids[i]); }
     ctlgOpenImages = ids.map((id,i)=> Object.assign({}, ctlgOpenImages.find(x=>x.id===id), { position:i }));
-  }catch(e){ toast('⚠ Reorder failed: '+e.message); }
+  }catch(e){ toast('⚠ Reorder failed: '+(e.message||e)); }
 }
 
 /* ===== Bikes admin: product CRUD + image management =====
