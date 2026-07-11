@@ -576,17 +576,17 @@
   .catgrouphead{display:flex;align-items:center;gap:8px;margin:0 0 4px;}
   .catgrouphead .caticon{font-size:20px;}
   .catgrouphead h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0;}
-  .catgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px;}
+  .catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;}
   .catcard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .16s,box-shadow .2s;display:flex;flex-direction:column;}
   .catcard:active{transform:scale(.98);}
   @media (hover:hover){ .catcard:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.10);} }
   .catcard .catmedia{aspect-ratio:1/1;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-  .catcard .catmedia img{width:100%;height:100%;object-fit:contain;padding:12px;mix-blend-mode:multiply;}
+  .catcard .catmedia img{width:100%;height:100%;object-fit:contain;padding:10px;mix-blend-mode:multiply;image-rendering:-webkit-optimize-contrast;}
   .catcard .catmedia .ph{font-size:38px;opacity:.8;}
   .catcard .cattx{padding:11px 12px 13px;display:flex;flex-direction:column;gap:3px;}
   .catcard .cattl{font-size:13px;font-weight:700;letter-spacing:-.01em;line-height:1.25;}
   .catcard .catpr{font-size:12.5px;color:var(--red,#e0245e);font-weight:800;}
-  @media (max-width:560px){ .catgrid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .catgrid{grid-template-columns:repeat(3,1fr);gap:8px;} .catcard .cattl{font-size:11.5px;} .catcard .catpr{font-size:11px;} .catcard .cattx{padding:8px 8px 10px;} }
 
   /* ---- catalog product sheet ---- */
   .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
@@ -739,16 +739,16 @@
     <div class="grid" id="grid"></div>
   </section>
 
-  <!-- ===== shop more categories ===== -->
-  <section id="more">
-    <div class="morehead"><h2>Shop More Categories</h2><a href="bikes.html" id="moreViewAll">View all</a></div>
-    <div class="moregrid" id="moreGrid"></div>
-  </section>
-
   <!-- ===== live catalog (accessories, kitchen, electronics, …) from admin ===== -->
   <section id="catalog" style="display:none;">
     <div class="sechead"><div><h2>More from MiStore</h2><p>Accessories, kitchen, electronics and more — tap any item to order on WhatsApp.</p></div></div>
     <div id="catalogSections"></div>
+  </section>
+
+  <!-- ===== shop more categories ===== -->
+  <section id="more">
+    <div class="morehead"><h2>Shop More Categories</h2><a href="bikes.html" id="moreViewAll">View all</a></div>
+    <div class="moregrid" id="moreGrid"></div>
   </section>
 
   <section id="how">
@@ -1468,6 +1468,11 @@ function renderDepts(){
 function selectDept(key){
   const d=deptDef(key);
   if(d.href){ window.location.href=d.href; return; }   /* Bikes -> its own page */
+  /* Accessories/Gadgets live in the catalog section — jump straight to the products */
+  const catSec=document.getElementById('catalog');
+  if((key==='accessories'||key==='gadgets') && catSec && catSec.style.display!=='none'){
+    catSec.scrollIntoView({behavior:'smooth',block:'start'}); return;
+  }
   dept=key;
   const bl=brandList(); category=(bl.find(b=>b.ready)||bl[0]||{}).key;
   renderDepts(); renderBrands(); renderTabs(); renderGrid();
@@ -2194,7 +2199,7 @@ function openCatSheet(id){
   const price = p.price_from_ngn ? ('From '+fmtCatalog(p.price_from_ngn)) : 'Price on request';
   const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${i===0?'on':''}" alt="">`).join('')}</div>` : '';
   $('catSheetBody').innerHTML = `
-    <div class="csmedia"><img id="csMainImg" src="${imgs[0]||''}" alt="${esc(p.name||'')}" onerror="this.style.display='none'"></div>
+    <div class="csmedia"><img id="csMainImg" src="${imgs[0]||''}" alt="${esc(p.name||'')}" onerror="this.style.display='none'" onload="if(this.naturalWidth&&this.naturalWidth<300){this.parentNode.style.maxHeight='230px';this.style.padding='28px';}"></div>
     ${thumbs}
     <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')}</div>
     <h3 class="csname">${esc(p.name||'Item')}</h3>
@@ -2220,12 +2225,18 @@ async function loadStorefrontCatalog(){
   let rows;
   try{
     const { data, error } = await c.from('catalog_products')
-      .select('id,name,brand,description,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
+      .select('id,name,brand,description,supplier_id,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
       .eq('status','published').limit(400);
     if(error) throw error; rows = data||[];
   }catch(e){ console.warn('[MiStore catalog] DB fetch failed — using bundled catalog:', e && (e.message||e)); return loadBundledCatalog(); }
-  if(!rows.length){ console.info('[MiStore catalog] 0 published products in DB — using bundled catalog'); return loadBundledCatalog(); }
-  renderCatalogRows(rows);
+  /* Merge: admin-managed products win; the bundled catalog fills in everything
+     not (yet) managed in the admin, so ALL products always show. */
+  const bundled = await fetchBundledRows();
+  const have = new Set(rows.map(r=>String(r.supplier_id||'')).filter(Boolean));
+  const merged = rows.concat(bundled.filter(b=>!have.has(String(b.supplier_id))));
+  if(!merged.length){ console.info('[MiStore catalog] no products anywhere'); return; }
+  console.info('[MiStore catalog] showing '+rows.length+' admin + '+(merged.length-rows.length)+' bundled products');
+  renderCatalogRows(merged);
 }
 
 function renderCatalogRows(rows){
@@ -2256,6 +2267,10 @@ const BUNDLED_CATS = {
   earphone:{name:'Earbuds',slug:'earphone',icon:'🎧',position:4,label:'Wireless Earbuds'},
 };
 async function loadBundledCatalog(){
+  const rows = await fetchBundledRows();
+  if(rows.length){ console.info('[MiStore catalog] showing '+rows.length+' bundled products'); renderCatalogRows(rows); }
+}
+async function fetchBundledRows(){
   /* live rates if reachable, house defaults otherwise */
   let rate=208, margin=15;
   try{
@@ -2279,12 +2294,12 @@ async function loadBundledCatalog(){
       const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
       if(cap) nm=cap[1]+'mAh '+cat.label;
       nm+=' · '+String(p.supplier_id).slice(-4);
-      rows.push({ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'',
+      rows.push({ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'', supplier_id:String(p.supplier_id),
         price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
         _localImgs:imgs, catalog_categories:cat, catalog_images:[] });
     });
   }
-  if(rows.length){ console.info('[MiStore catalog] showing '+rows.length+' bundled products'); renderCatalogRows(rows); }
+  return rows;
 }
 
 (function waitSb(tries){
