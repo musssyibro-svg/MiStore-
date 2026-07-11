@@ -70,7 +70,7 @@ see §8).
 - `bike_config(id, shipping_per_cbm_ngn, logistics_service_ngn, rmb_to_ngn, usd_to_rmb, …)`
 
 **Catalog (reusable engine)**
-- `store_settings(id, exchange_rate, sea_rate_per_cbm, air_rate_per_kg, …)`
+- `store_settings(id, exchange_rate, sea_rate_per_cbm, air_rate_per_kg, default_profit_pct, …)`
 - `catalog_categories(id, parent_id, name, slug, position, featured, hidden, icon, metadata jsonb, …)` — `metadata.fields` holds each category's custom spec schema.
 - `catalog_products(id, category_id, supplier_id, name, slug, brand, supplier, description, moq, qty_per_carton, sold_by_carton, weight_kg, cbm, stock, featured, show_on_homepage, status, seo jsonb, metadata jsonb, …)` — `metadata.attributes` holds per-product custom field values; `metadata.legacy_image` points at the imported supplier photo until one is uploaded.
 - `catalog_variants(id, product_id, spec1, spec2, variant_label, sku, rmb_price, profit_ngn, moq, qty_per_carton, weight_kg, cbm, stock, position, is_default, …)`
@@ -80,8 +80,12 @@ see §8).
 
 **Pricing formula (catalog):** `total = (rmb_price × exchange_rate) + shipping
 (sea = cbm × sea_rate_per_cbm, or air = weight_kg × air_rate_per_kg, or none) +
-profit_ngn`. Computed live from `store_settings` — changing one rate updates every
-product. Customers never see `rmb_price`.
+profit`. When a variant has an explicit `profit_ngn` it is used; **when profit is
+blank, the temporary default margin applies**: `total = (cost + shipping) × (1 +
+default_profit_pct/100)` (default **15%**, editable in Store settings — e.g. a
+₦10,000 cost+shipping → ₦11,500). An explicit ₦0 profit is honoured (no margin).
+Computed live from `store_settings` — changing one rate updates every product.
+Customers never see `rmb_price`.
 
 ---
 
