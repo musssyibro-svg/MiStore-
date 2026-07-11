@@ -2183,8 +2183,9 @@ function catStoreCard(p){
 function openCatSheet(id){
   const p = CAT_STORE[id]; if(!p) return;
   const sheet = $('catSheet'); if(!sheet) return;
-  const imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)))
+  let imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)))
     .map(i=>`${SUPABASE_URL}/storage/v1/object/public/${i.storage_bucket||'catalog-photos'}/${i.storage_path}`);
+  if(!imgs.length && p._localImgs && p._localImgs.length) imgs = p._localImgs.slice(0,6);
   if(!imgs.length && p.metadata && p.metadata.legacy_image) imgs.push('catalog-import/'+p.metadata.legacy_image);
   const cat = p.catalog_categories||{};
   const attrs = (p.metadata&&p.metadata.attributes)||{};
@@ -2215,15 +2216,19 @@ function openCatSheet(id){
 
 async function loadStorefrontCatalog(){
   const c = (typeof getClient==='function') ? getClient() : null;
-  if(!c){ console.warn('[MiStore catalog] supabase-js not loaded — live products skipped'); return; }
+  if(!c){ console.warn('[MiStore catalog] supabase-js not loaded — using bundled catalog'); return loadBundledCatalog(); }
   let rows;
   try{
     const { data, error } = await c.from('catalog_products')
       .select('id,name,brand,description,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
       .eq('status','published').limit(400);
     if(error) throw error; rows = data||[];
-  }catch(e){ console.warn('[MiStore catalog] fetch failed:', e && (e.message||e)); return; }  /* section stays hidden; rest of storefront unaffected */
-  if(!rows.length){ console.info('[MiStore catalog] 0 published products — publish in Admin → Products'); return; }
+  }catch(e){ console.warn('[MiStore catalog] DB fetch failed — using bundled catalog:', e && (e.message||e)); return loadBundledCatalog(); }
+  if(!rows.length){ console.info('[MiStore catalog] 0 published products in DB — using bundled catalog'); return loadBundledCatalog(); }
+  renderCatalogRows(rows);
+}
+
+function renderCatalogRows(rows){
   rows.forEach(p=>{ CAT_STORE[p.id]=p; });
   const groups = {};
   rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
@@ -2240,9 +2245,52 @@ async function loadStorefrontCatalog(){
   host.querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=> openCatSheet(el.dataset.catid); });
 }
 
+/* BUNDLED CATALOG FALLBACK — the supplier catalog ships inside the site itself
+   (catalog-import/), so customers see the new products even before the
+   database is set up. The moment the admin publishes products in Supabase,
+   that version takes over automatically. */
+const BUNDLED_CATS = {
+  smartwatch:{name:'Smart Watches',slug:'smartwatch',icon:'⌚',position:1,label:'Smart Watch'},
+  powerbank:{name:'Power Banks',slug:'powerbank',icon:'🔋',position:2,label:'Power Bank'},
+  speaker:{name:'Speakers',slug:'speaker',icon:'🔊',position:3,label:'Speaker'},
+  earphone:{name:'Earbuds',slug:'earphone',icon:'🎧',position:4,label:'Wireless Earbuds'},
+};
+async function loadBundledCatalog(){
+  /* live rates if reachable, house defaults otherwise */
+  let rate=208, margin=15;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=exchange_rate,default_profit_pct`,
+      {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
+    if(r.ok){ const j=await r.json(); if(j[0]){ rate=+j[0].exchange_rate||208; margin=(j[0].default_profit_pct==null?15:+j[0].default_profit_pct); } }
+  }catch(e){}
+  const rows=[];
+  for(const key of Object.keys(BUNDLED_CATS)){
+    let arr;
+    try{ arr = await (await fetch('catalog-import/data/'+key+'_products.json',{cache:'no-store'})).json(); }
+    catch(e){ continue; }
+    const cat=BUNDLED_CATS[key];
+    (arr.products||arr||[]).forEach(p=>{
+      const vs=(p.variants||[]).filter(v=>v.rmb_price>0);
+      const min=vs.length? Math.min.apply(null,vs.map(v=>v.rmb_price)) : 0;
+      const priceFrom = min? Math.round(min*rate*(1+margin/100)) : null;
+      const imgs=[...new Set((p.variants||[]).map(v=>v.image).filter(Boolean))].map(u=>'catalog-import/'+u);
+      /* friendlier name: pull a capacity like 10000毫安 out of the specs when present */
+      let nm=cat.label;
+      const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
+      if(cap) nm=cap[1]+'mAh '+cat.label;
+      nm+=' · '+String(p.supplier_id).slice(-4);
+      rows.push({ id:'local-'+key+'-'+p.supplier_id, name:nm, description:'',
+        price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
+        _localImgs:imgs, catalog_categories:cat, catalog_images:[] });
+    });
+  }
+  if(rows.length){ console.info('[MiStore catalog] showing '+rows.length+' bundled products'); renderCatalogRows(rows); }
+}
+
 (function waitSb(tries){
   if(window.supabase){ loadLive(); loadShowcase(); loadStorefrontCatalog(); }
   else if(tries>0){ setTimeout(()=>waitSb(tries-1),150); }
+  else { loadBundledCatalog(); }   /* even with no supabase-js at all, products still show */
 })(40);
 </script>
 </body>

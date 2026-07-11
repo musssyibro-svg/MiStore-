@@ -591,6 +591,7 @@
     <div class="tabgrouprow">
       <button class="tab" data-tab="storesettings">⚙️ Store</button>
       <button class="tab" data-tab="bikes">💰 Bike pricing</button>
+      <a class="tab" href="health.html" style="text-decoration:none;">🩺 Health</a>
     </div>
   </div>
 </div>
@@ -1522,8 +1523,8 @@ function ctlgCoverUrl(p){
   return '';
 }
 
-async function importExistingCatalog(){
-  if(!confirm('Import accessories (earbuds, power banks, speakers, smart watches) from the supplier catalog as drafts? Safe to run — it skips products already imported.')) return;
+async function importExistingCatalog(publishNow, skipConfirm){
+  if(!skipConfirm && !confirm('Import accessories (earbuds, power banks, speakers, smart watches) from the supplier catalog'+(publishNow?' and publish them':' as drafts')+'? Safe to run — it skips products already imported.')) return 0;
   const btn=document.getElementById('ctlgImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
   try{
     await loadCatalogCategories();
@@ -1542,7 +1543,7 @@ async function importExistingCatalog(){
         const firstImg = (p.variants||[]).find(v=>v.image)?.image || null;
         const { data:created, error } = await db.from('catalog_products').insert({
           category_id: catBySlug[p.category]||null, supplier_id: String(p.supplier_id),
-          name: p.name_guess || (p.category+'-'+p.supplier_id), status:'draft',
+          name: p.name_guess || (p.category+'-'+p.supplier_id), status: publishNow?'published':'draft',
           metadata:{ legacy_image:firstImg, variant_count:p.variant_count||((p.variants||[]).length) }
         }).select('id').single();
         if(error) throw error;
@@ -1555,9 +1556,12 @@ async function importExistingCatalog(){
         have.add(String(p.supplier_id)); n++;
       }
     }
-    toast('✓ Imported '+n+' products as drafts — review and publish them'); ctlgProducts=[]; ctlgLoaded=false; render();
+    toast('✓ Imported '+n+' products'+(publishNow?' — they are LIVE on the store':' as drafts — review and publish them')); ctlgProducts=[]; ctlgLoaded=false; render();
+    if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
+    return n;
   }catch(e){ toast('⚠ Import failed: '+(e.message||e)); }
   if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
+  return 0;
 }
 
 /* Products matching the current search + category (before the status chip). */
@@ -1624,6 +1628,37 @@ function bindCtlgListEvents(){
 }
 function refreshCtlgList(){ const w=document.getElementById('ctlgListWrap'); if(w){ w.innerHTML=ctlgListInnerHTML(); bindCtlgListEvents(); } }
 
+/* ONE-TAP STORE SETUP — every launch step in order, no knowledge needed:
+   1. imports the accessories catalog (skips duplicates)
+   2. publishes anything still in drafts
+   3. computes every customer price at current rates + margin
+   4. imports the bikes catalog if the bikes table is empty
+   Safe to tap again any time — every step skips what's already done. */
+async function oneTapSetup(){
+  const btn=document.getElementById('oneTapBtn');
+  const say=(t)=>{ if(btn) btn.textContent=t; };
+  if(btn) btn.disabled=true;
+  try{
+    if(!storeSettings) await loadStoreSettings();
+    say('1/4 Importing products…');
+    const { data:cp } = await db.from('catalog_products').select('id').limit(1);
+    if(!cp || !cp.length) await importExistingCatalog(true, true);
+    say('2/4 Publishing drafts…');
+    const { data:drafts } = await db.from('catalog_products').select('id').eq('status','draft');
+    const dids=(drafts||[]).map(d=>d.id);
+    for(let i=0;i<dids.length;i+=100){ const { error } = await db.from('catalog_products').update({status:'published'}).in('id',dids.slice(i,i+100)); if(error) throw error; }
+    say('3/4 Setting customer prices…');
+    await recomputeAllCatalogPrices();
+    say('4/4 Importing bikes…');
+    const { data:bk } = await db.from('bikes').select('id').limit(1);
+    if(!bk || !bk.length) await importExistingBikes(true);
+    ctlgProducts=[]; ctlgLoaded=false;
+    toast('🎉 Store is set up — your products are LIVE on the customer page.');
+    render();
+  }catch(e){ toast('⚠ Setup stopped: '+(e.message||e)); }
+  if(btn){ btn.disabled=false; btn.textContent='🚀 Put my store online (one tap)'; }
+}
+
 function renderCatalogTab(){
   if(ctlgOpenId){ renderCatalogForm(); return; }
   if(!ctlgCategories.length) loadCatalogCategories();
@@ -1643,10 +1678,12 @@ function renderCatalogTab(){
       <button class="cpBtn" id="ctlgManageCatsBtn" style="width:auto;">⚙ Categories</button>
       <button class="cpBtn primary" id="ctlgNewBtn">+ New product</button>
     </div>
+    <button class="cpBtn primary" id="oneTapBtn" style="width:100%;margin:2px 0 10px;padding:13px;font-size:15px;">🚀 Put my store online (one tap)</button>
     <div id="ctlgListWrap">${ctlgListInnerHTML()}</div>
   `;
 
   document.getElementById('ctlgNewBtn').onclick = ()=> openCatalogForm('new');
+  const ot=document.getElementById('oneTapBtn'); if(ot) ot.onclick=oneTapSetup;
   document.getElementById('ctlgManageCatsBtn').onclick = ()=>{ ctlgView='categories'; loadCatalogCategories().then(render); };
   const search = document.getElementById('ctlgSearchInput');
   search.oninput = ()=>{ ctlgSearch = search.value.trim(); refreshCtlgList(); };            // list-only refresh keeps focus
@@ -2089,8 +2126,8 @@ function bkCoverUrl(bike){
   if(bike.metadata && bike.metadata.legacy_image) return 'assets/bikes/images/'+bike.metadata.legacy_image;
   return '';
 }
-async function importExistingBikes(){
-  if(!confirm('Import your existing bikes from the current catalog into the database? Safe to run — it skips ones already imported.')) return;
+async function importExistingBikes(skipConfirm){
+  if(!skipConfirm && !confirm('Import your existing bikes from the current catalog into the database? Safe to run — it skips ones already imported.')) return;
   const btn=document.getElementById('bkAdmImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
   try{
     const d = await (await fetch('assets/bikes/data/products.json',{cache:'no-store'})).json();
