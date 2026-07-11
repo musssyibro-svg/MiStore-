@@ -588,6 +588,22 @@
   .catcard .catpr{font-size:12.5px;color:var(--red,#e0245e);font-weight:800;}
   @media (max-width:560px){ .catgrid{grid-template-columns:repeat(2,1fr);} }
 
+  /* ---- catalog product sheet ---- */
+  .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
+  .csmedia img{width:100%;height:100%;object-fit:contain;padding:16px;mix-blend-mode:multiply;}
+  .csthumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch;}
+  .csthumbs img{width:56px;height:56px;flex:0 0 auto;object-fit:contain;background:#fff;border:2px solid var(--line);border-radius:12px;padding:5px;cursor:pointer;mix-blend-mode:multiply;}
+  .csthumbs img.on{border-color:var(--red,#e0245e);}
+  .cskicker{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);}
+  .csname{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:2px 0 4px;}
+  .csprice{font-size:17px;font-weight:800;color:var(--red,#e0245e);margin-bottom:8px;}
+  .csdesc{font-size:13.5px;color:var(--muted);line-height:1.55;margin:0 0 12px;}
+  .csspecs{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+  .csrow{display:flex;justify-content:space-between;gap:12px;padding:9px 13px;font-size:13px;border-bottom:1px solid var(--line);}
+  .csrow:last-child{border-bottom:none;}
+  .csrow span{color:var(--muted);text-transform:capitalize;}
+  .csnote{font-size:11.5px;color:var(--faint);text-align:center;margin:10px 0 0;}
+
   /* ---- why MiStore band ---- */
   .whyband{background:var(--ink);color:#fff;border-radius:22px;padding:22px 20px;margin-top:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
   :root[data-theme="dark"] .whyband{background:var(--card);border:1px solid var(--line);}
@@ -808,6 +824,12 @@
   <div class="sbody" id="checkoutBody"></div>
 </div>
 
+<div class="sheet" id="catSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Product</h2><button class="xbtn" id="csClose">✕</button></div>
+  <div class="sbody" id="catSheetBody"></div>
+</div>
+
 <div class="sheet" id="wishSheet">
   <div class="grab"></div>
   <div class="shead"><h2>Wishlist</h2><button class="xbtn" id="wSheetClose">✕</button></div>
@@ -826,8 +848,10 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(s);"></script>
+<!-- supabase-js is SELF-HOSTED (assets/vendor/) so live products load on every
+     network — CDNs are the fallback, not the requirement. -->
+<script src="assets/vendor/supabase.min.js"
+        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onerror=function(){var u=document.createElement('script');u.src='https://unpkg.com/@supabase/supabase-js@2';document.head.appendChild(u)};document.head.appendChild(s);"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"
         onerror="window._gsapFailed=true"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
@@ -1789,8 +1813,8 @@ function setBackgroundActive(active){
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
-scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets;
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
 $('cartbar').onclick=openCart;
@@ -2134,25 +2158,73 @@ function catStoreImg(p){
   if(p.metadata&&p.metadata.legacy_image) return 'catalog-import/'+p.metadata.legacy_image;
   return '';
 }
+/* Catalog price display: accessories can cost ₦3,000 — rounding those up to the
+   nearest ₦5k (the phone/bike rule) would overstate them badly. Under ₦50k we
+   show the near-exact figure (rounded UP to the next ₦100); above ₦50k we keep
+   the store-wide 5k rule. */
+function fmtCatalog(n){
+  const v = +n||0;
+  if(v >= 50000) return fmtK(v);
+  return '₦' + (Math.ceil(v/100)*100).toLocaleString();
+}
+const CAT_STORE = {};   /* id -> product, for the detail sheet */
 function catStoreCard(p){
   const img=catStoreImg(p);
-  const price = p.price_from_ngn ? ('From '+fmtK(p.price_from_ngn)) : 'Tap to enquire';
+  const price = p.price_from_ngn ? ('From '+fmtCatalog(p.price_from_ngn)) : 'Tap to enquire';
   const media = img ? `<img src="${img}" loading="lazy" alt="${esc(p.name||'')}" onerror="this.parentNode.innerHTML='<span class=&quot;ph&quot;>📦</span>'">` : '<span class="ph">📦</span>';
-  return `<div class="catcard" data-order="${esc(p.name||'Item')}">
+  return `<div class="catcard" data-catid="${p.id}">
     <div class="catmedia">${media}</div>
     <div class="cattx"><div class="cattl">${esc(p.name||'Item')}</div><div class="catpr">${price}</div></div>
   </div>`;
 }
+
+/* Product detail sheet — same premium sheet pattern as phones, so tapping a
+   catalog item feels native to the store instead of bouncing straight out. */
+function openCatSheet(id){
+  const p = CAT_STORE[id]; if(!p) return;
+  const sheet = $('catSheet'); if(!sheet) return;
+  const imgs=(p.catalog_images||[]).slice().sort((a,b)=>((b.is_cover?1:0)-(a.is_cover?1:0))||((a.position||0)-(b.position||0)))
+    .map(i=>`${SUPABASE_URL}/storage/v1/object/public/${i.storage_bucket||'catalog-photos'}/${i.storage_path}`);
+  if(!imgs.length && p.metadata && p.metadata.legacy_image) imgs.push('catalog-import/'+p.metadata.legacy_image);
+  const cat = p.catalog_categories||{};
+  const attrs = (p.metadata&&p.metadata.attributes)||{};
+  const attrRows = Object.keys(attrs).filter(k=>String(attrs[k]||'').trim()!=='')
+    .map(k=>`<div class="csrow"><span>${esc(k.replace(/-/g,' '))}</span><b>${esc(attrs[k])}</b></div>`).join('');
+  const price = p.price_from_ngn ? ('From '+fmtCatalog(p.price_from_ngn)) : 'Price on request';
+  const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${i===0?'on':''}" alt="">`).join('')}</div>` : '';
+  $('catSheetBody').innerHTML = `
+    <div class="csmedia"><img id="csMainImg" src="${imgs[0]||''}" alt="${esc(p.name||'')}" onerror="this.style.display='none'"></div>
+    ${thumbs}
+    <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')}</div>
+    <h3 class="csname">${esc(p.name||'Item')}</h3>
+    <div class="csprice">${price}</div>
+    ${p.description?`<p class="csdesc">${esc(p.description)}</p>`:''}
+    ${attrRows?`<div class="csspecs">${attrRows}</div>`:''}
+    <button class="addbtn" id="csOrderBtn">Order on WhatsApp</button>
+    <p class="csnote">We confirm colour, model and availability with you on WhatsApp before you pay.</p>`;
+  $('csOrderBtn').onclick = ()=>{
+    const msg = 'Hi MiStore, I want to order: '+(p.name||'Item')+(p.price_from_ngn?(' ('+fmtCatalog(p.price_from_ngn)+')'):'');
+    window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
+  };
+  sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{
+    $('csMainImg').src = t.src;
+    sheet.querySelectorAll('[data-csidx]').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+  };});
+  showSheet(sheet);
+}
+
 async function loadStorefrontCatalog(){
-  const c = (typeof getClient==='function') ? getClient() : null; if(!c) return;
+  const c = (typeof getClient==='function') ? getClient() : null;
+  if(!c){ console.warn('[MiStore catalog] supabase-js not loaded — live products skipped'); return; }
   let rows;
   try{
     const { data, error } = await c.from('catalog_products')
-      .select('id,name,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
+      .select('id,name,brand,description,price_from_ngn,metadata,catalog_categories(name,slug,icon,position),catalog_images(storage_path,storage_bucket,is_cover,position)')
       .eq('status','published').limit(400);
     if(error) throw error; rows = data||[];
-  }catch(e){ return; }            /* fail silent — rest of storefront unaffected */
-  if(!rows.length) return;
+  }catch(e){ console.warn('[MiStore catalog] fetch failed:', e && (e.message||e)); return; }  /* section stays hidden; rest of storefront unaffected */
+  if(!rows.length){ console.info('[MiStore catalog] 0 published products — publish in Admin → Products'); return; }
+  rows.forEach(p=>{ CAT_STORE[p.id]=p; });
   const groups = {};
   rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
     const k=cat.slug||'more'; (groups[k]=groups[k]||{cat,items:[]}).items.push(p); });
@@ -2165,10 +2237,7 @@ async function loadStorefrontCatalog(){
   const host=document.getElementById('catalogSections'); if(!host) return;
   host.innerHTML = html;
   const sec=document.getElementById('catalog'); if(sec) sec.style.display='';
-  host.querySelectorAll('[data-order]').forEach(el=>{ el.onclick=()=>{
-    const nm=el.getAttribute('data-order');
-    window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to order: '+nm),'_blank','noopener');
-  }; });
+  host.querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=> openCatSheet(el.dataset.catid); });
 }
 
 (function waitSb(tries){

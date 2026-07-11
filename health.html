@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>MiStore Health Check</title>
+<style>
+  :root{--bg:#f6f6f4;--card:#fff;--line:rgba(0,0,0,.09);--tx:#111;--muted:#666;--ok:#0a7d33;--bad:#c81e3e;--warn:#a86400;}
+  @media (prefers-color-scheme:dark){ :root{--bg:#111214;--card:#1b1c1f;--line:rgba(255,255,255,.1);--tx:#f2f2f2;--muted:#9a9a9a;} }
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);padding:18px 14px 60px;max-width:680px;margin:0 auto;}
+  h1{font-size:22px;letter-spacing:-.02em;margin:8px 0 2px;}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:16px;}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;}
+  .check h3{font-size:14px;display:flex;align-items:center;gap:8px;}
+  .st{font-size:16px;}
+  .detail{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
+  .fix{font-size:12.5px;margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(200,30,62,.08);color:var(--bad);line-height:1.5;}
+  .ok .fix{display:none;}
+  button{font:inherit;font-weight:700;background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:11px 20px;cursor:pointer;margin:6px 0 18px;}
+  .errlog{font-size:11.5px;font-family:ui-monospace,Menlo,monospace;color:var(--bad);white-space:pre-wrap;word-break:break-word;}
+</style>
+</head>
+<body>
+<h1>🩺 MiStore Health Check</h1>
+<p class="sub">Runs every live check from THIS device's network — deployment, database, security policy, published products, images, and errors. Screenshot the results if you need help.</p>
+<button onclick="runAll()">▶ Run all checks again</button>
+<div id="checks"></div>
+<div class="check"><h3>🧯 JavaScript errors captured on this page</h3><div class="errlog" id="jsErrors">none</div></div>
+
+<script>
+const SUPABASE_URL='https://pisfsnmwwotxxuouogqz.supabase.co';
+const ANON='sb_publishable_qAJggq-HDq-zea6ZaAGEfA_6Sft-8rc';
+const H={apikey:ANON, Authorization:'Bearer '+ANON};
+const BUILD='2026-07-12-1';   /* bumped on each deploy of this file */
+const jsErrs=[];
+window.onerror=(m,s,l,c)=>{ jsErrs.push(m+' @ '+(s||'').split('/').pop()+':'+l); document.getElementById('jsErrors').textContent=jsErrs.join('\n'); };
+
+const CHECKS=[
+ {id:'deploy', name:'1 · GitHub Pages serving the latest code',
+  run: async ()=>{
+    const r=await fetch('https://api.github.com/repos/musssyibro-svg/MiStore-/commits/main',{cache:'no-store'});
+    if(!r.ok) return {ok:null, d:'GitHub API answered '+r.status+' — cannot compare (not a store problem).'};
+    const j=await r.json();
+    const when=new Date(j.commit.committer.date);
+    const mins=Math.round((Date.now()-when.getTime())/60000);
+    return {ok:true, d:'Newest commit on main: "'+j.commit.message.split('\n')[0]+'" ('+mins+' min ago, '+j.sha.slice(0,7)+').\nThis page build: '+BUILD+'. If you deployed minutes ago and still see old pages, hard-refresh with ?v='+Date.now()};
+  },
+  fix:'Open pages with a fresh ?v= number, or Settings → Pages must be Deploy from branch: main /(root).'},
+
+ {id:'sblib', name:'2 · Supabase library loads (self-hosted)',
+  run: async ()=>{
+    const r=await fetch('assets/vendor/supabase.min.js',{cache:'no-store'});
+    if(!r.ok) return {ok:false, d:'assets/vendor/supabase.min.js answered '+r.status};
+    const t=await r.text();
+    return {ok:t.includes('createClient'), d:'File served, '+Math.round(t.length/1024)+'KB'+(t.includes('createClient')?', looks valid.':' — but does NOT look like supabase-js!')};
+  },
+  fix:'The storefront cannot load live products without this file. Redeploy or check the file exists on main.'},
+
+ {id:'reach', name:'3 · Supabase database reachable',
+  run: async ()=>{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/store_settings?id=eq.default&select=exchange_rate,default_profit_pct',{headers:H});
+    const b=await r.text();
+    if(!r.ok) return {ok:false, d:'HTTP '+r.status+' — '+b.slice(0,300)};
+    const j=JSON.parse(b);
+    return {ok:j.length>0, d:j.length? ('Connected. Rates: ¥→₦ '+j[0].exchange_rate+', margin '+(j[0].default_profit_pct??'—')+'%') : 'Connected, but store_settings has no default row.'};
+  },
+  fix:'Run CATALOG_SETUP.sql in Supabase → SQL Editor (creates store_settings and the default row).'},
+
+ {id:'pub', name:'4 · Published products visible to customers (RLS)',
+  run: async ()=>{
+    const q='/rest/v1/catalog_products?status=eq.published&select=id,name,price_from_ngn,catalog_categories(name),catalog_images(storage_path)&limit=200';
+    const r=await fetch(SUPABASE_URL+q,{headers:H});
+    const b=await r.text();
+    if(!r.ok) return {ok:false, d:'HTTP '+r.status+' — '+b.slice(0,300)};
+    const j=JSON.parse(b);
+    if(!j.length) return {ok:false, d:'0 published products. This is exactly why the customer page shows nothing.'};
+    const noPrice=j.filter(p=>p.price_from_ngn==null).length;
+    return {ok:true, d:j.length+' published product(s). Sample: '+j.slice(0,3).map(p=>p.name).join(' · ')+(noPrice?('\n⚠ '+noPrice+' have no customer price — tap "Recompute all product prices" in Admin → Settings → Store.'):'')};
+  },
+  fix:'Admin → Products → ⬇ Import (if empty) → ✓ Publish all shown. Drafts are never shown to customers.'},
+
+ {id:'cats', name:'5 · Categories readable',
+  run: async ()=>{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/catalog_categories?select=name,hidden&order=position',{headers:H});
+    const b=await r.text();
+    if(!r.ok) return {ok:false, d:'HTTP '+r.status+' — '+b.slice(0,200)};
+    const j=JSON.parse(b);
+    return {ok:j.length>0, d:j.length+' categories: '+j.filter(c=>!c.hidden).map(c=>c.name).join(', ')};
+  },
+  fix:'Run CATALOG_SETUP.sql to create and seed catalog_categories.'},
+
+ {id:'img', name:'6 · Product photos load from storage',
+  run: async ()=>{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/catalog_images?select=storage_bucket,storage_path&limit=1',{headers:H});
+    const j=r.ok? await r.json():[];
+    if(!j.length) return {ok:null, d:'No uploaded photos yet (imported products use their bundled supplier image — that is fine).'};
+    const u=SUPABASE_URL+'/storage/v1/object/public/'+(j[0].storage_bucket||'catalog-photos')+'/'+j[0].storage_path;
+    const ir=await fetch(u,{method:'HEAD'});
+    return {ok:ir.ok, d:'Test photo: HTTP '+ir.status+'\n'+u.slice(0,120)+'…'};
+  },
+  fix:'Storage bucket catalog-photos must be Public — re-run CATALOG_SETUP.sql or check Supabase → Storage.'},
+
+ {id:'bikes', name:'7 · Bikes data (admin catalog)',
+  run: async ()=>{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/bikes?select=id&status=eq.published&limit=500',{headers:H});
+    const b=await r.text();
+    if(!r.ok) return {ok:false, d:'HTTP '+r.status+' — '+b.slice(0,200)};
+    const n=JSON.parse(b).length;
+    return {ok:n>0?true:null, d:n+' published bike(s) in the database.'+(n?'':' (The public bikes page still uses its built-in list, so this is not an error.)')};
+  },
+  fix:'Admin → Bikes → ⬇ Import my existing bikes (after running BIKES_SETUP.sql).'},
+
+ {id:'secure', name:'8 · Supplier prices are NOT exposed (security)',
+  run: async ()=>{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/catalog_variants?select=rmb_price&limit=1',{headers:H});
+    const b=await r.text();
+    if(!r.ok) return {ok:true, d:'Anonymous request for supplier prices was rejected (HTTP '+r.status+') — correct.'};
+    const j=JSON.parse(b);
+    return {ok:j.length===0, d:j.length===0?'Query allowed but returns 0 rows to anonymous users — supplier ¥ prices are hidden. Correct.':'❗ SUPPLIER PRICES ARE PUBLIC — fix RLS immediately (re-run CATALOG_SETUP.sql).'};
+  },
+  fix:'Re-run CATALOG_SETUP.sql: catalog_variants must have ONLY the admin (authenticated) policy.'},
+];
+
+async function runAll(){
+  const host=document.getElementById('checks'); host.innerHTML='';
+  for(const c of CHECKS){
+    const el=document.createElement('div'); el.className='check'; el.innerHTML='<h3><span class="st">⏳</span> '+c.name+'</h3><div class="detail">running…</div>';
+    host.appendChild(el);
+    let res;
+    try{ res=await c.run(); }
+    catch(e){ res={ok:false, d:'Network/JS error: '+(e.message||e)}; }
+    const icon = res.ok===true?'✅':(res.ok===null?'ℹ️':'❌');
+    el.className='check'+(res.ok===true?' ok':'');
+    el.innerHTML='<h3><span class="st">'+icon+'</span> '+c.name+'</h3><div class="detail">'+res.d+'</div>'+(res.ok===false?('<div class="fix">Fix: '+c.fix+'</div>'):'');
+  }
+}
+runAll();
+</script>
+</body>
+</html>
