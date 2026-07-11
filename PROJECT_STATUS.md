@@ -154,10 +154,11 @@ hero, GitHub Pages deploy from `main` with `.nojekyll`.
 
 ## 5. Remaining work
 
-- **Customer storefront sections** for catalog products (Accessories/Kitchen/…):
-  the admin manages them, but `index.html` does not yet render them to customers.
-  Requires a public read path (see §8). **Deliberately deferred** until the admin
-  is verified, per the "don't cut over until verified" plan.
+- **Customer storefront sections** for catalog products — **DONE.** `index.html`
+  now renders published catalog products grouped by category (tap → WhatsApp
+  order). Additive/defensive: if the fetch fails or returns nothing, the section
+  hides itself and the rest of the storefront is unaffected. Uses the
+  customer-safe `price_from_ngn` only (see §8) — supplier ¥ cost is never fetched.
 - **Kitchen bulk data**: categories are seeded, but the Kitchen PDFs are not yet
   parsed into `catalog-import/data/`. Kitchen products can be added manually now.
 - **Migrate Phones and Bikes onto the catalog engine** (optional; they work today).
@@ -221,15 +222,20 @@ optional `metadata.fields`).
 
 ## 8. A note on the customer storefront + supplier pricing
 
-`catalog_products` / `catalog_variants` are **admin-read-only** by RLS, so the
-supplier ¥ price (`rmb_price`) can never be read by an anonymous storefront
-visitor. When the customer storefront is built, expose products through **one of**:
-- a computed `customer_price_ngn` column written at save time (like bikes), read
-  via a public policy that excludes `rmb_price`; or
-- a read-only view / materialized projection that omits supplier pricing.
+**Implemented as follows:** `catalog_variants` (which holds `rmb_price`) stays
+**admin-only** by RLS. `catalog_products` has a **public read policy limited to
+`status = 'published'`**, and a computed **`price_from_ngn`** column (cheapest
+variant total incl. margin, no supplier cost) is written by the admin on every
+save and import. The storefront reads only `catalog_products` + `catalog_images`
+(never variants), so supplier ¥ pricing can never reach a customer.
 
-Do **not** simply add a blanket public-read policy to `catalog_variants` — that
-would expose `rmb_price`.
+**Known limitation:** `price_from_ngn` is a snapshot. If you change the exchange
+rate / margin in Store settings, existing products keep their old "from" price
+until re-saved (or re-imported). A future "recompute all prices" admin button can
+refresh them in bulk.
+
+Do **not** add a public-read policy to `catalog_variants` — that would expose
+`rmb_price`.
 
 ---
 
