@@ -1,7 +1,6 @@
 {
  "brand": "Samsung",
  "currency": "RMB",
- "basis": "Xianyu (靓机汇 anchored)",
  "updated": "2026-07-12",
  "models": [
   {
@@ -11,8 +10,7 @@
     {
      "storage": "128GB",
      "buy_rmb": 450,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -23,8 +21,7 @@
     {
      "storage": "128GB",
      "buy_rmb": 480,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -35,8 +32,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 950,
-     "status": "verified",
-     "note": "DeepSeek runs high"
+     "status": "verified"
     }
    ]
   },
@@ -47,8 +43,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 800,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -59,8 +54,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 850,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -71,8 +65,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1350,
-     "status": "verified",
-     "note": "S Pen support; DeepSeek high"
+     "status": "verified"
     }
    ]
   },
@@ -83,8 +76,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "靓机汇 not listed - check Xianyu"
+     "status": "needs-check"
     }
    ]
   },
@@ -95,8 +87,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 900,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -107,8 +98,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1000,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -119,8 +109,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1750,
-     "status": "verified",
-     "note": "S Pen; DeepSeek high"
+     "status": "verified"
     }
    ]
   },
@@ -131,8 +120,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1300,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -143,8 +131,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1600,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -155,8 +142,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1100,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -167,8 +153,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 2450,
-     "status": "verified",
-     "note": "S Pen; DeepSeek high. 8+256 = ¥2,350"
+     "status": "verified"
+    },
+    {
+     "storage": "256GB · 8GB RAM",
+     "buy_rmb": 2350,
+     "status": "verified"
     }
    ]
   },
@@ -179,8 +169,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1950,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -191,8 +180,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 2100,
-     "status": "verified",
-     "note": "No charger in box"
+     "status": "verified"
     }
    ]
   },
@@ -203,8 +191,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "靓机汇 not listed - check Xianyu"
+     "status": "needs-check"
     }
    ]
   },
@@ -215,20 +202,17 @@
     {
      "storage": "256GB",
      "buy_rmb": 3300,
-     "status": "verified",
-     "note": "S Pen; new discounted to ¥5,899"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 3650,
-     "status": "verified",
-     "note": "S Pen"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 4100,
-     "status": "verified",
-     "note": "S Pen"
+     "status": "verified"
     }
    ]
   },
@@ -239,8 +223,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 3050,
-     "status": "verified",
-     "note": "No charger; new RRP ¥5,999"
+     "status": "verified"
     }
    ]
   },
@@ -251,8 +234,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 2600,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -263,8 +245,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 3150,
-     "status": "verified",
-     "note": "new RRP ¥6,999"
+     "status": "verified"
     }
    ]
   },
@@ -275,20 +256,17 @@
     {
      "storage": "256GB",
      "buy_rmb": 4450,
-     "status": "verified",
-     "note": "S Pen"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 5000,
-     "status": "verified",
-     "note": "S Pen"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 5900,
-     "status": "verified",
-     "note": "S Pen (16+1TB)"
+     "status": "verified"
     }
    ]
   },
@@ -299,8 +277,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 3300,
-     "status": "verified",
-     "note": "current gen"
+     "status": "verified"
     }
    ]
   },
@@ -311,14 +288,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 4350,
-     "status": "verified",
-     "note": "current gen"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 4650,
-     "status": "verified",
-     "note": "current gen"
+     "status": "verified"
     }
    ]
   },
@@ -329,20 +304,17 @@
     {
      "storage": "256GB",
      "buy_rmb": 5400,
-     "status": "verified",
-     "note": "S Pen, current gen"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 5800,
-     "status": "verified",
-     "note": "S Pen, current gen"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 7100,
-     "status": "verified",
-     "note": "S Pen (16+1TB)"
+     "status": "verified"
     }
    ]
   },
@@ -353,8 +325,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1250,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -365,8 +336,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1600,
-     "status": "verified",
-     "note": "DeepSeek matches"
+     "status": "verified"
     }
    ]
   },
@@ -377,20 +347,17 @@
     {
      "storage": "256GB",
      "buy_rmb": 1850,
-     "status": "verified",
-     "note": "DeepSeek high"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 1950,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 2050,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -401,14 +368,12 @@
     {
      "storage": "512GB",
      "buy_rmb": 2600,
-     "status": "verified",
-     "note": "DeepSeek ¥4,800 = ERROR"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 2750,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -419,14 +384,12 @@
     {
      "storage": "512GB",
      "buy_rmb": 4500,
-     "status": "verified",
-     "note": "test hinge+crease before buying"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 4850,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -437,20 +400,17 @@
     {
      "storage": "256GB",
      "buy_rmb": 6400,
-     "status": "verified",
-     "note": "new RRP ¥13,999"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 7000,
-     "status": "verified",
-     "note": "new RRP ¥14,999"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 7800,
-     "status": "verified",
-     "note": "16+1TB; new RRP ¥17,499"
+     "status": "verified"
     }
    ]
   },
@@ -461,14 +421,12 @@
     {
      "storage": "512GB",
      "buy_rmb": 12800,
-     "status": "verified",
-     "note": "16+512, ultra-rare"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 13800,
-     "status": "verified",
-     "note": "16+1TB, ultra-rare"
+     "status": "verified"
     }
    ]
   },
@@ -479,14 +437,12 @@
     {
      "storage": "128GB",
      "buy_rmb": 600,
-     "status": "verified",
-     "note": "DeepSeek ¥1,300 way high"
+     "status": "verified"
     },
     {
      "storage": "256GB",
      "buy_rmb": 700,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -497,8 +453,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 800,
-     "status": "verified",
-     "note": "DeepSeek way high. 8+512 = ¥900"
+     "status": "verified"
+    },
+    {
+     "storage": "512GB · 8GB RAM",
+     "buy_rmb": 900,
+     "status": "verified"
     }
    ]
   },
@@ -509,8 +469,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 1300,
-     "status": "verified",
-     "note": "DeepSeek high. 8+512 = ¥1,400"
+     "status": "verified"
+    },
+    {
+     "storage": "512GB · 8GB RAM",
+     "buy_rmb": 1400,
+     "status": "verified"
     }
    ]
   },
@@ -521,14 +485,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 1850,
-     "status": "verified",
-     "note": "DeepSeek high"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 2100,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -539,8 +501,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1550,
-     "status": "verified",
-     "note": "new RRP ¥6,499"
+     "status": "verified"
     }
    ]
   },
@@ -551,14 +512,12 @@
     {
      "storage": "256GB",
      "buy_rmb": 3000,
-     "status": "verified",
-     "note": "new RRP ¥7,999; DeepSeek high"
+     "status": "verified"
     },
     {
      "storage": "512GB",
      "buy_rmb": 3300,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -569,8 +528,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 650,
-     "status": "verified",
-     "note": ""
+     "status": "verified"
     }
    ]
   },
@@ -581,8 +539,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1300,
-     "status": "verified",
-     "note": "S Pen; DeepSeek slightly high"
+     "status": "verified"
     }
    ]
   },
@@ -593,8 +550,7 @@
     {
      "storage": "256GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "靓机汇 not listed - verify"
+     "status": "needs-check"
     }
    ]
   },
@@ -605,8 +561,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "靓机汇 not listed - verify"
+     "status": "needs-check"
     }
    ]
   },
@@ -617,8 +572,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1000,
-     "status": "verified",
-     "note": "12+512"
+     "status": "verified"
     }
    ]
   },
@@ -629,8 +583,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1200,
-     "status": "verified",
-     "note": "12+512"
+     "status": "verified"
     }
    ]
   },
@@ -641,8 +594,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1700,
-     "status": "verified",
-     "note": "16+512"
+     "status": "verified"
     }
    ]
   },
@@ -653,8 +605,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1050,
-     "status": "verified",
-     "note": "12+512"
+     "status": "verified"
     }
    ]
   },
@@ -665,8 +616,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 2300,
-     "status": "verified",
-     "note": "16+512"
+     "status": "verified"
     }
    ]
   },
@@ -677,8 +627,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 1600,
-     "status": "verified",
-     "note": "12+512"
+     "status": "verified"
     }
    ]
   },
@@ -689,8 +638,7 @@
     {
      "storage": "1TB",
      "buy_rmb": 3600,
-     "status": "verified",
-     "note": "16+1TB"
+     "status": "verified"
     }
    ]
   },
@@ -701,8 +649,7 @@
     {
      "storage": "512GB",
      "buy_rmb": 2800,
-     "status": "verified",
-     "note": "12+512"
+     "status": "verified"
     }
    ]
   },
@@ -713,14 +660,12 @@
     {
      "storage": "512GB",
      "buy_rmb": 6400,
-     "status": "verified",
-     "note": "16+512"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 6900,
-     "status": "verified",
-     "note": "16+1TB"
+     "status": "verified"
     }
    ]
   },
@@ -731,14 +676,12 @@
     {
      "storage": "512GB",
      "buy_rmb": 9300,
-     "status": "verified",
-     "note": "16+512, current gen"
+     "status": "verified"
     },
     {
      "storage": "1TB",
      "buy_rmb": 10300,
-     "status": "verified",
-     "note": "16+1TB, current gen"
+     "status": "verified"
     }
    ]
   },
@@ -749,8 +692,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 430,
-     "status": "verified",
-     "note": "A52 5G"
+     "status": "verified"
     }
    ]
   },
@@ -761,8 +703,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 550,
-     "status": "verified",
-     "note": "A53 5G"
+     "status": "verified"
     }
    ]
   },
@@ -773,8 +714,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 600,
-     "status": "verified",
-     "note": "A54 5G"
+     "status": "verified"
     }
    ]
   },
@@ -785,8 +725,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1300,
-     "status": "verified",
-     "note": "A55 5G"
+     "status": "verified"
     }
    ]
   },
@@ -797,8 +736,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1400,
-     "status": "verified",
-     "note": "A56 5G"
+     "status": "verified"
     }
    ]
   },
@@ -809,8 +747,7 @@
     {
      "storage": "256GB",
      "buy_rmb": 1600,
-     "status": "verified",
-     "note": "A57 5G, current"
+     "status": "verified"
     }
    ]
   },
@@ -821,8 +758,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -833,8 +769,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -845,8 +780,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -857,8 +791,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -869,8 +802,7 @@
     {
      "storage": "256GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -881,8 +813,7 @@
     {
      "storage": "256GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -893,8 +824,7 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   },
@@ -905,10 +835,10 @@
     {
      "storage": "128GB",
      "buy_rmb": null,
-     "status": "needs-check",
-     "note": "budget - thin Xianyu data, check live"
+     "status": "needs-check"
     }
    ]
   }
- ]
+ ],
+ "_note": "INTERNAL: buy_rmb are wholesale ¥ buy prices — the storefront computes the ₦ selling price and never displays ¥."
 }
