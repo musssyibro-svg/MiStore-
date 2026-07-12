@@ -624,6 +624,26 @@
   .reqcta{background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:12px 20px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;}
   .reqbtn{margin-top:12px;background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:800;cursor:pointer;}
 
+  /* ---- product sheet controls ---- */
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+  .optchip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:700;color:var(--tx);cursor:pointer;}
+  .optchip.on{border-color:var(--red,#e0245e);color:var(--red,#e0245e);}
+  .qtyrow{display:flex;align-items:center;gap:14px;margin:0 0 14px;}
+  .qbtn{width:44px;height:44px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);font-size:22px;font-weight:700;cursor:pointer;color:var(--tx);}
+  .qbtn:active{transform:scale(.94);}
+  .qval{display:flex;flex-direction:column;align-items:center;min-width:70px;}
+  .qval b{font-size:20px;font-weight:800;}
+  .qval small{font-size:10.5px;color:var(--faint);}
+  .shiprow{display:flex;gap:8px;margin:0 0 14px;}
+  .shipopt{flex:1;display:flex;flex-direction:column;gap:2px;align-items:flex-start;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 11px;cursor:pointer;text-align:left;}
+  .shipopt.on{border-color:var(--red,#e0245e);background:rgba(224,36,94,.05);}
+  .shipopt b{font-size:13px;}
+  .shipopt span{font-size:13px;font-weight:800;color:var(--red,#e0245e);}
+  .shipopt small{font-size:10px;color:var(--faint);}
+  .cstotbox{border:1px solid var(--line);border-radius:14px;padding:4px 13px;margin:0 0 14px;background:var(--card);}
+  .cstotbox .cstot{border-top:1px solid var(--line);margin-top:2px;}
+  .cstotbox .cstot b{font-size:16px;color:var(--red,#e0245e);}
+
   /* ---- catalog product sheet ---- */
   #catSheet{z-index:72;}
   .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
@@ -1055,12 +1075,12 @@ const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","
    shopped inline; Bikes links to its own page; the rest are coming soon. */
 const DEPARTMENTS = [
   { key:'phones',      name:'Phones',      ready:true,  img:'assets/cutouts/iphone-17-pro-max-back.webp' },
+  { key:'accessories', name:'Accessories', ready:true,  dev:'headphones' },
   { key:'bikes',       name:'Bikes',       ready:true,  img:'assets/bikes/icon-sport.png', href:'bikes.html' },
+  { key:'kitchen',     name:'Kitchen',     ready:true,  ph:'🍽️' },
   { key:'laptops',     name:'Laptops',     ready:false, dev:'laptop' },
   { key:'tablets',     name:'Tablets',     ready:false, dev:'tablet' },
-  { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' },
-  { key:'kitchen',     name:'Kitchen',     ready:true,  ph:'🍳' },
-  { key:'accessories', name:'Accessories', ready:true,  dev:'headphones' }
+  { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' }
 ];
 /* Secondary brand navigation, per department. */
 const BRANDS = {
@@ -1633,7 +1653,10 @@ function catDeptHeroHTML(){
   const groups=window._catGroups||{}; let feat=null;
   if(dept==='kitchen'){
     const ka=(groups['kitchen-appliances']||{items:[]}).items;
-    feat=ka.find(p=>/blender/i.test(p.name||'')&&catProductImg(p)) || ka.find(p=>/juicer|air fryer/i.test(p.name||'')&&catProductImg(p)) || ka.find(p=>catProductImg(p));
+    feat=ka.find(p=>/blender/i.test(p.name||'')&&/glass|2-in-1/i.test(p.name||'')&&catProductImg(p))
+       || ka.find(p=>/blender/i.test(p.name||'')&&catProductImg(p))
+       || ka.find(p=>/juicer|air fryer/i.test(p.name||'')&&catProductImg(p))
+       || ka.find(p=>catProductImg(p));
   } else if(dept==='accessories'){
     const sw=(groups['smartwatch']||{items:[]}).items, pb=(groups['powerbank']||{items:[]}).items;
     feat=sw.find(p=>catProductImg(p)) || pb.find(p=>catProductImg(p));
@@ -2357,41 +2380,78 @@ function openCatSheet(id){
     const cov=catProductImg(p); if(cov) imgs.push(cov);
     (b._localImgs||[]).forEach(u=>{ if(imgs.indexOf(u)<0) imgs.push(u); });
   }
-  imgs=imgs.slice(0,6);
+  imgs=imgs.slice(0,8);
   const cat=p.catalog_categories||{};
-  const moq = (p._moq!=null)?p._moq:((b._moq!=null)?b._moq:null);
-  const unit = p.price_from_ngn||b.price_from_ngn;
-  const minTotal = (unit&&moq)? unit*moq : null;
-  const variants=(b._variants||[]).slice(0,8);
-  const vRows=variants.map(v=>`<div class="csrow"><span>${esc(v.label||'Option')}</span><b>${v.unit?fmtCatalog(v.unit)+'/pc':'—'}</b></div>`).join('');
+  const variants=(b._variants&&b._variants.length)?b._variants:[{label:'Standard',unit:(p.price_from_ngn||b.price_from_ngn||0)}];
+  const hasColors=variants.length>1;
+  const pcs=(b._pcsCarton||b._moq||p._moq||1)||1;
+  const moq=(p._moq!=null?p._moq:(b._moq!=null?b._moq:pcs))||1;
+  const cbm=+b._cbm||0, weight=+b._weight||0, wEst=!!b._weightEst;
+  const rates=window._storeRates||{sea:500000,air:20000};
   const attrs=(p.metadata&&p.metadata.attributes)||{};
   const aRows=Object.keys(attrs).filter(k=>String(attrs[k]||'').trim()!=='').map(k=>`<div class="csrow"><span>${esc(k.replace(/-/g,' '))}</span><b>${esc(attrs[k])}</b></div>`).join('');
-  const desc = p.description || CAT_BLURBS[cat.slug] || '';
-  const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${i===0?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>` : '';
-  $('catSheetBody').innerHTML = `
-    <div class="csmedia"><img id="csMainImg" src="${imgs[0]||''}" alt="${esc(p.name||'')}" onerror="this.style.display='none'" onload="if(this.naturalWidth&&this.naturalWidth<300){this.parentNode.style.maxHeight='230px';this.style.padding='28px';}"></div>
-    ${thumbs}
-    <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')} · Wholesale</div>
-    <h3 class="csname">${esc(p.name||'Item')}</h3>
-    <div class="csprice">${unit?fmtCatalog(unit)+' <span class="perpc">per piece</span>':'Price on request'}</div>
-    <div class="csmoqbox">
-      <div class="csrow"><span>Minimum order</span><b>${moq!=null?(moq+' pieces'):'By the carton — confirmed on WhatsApp'}</b></div>
-      ${minTotal?`<div class="csrow"><span>Min. order total (approx.)</span><b>${fmtCatalog(minTotal)}</b></div>`:''}
-      <div class="csrow"><span>Shipping</span><b>Sea or air — quoted on WhatsApp</b></div>
-    </div>
-    ${desc?`<p class="csdesc">${esc(desc)}</p>`:''}
-    ${vRows?`<div class="csspecshead">Options &amp; unit prices</div><div class="csspecs">${vRows}</div>${(b._variants||[]).length>8?'<p class="csnote">More colours/options — ask on WhatsApp.</p>':''}`:''}
-    ${aRows?`<div class="csspecshead">Details</div><div class="csspecs">${aRows}</div>`:''}
-    <button class="addbtn" id="csOrderBtn">${moq!=null?('Order '+moq+'+ pcs on WhatsApp'):'Order in bulk on WhatsApp'}</button>
-    <p class="csnote">Bulk/wholesale item. We confirm colours, exact quantity and shipping (sea or air) with you on WhatsApp before you pay.</p>`;
-  $('csOrderBtn').onclick = ()=>{
-    const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+(moq!=null?(' — minimum '+moq+' pcs'):' — bulk order')+(unit?(' at '+fmtCatalog(unit)+'/pc'):'')+'. Please give me the total with shipping.';
-    window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
-  };
-  sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{
-    $('csMainImg').src=t.src;
-    sheet.querySelectorAll('[data-csidx]').forEach(x=>x.classList.remove('on')); t.classList.add('on');
-  };});
+  const desc=p.description||b.description||CAT_BLURBS[cat.slug]||'';
+
+  let vi=0, qty=moq, ship='none';
+  const step=Math.max(1,pcs);
+
+  function paint(){
+    const unit=variants[vi].unit||0;
+    const cartons=Math.max(1,Math.ceil(qty/(pcs||1)));
+    const sea=cbm? Math.round(cartons*cbm*rates.sea) : null;
+    const air=weight? Math.round(cartons*weight*rates.air) : null;
+    const shipCost = ship==='sea'?(sea||0) : ship==='air'?(air||0) : 0;
+    const goods=unit*qty;
+    const total=goods+shipCost;
+    const vimg=variants[vi].img;
+    const heroImg = vimg || imgs[0] || '';
+    const thumbs = imgs.length>1 ? `<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${(!vimg&&i===0)?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>` : '';
+    const colorChips = hasColors ? `<div class="csopts"><div class="csspecshead">Choose colour / option</div><div class="chiprow">${variants.map((v,i)=>`<button class="optchip ${i===vi?'on':''}" data-vi="${i}">${esc(v.label||('Option '+(i+1)))}${v.unit?` · ${fmtCatalog(v.unit)}`:''}</button>`).join('')}</div></div>` : '';
+    const shipRow = (sea!=null||air!=null) ? `
+      <div class="csspecshead">Choose shipping</div>
+      <div class="shiprow">
+        ${sea!=null?`<button class="shipopt ${ship==='sea'?'on':''}" data-ship="sea"><b>Sea</b><span>${fmtCatalog(sea)}</span><small>cheapest · slower</small></button>`:''}
+        ${air!=null?`<button class="shipopt ${ship==='air'?'on':''}" data-ship="air"><b>Air${wEst?' (est.)':''}</b><span>${fmtCatalog(air)}</span><small>faster · pricier</small></button>`:''}
+        <button class="shipopt ${ship==='none'?'on':''}" data-ship="none"><b>Decide later</b><span>on WhatsApp</span><small>we advise you</small></button>
+      </div>` : `<div class="csrow"><span>Shipping</span><b>Quoted on WhatsApp</b></div>`;
+
+    $('catSheetBody').innerHTML = `
+      <div class="csmedia"><img id="csMainImg" src="${heroImg}" alt="${esc(p.name||'')}" onerror="this.style.display='none'" onload="if(this.naturalWidth&&this.naturalWidth<300){this.parentNode.style.maxHeight='230px';this.style.padding='28px';}"></div>
+      ${thumbs}
+      <div class="cskicker">${esc(cat.icon||'')} ${esc(cat.name||'MiStore')} · Wholesale</div>
+      <h3 class="csname">${esc(p.name||'Item')}</h3>
+      <div class="csprice">${unit?fmtCatalog(unit)+' <span class="perpc">per piece</span>':'Price on request'}</div>
+      ${desc?`<p class="csdesc">${esc(desc)}</p>`:''}
+      ${colorChips}
+      <div class="csspecshead">Quantity <small style="font-weight:600;color:var(--faint)">(min ${moq}${pcs>1?`, ${pcs}/carton`:''})</small></div>
+      <div class="qtyrow">
+        <button class="qbtn" id="qMinus">−</button>
+        <div class="qval"><b id="qVal">${qty}</b><small>${cartons} carton${cartons>1?'s':''}</small></div>
+        <button class="qbtn" id="qPlus">+</button>
+      </div>
+      ${shipRow}
+      <div class="cstotbox">
+        <div class="csrow"><span>${qty} pcs × ${fmtCatalog(unit)}</span><b>${fmtCatalog(goods)}</b></div>
+        ${shipCost?`<div class="csrow"><span>Shipping (${ship})</span><b>${fmtCatalog(shipCost)}</b></div>`:''}
+        <div class="csrow cstot"><span>Estimated total</span><b>${fmtCatalog(total)}</b></div>
+      </div>
+      ${aRows?`<div class="csspecshead">Details</div><div class="csspecs">${aRows}</div>`:''}
+      <button class="addbtn" id="csOrderBtn">Order ${qty} pcs on WhatsApp</button>
+      <p class="csnote">Wholesale item — final shipping is confirmed on WhatsApp before you pay.${wEst&&(ship==='air')?' Air cost is a volume estimate.':''}</p>`;
+
+    sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{ $('csMainImg').src=t.src; sheet.querySelectorAll('[data-csidx]').forEach(x=>x.classList.remove('on')); t.classList.add('on'); }; });
+    sheet.querySelectorAll('[data-vi]').forEach(el=>{ el.onclick=()=>{ vi=+el.dataset.vi; paint(); }; });
+    sheet.querySelectorAll('[data-ship]').forEach(el=>{ el.onclick=()=>{ ship=el.dataset.ship; paint(); }; });
+    $('qMinus').onclick=()=>{ qty=Math.max(moq, qty-step); paint(); };
+    $('qPlus').onclick=()=>{ qty=qty+step; paint(); };
+    $('csOrderBtn').onclick=()=>{
+      const col=hasColors?(' · '+variants[vi].label):'';
+      const shipTxt = ship==='sea'?(' · sea shipping ~'+fmtCatalog(sea)) : ship==='air'?(' · air shipping ~'+fmtCatalog(air)) : ' · shipping to be advised';
+      const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+col+' — '+qty+' pcs at '+fmtCatalog(unit)+'/pc'+shipTxt+'. Estimated total '+fmtCatalog(total)+'. Please confirm.';
+      window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
+    };
+  }
+  paint();
   showSheet(sheet);
 }
 
@@ -2435,6 +2495,12 @@ async function fetchBundledRows(){
       {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
     if(r.ok){ const j=await r.json(); if(j[0]){ rate=+j[0].exchange_rate||208; margin=(j[0].default_profit_pct==null?15:+j[0].default_profit_pct); } }
   }catch(e){}
+  try{
+    const r2=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=sea_rate_per_cbm,air_rate_per_kg`,
+      {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
+    if(r2.ok){ const j=await r2.json(); if(j[0]) window._storeRates={sea:+j[0].sea_rate_per_cbm||500000, air:+j[0].air_rate_per_kg||20000}; }
+  }catch(e){}
+  if(!window._storeRates) window._storeRates={sea:500000, air:20000};
   const rows=[];
   for(const key of Object.keys(BUNDLED_CATS)){
     let arr;
@@ -2450,7 +2516,12 @@ async function fetchBundledRows(){
       const moq = moqs.length? Math.min.apply(null,moqs) : null;
       const variants=(p.variants||[]).map(v=>({
         label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
+        img: v.image? 'catalog-import/'+v.image : null,
         unit: v.rmb_price? Math.round(v.rmb_price*rate*(1+margin/100)) : null }));
+      const v0=(p.variants||[])[0]||{};
+      const cbm=+v0.cbm||0;
+      const weight=+v0.weight_kg|| (cbm? +(cbm*150).toFixed(1) : 0);   /* volumetric estimate when GW unknown */
+      const pcsCarton=+v0.qty_per_carton|| moq || null;
       let nm;
       if(p.name_en){ nm=p.name_en; }
       else{
@@ -2461,7 +2532,7 @@ async function fetchBundledRows(){
       }
       const row={ id:'local-'+key+'-'+p.supplier_id, name:nm, description:(p.description_en||''), supplier_id:String(p.supplier_id),
         price_from_ngn:priceFrom, metadata:{legacy_image:(imgs[0]||'').replace('catalog-import/','')},
-        _localImgs:imgs, _moq:moq, _variants:variants,
+        _localImgs:imgs, _moq:moq, _variants:variants, _cbm:cbm, _weight:weight, _pcsCarton:pcsCarton, _weightEst:!(v0.weight_kg),
         catalog_categories:cat, catalog_images:[] };
       row._bundled=row;
       BUNDLED_BY_SID[row.supplier_id]=row;
