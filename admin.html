@@ -394,6 +394,8 @@
   .tabgroup{display:flex;flex-direction:column;gap:5px;}
   .tabgrouplabel{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.7;padding-left:4px;}
   .tabgrouprow{display:flex;flex-wrap:wrap;gap:8px;}
+  .ctlgGroupHead{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#666);padding:14px 2px 6px;display:flex;gap:8px;align-items:center;}
+  .ctlgGroupHead .count{background:var(--surface,#eee);border-radius:999px;padding:1px 8px;font-size:11px;}
   .tab{flex:0 0 auto;border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);
     border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer;letter-spacing:-.01em;
     display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;}
@@ -1506,7 +1508,7 @@ async function loadCatalogList(){
   try{
     const { data, error } = await db.from('catalog_products')
       .select('*, catalog_categories(name,slug), catalog_variants(*), catalog_images(*)')
-      .order('updated_at',{ascending:false}).limit(500);
+      .order('updated_at',{ascending:false}).limit(3000);
     if(error) throw error;
     ctlgProducts = data || [];
     ctlgLoaded = true;
@@ -1550,21 +1552,27 @@ async function importExistingCatalog(publishNow, skipConfirm){
       const products = arr.products || arr || [];
       for(const p of products){
         if(have.has(String(p.supplier_id))) continue;
-        const firstImg = (p.variants||[]).find(v=>v.image)?.image || null;
-        const { data:created, error } = await db.from('catalog_products').insert({
-          category_id: catBySlug[p.category]||null, supplier_id: String(p.supplier_id),
-          name: friendlyCatalogName(p), status: publishNow?'published':'draft',
-          moq: (p.variants||[]).reduce((m,v)=>Math.min(m, v.moq||1e9), 1e9)===1e9?100:(p.variants||[]).reduce((m,v)=>Math.min(m, v.moq||1e9), 1e9),
-          metadata:{ legacy_image:firstImg, variant_count:p.variant_count||((p.variants||[]).length) }
-        }).select('id').single();
-        if(error) throw error;
-        const vrows = (p.variants||[]).map((v,i)=>({
-          product_id: created.id, spec1: v.spec1||null, spec2: v.spec2||null,
-          variant_label: v.variant_label||null, rmb_price: v.rmb_price??null,
-          moq: v.moq??null, position:i, is_default:i===0 }));
-        for(let i=0;i<vrows.length;i+=50){ const { error:ve } = await db.from('catalog_variants').insert(vrows.slice(i,i+50)); if(ve) throw ve; }
-        await persistCatalogPriceFrom(created.id, {}, p.variants||[]);
-        have.add(String(p.supplier_id)); n++;
+        try{
+          const firstImg = (p.variants||[]).find(v=>v.image)?.image || null;
+          const moqs=(p.variants||[]).map(v=>v.moq).filter(x=>x!=null);
+          const pf = catalogPriceFrom({}, p.variants||[]);   // price computed inline — no extra update
+          const { data:created, error } = await db.from('catalog_products').insert({
+            category_id: catBySlug[p.category]||null, supplier_id: String(p.supplier_id),
+            name: friendlyCatalogName(p), status: publishNow?'published':'draft',
+            moq: moqs.length?Math.min.apply(null,moqs):100,
+            price_from_ngn: pf,
+            description: (p.description_en||null),
+            metadata:{ legacy_image:firstImg, variant_count:p.variant_count||((p.variants||[]).length) }
+          }).select('id').single();
+          if(error) throw error;
+          const vrows = (p.variants||[]).map((v,i)=>({
+            product_id: created.id, spec1: v.spec1||null, spec2: v.spec2||null,
+            variant_label: v.variant_label||null, rmb_price: v.rmb_price??null,
+            moq: v.moq??null, position:i, is_default:i===0 }));
+          for(let i=0;i<vrows.length;i+=50){ await db.from('catalog_variants').insert(vrows.slice(i,i+50)); }
+          have.add(String(p.supplier_id)); n++;
+          if(n%25===0){ const ob=document.getElementById('oneTapBtn'); if(ob) ob.textContent='Importing… '+n; const ib=document.getElementById('ctlgImportBtn'); if(ib) ib.textContent='Importing… '+n; }
+        }catch(e){ /* skip a bad row, keep importing the rest */ }
       }
     }
     toast('✓ Imported '+n+' products'+(publishNow?' — they are LIVE on the store':' as drafts — review and publish them')); ctlgProducts=[]; ctlgLoaded=false; render();
@@ -1585,20 +1593,27 @@ function ctlgFilteredBase(){
 
 /* Just the chips + list — re-rendered on filter/search changes WITHOUT rebuilding
    the search box or category dropdown, so neither loses focus or closes. */
+function ctlgRowHTML(p){
+  return `
+    <div class="bkAdmRow" data-open-product="${p.id}">
+      <img class="bkAdmThumb" src="${ctlgCoverUrl(p)}" onerror="this.style.visibility='hidden'" alt="">
+      <div class="bkAdmRowInfo">
+        <div class="bkAdmRowName">${esc(p.name||'Untitled')}</div>
+        <div class="bkAdmRowMeta">${p.price_from_ngn?('₦'+Number(p.price_from_ngn).toLocaleString()+'/pc · '):''}${p.catalog_variants?.length||0} variant(s) · MOQ ${p.moq||100}</div>
+      </div>
+      <span class="bkAdmBadge ${p.status==='published'?'':(p.status==='archived'?'arch':'draft')}">${esc(p.status||'draft')}</span>
+    </div>`;
+}
 function ctlgListInnerHTML(){
   const base = ctlgFilteredBase();
   const counts = { all:base.length, published:0, draft:0, archived:0 };
   base.forEach(p=>{ const s=p.status||'draft'; if(counts[s]!=null) counts[s]++; });
   const shown = ctlgStatusFilter==='all' ? base : base.filter(p=>(p.status||'draft')===ctlgStatusFilter);
-  const rows = shown.map(p=>`
-    <div class="bkAdmRow" data-open-product="${p.id}">
-      <img class="bkAdmThumb" src="${ctlgCoverUrl(p)}" onerror="this.style.visibility='hidden'" alt="">
-      <div class="bkAdmRowInfo">
-        <div class="bkAdmRowName">${esc(p.name||'Untitled')}</div>
-        <div class="bkAdmRowMeta">${esc(p.catalog_categories?.name||'Uncategorized')} · ${p.catalog_variants?.length||0} variant(s) · MOQ ${p.moq||100}</div>
-      </div>
-      <span class="bkAdmBadge ${p.status==='published'?'':(p.status==='archived'?'arch':'draft')}">${esc(p.status||'draft')}</span>
-    </div>`).join('');
+  /* group into category sections, like the customer page */
+  const groups={}; const order=[];
+  shown.forEach(p=>{ const cn=(p.catalog_categories&&p.catalog_categories.name)||'Uncategorized'; if(!groups[cn]){groups[cn]=[];order.push(cn);} groups[cn].push(p); });
+  order.sort();
+  const rows = order.map(cn=>`<div class="ctlgGroupHead">${esc(cn)} <span class="count">${groups[cn].length}</span></div>`+groups[cn].map(ctlgRowHTML).join('')).join('');
   const statusChips = ['all','published','draft','archived'].map(f=>
     `<button class="bkAdmChip ${f===ctlgStatusFilter?'on':''}" data-ctlgfilter="${f}">${f==='archived'?'Trash':f[0].toUpperCase()+f.slice(1)} (${counts[f]})</button>`).join('');
   return `
