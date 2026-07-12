@@ -607,6 +607,7 @@
   .csspecshead{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 6px;}
 
   /* ---- catalog product sheet ---- */
+  #catSheet{z-index:72;}
   .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
   .csmedia img{width:100%;height:100%;object-fit:contain;padding:16px;mix-blend-mode:multiply;}
   .csthumbs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch;}
@@ -757,12 +758,6 @@
     <div class="grid" id="grid"></div>
   </section>
 
-  <!-- ===== live catalog (accessories, kitchen, electronics, …) from admin ===== -->
-  <section id="catalog" style="display:none;">
-    <div class="sechead"><div><h2>Shop by Category</h2><p>Wholesale accessories &amp; gadgets — open a category, pick a product, order in bulk on WhatsApp.</p></div></div>
-    <div id="catalogSections"></div>
-  </section>
-
   <!-- ===== shop more categories ===== -->
   <section id="more">
     <div class="morehead"><h2>Shop More Categories</h2><a href="bikes.html" id="moreViewAll">View all</a></div>
@@ -846,12 +841,6 @@
   <div class="grab"></div>
   <div class="shead"><h2>Product</h2><button class="xbtn" id="csClose">✕</button></div>
   <div class="sbody" id="catSheetBody"></div>
-</div>
-
-<div class="sheet" id="catListSheet">
-  <div class="grab"></div>
-  <div class="shead"><h2 id="catListTitle">Category</h2><button class="xbtn" id="clClose">✕</button></div>
-  <div class="sbody" id="catListBody"></div>
 </div>
 
 <div class="sheet" id="wishSheet">
@@ -1045,7 +1034,8 @@ const DEPARTMENTS = [
   { key:'laptops',     name:'Laptops',     ready:false, dev:'laptop' },
   { key:'tablets',     name:'Tablets',     ready:false, dev:'tablet' },
   { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' },
-  { key:'accessories', name:'Accessories', ready:false, dev:'headphones' }
+  { key:'kitchen',     name:'Kitchen',     ready:true,  ph:'🍳' },
+  { key:'accessories', name:'Accessories', ready:true,  dev:'headphones' }
 ];
 /* Secondary brand navigation, per department. */
 const BRANDS = {
@@ -1060,7 +1050,16 @@ const BRANDS = {
   laptops:['Apple','Dell','HP','Lenovo','ASUS','MSI'].map(n=>({key:n.toLowerCase(),name:n,ready:false,sub:n+' laptops — landing soon at MiStore.'})),
   tablets:['Apple','Samsung','Lenovo','Xiaomi'].map(n=>({key:'t-'+n.toLowerCase(),name:n,ready:false,sub:n+' tablets — landing soon at MiStore.'})),
   gadgets:['Watches','Earbuds','Chargers','Power banks'].map(n=>({key:'g-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — landing soon at MiStore.'})),
-  accessories:['Cases','Cables','Adapters','Screens'].map(n=>({key:'a-'+n.toLowerCase(),name:n,ready:false,sub:n+' — landing soon at MiStore.'})),
+  accessories:[
+    { key:'powerbank',  name:'Power Banks',   ready:true, sub:'Portable chargers, 5,000–20,000mAh — wholesale stock.' },
+    { key:'earphone',   name:'Earbuds',       ready:true, sub:'Bluetooth earbuds with charging case — wholesale stock.' },
+    { key:'speaker',    name:'Speakers',      ready:true, sub:'Portable Bluetooth speakers — wholesale stock.' },
+    { key:'smartwatch', name:'Smart Watches', ready:true, sub:'Full-touch smart watches — wholesale stock.' },
+  ],
+  kitchen:[
+    { key:'kitchen-appliances', name:'Appliances', ready:true, sub:'Air fryers, blenders, kettles, cookers — factory-direct.' },
+    { key:'kitchen-utensils',   name:'Utensils',   ready:true, sub:'Pressure cookers, pots, flasks and kitchen tools.' },
+  ],
   bikes:['City','Sport','Mountain','Fat Tire','Cargo','Folding','Motorcycles','Tricycles'].map(n=>({key:'b-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — see the full collection on our Electric Mobility page.'}))
 };
 function deptDef(k){ return DEPARTMENTS.find(d=>d.key===k)||DEPARTMENTS[0]; }
@@ -1492,11 +1491,6 @@ function renderDepts(){
 function selectDept(key){
   const d=deptDef(key);
   if(d.href){ window.location.href=d.href; return; }   /* Bikes -> its own page */
-  /* Accessories/Gadgets live in the catalog section — jump straight to the products */
-  const catSec=document.getElementById('catalog');
-  if((key==='accessories'||key==='gadgets') && catSec && catSec.style.display!=='none'){
-    catSec.scrollIntoView({behavior:'smooth',block:'start'}); return;
-  }
   dept=key;
   const bl=brandList(); category=(bl.find(b=>b.ready)||bl[0]||{}).key;
   renderDepts(); renderBrands(); renderTabs(); renderGrid();
@@ -1524,7 +1518,10 @@ function renderMore(){
 }
 /* legacy alias — the old category tab strip is hidden; nav is driven by depts+brands */
 function renderCategories(){ renderDepts(); renderBrands(); }
+function isCatalogDept(){ return dept==='kitchen'||dept==='accessories'; }
 function renderTabs(){
+  if(isCatalogDept()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none'; return; }
+  $('condTabs').style.display=''; $('condBlurb').style.display='';
   const ready=brandDef(category).ready;
   $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
   $('catSub').textContent=brandDef(category).sub||'';
@@ -1541,6 +1538,7 @@ function renderTabs(){
   $('condBlurb').innerHTML=condDef(cond).long+' <span style="color:var(--faint)">· Free case included with every phone.</span>';
 }
 function renderGrid(){
+  if(isCatalogDept()){ renderCatalogDeptGrid(); return; }
   /* coming-soon brands show an elegant panel instead of products */
   if(!brandDef(category).ready){
     const c=brandDef(category); const nm=deptDef(dept).name+' · '+c.name;
@@ -1561,6 +1559,35 @@ function renderGrid(){
     </article>`).join('');
   $('grid').querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>openProduct(el.dataset.open));
   $('grid').querySelectorAll('.wishbtn').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.add('pop'); setTimeout(()=>b.classList.remove('pop'),320); toggleWish(b.dataset.wish); });
+}
+
+/* ---- catalog departments (Kitchen, Accessories): products in the MAIN grid,
+   sub-sections in the brand bar — same navigation as Phones. Single-sheet
+   product view (no stacked sheets). ---- */
+function renderCatalogDeptGrid(){
+  $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
+  const slug=category;
+  if(window._catSlug!==slug){ window._catSlug=slug; window._catPage=24; }
+  $('catHead').textContent=(brandDef(category).name||deptDef(dept).name);
+  $('catSub').textContent=CAT_BLURBS[slug]||brandDef(category).sub||'Wholesale stock — tap a product for details and bulk pricing.';
+  const g=(window._catGroups||{})[slug];
+  if(!g){
+    $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading products…</div>';
+    ensureCatalogLoaded().then(()=>{ if(isCatalogDept()) renderGrid(); });
+    return;
+  }
+  const page=window._catPage||24;
+  const items=g.items.slice(0,page);
+  $('grid').innerHTML=`<div class="catgrid" style="grid-column:1/-1;margin-top:0">${items.map(catStoreCard).join('')}</div>`+
+    (g.items.length>page?`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto;max-width:320px;">Show more (${g.items.length-page} left)</button>`:'');
+  $('grid').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
+  const mb=$('catMoreBtn'); if(mb) mb.onclick=()=>{ window._catPage=(window._catPage||24)+48; renderGrid(); };
+}
+let _catLoadPromise=null;
+function ensureCatalogLoaded(){
+  if(window._catGroups) return Promise.resolve();
+  if(!_catLoadPromise) _catLoadPromise=loadStorefrontCatalog().catch(()=>{});
+  return _catLoadPromise;
 }
 
 /* ---------- product sheet + swipeable gallery ---------- */
@@ -1842,8 +1869,8 @@ function setBackgroundActive(active){
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet'),$('catListSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
-scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets; if($('clClose')) $('clClose').onclick=hideSheets;
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
 $('cartbar').onclick=openCart;
@@ -1937,7 +1964,7 @@ async function loadShowcase(){
     const k=b.dataset.bn;
     if(k==='home') window.scrollTo({top:0,behavior:'smooth'});
     else if(k==='shop') document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'});
-    else if(k==='cats'){ const cs=document.getElementById('catalog'); (cs&&cs.style.display!=='none'?cs:document.getElementById('deptBar')).scrollIntoView({behavior:'smooth',block:'start'}); }
+    else if(k==='cats') document.getElementById('deptBar').scrollIntoView({behavior:'smooth',block:'start'});
     else if(k==='wish') openWish();
     else if(k==='account') toast('Accounts are coming soon.');
   });
@@ -2245,37 +2272,14 @@ function catStoreCard(p){
   </div>`;
 }
 
-/* ---- view 1: category tiles ---- */
+/* build category groups from loaded rows (grid rendering happens via renderGrid) */
 function renderCatalogTiles(rows){
   rows.forEach(p=>{ CAT_STORE[p.id]=p; });
   const groups={};
   rows.forEach(p=>{ const cat=p.catalog_categories||{name:'More',slug:'more',icon:'📦',position:99};
     const k=cat.slug||'more'; (groups[k]=groups[k]||{cat,items:[]}).items.push(p); });
   window._catGroups=groups;
-  const ordered=Object.values(groups).sort((a,b)=>((a.cat.position||99)-(b.cat.position||99)));
-  const tiles=ordered.map(g=>{
-    const first=g.items.find(p=>catProductImg(p));
-    const img=first?catProductImg(first):'';
-    return `<div class="cattile" data-catslug="${esc(g.cat.slug)}">
-      <div class="cattilemedia">${img?`<img src="${img}" loading="lazy" alt="" data-alt="${esc(first?catFallbackImg(first):'')}" onerror="if(this.dataset.alt&&this.src.indexOf(this.dataset.alt)<0){this.src=this.dataset.alt}else{this.remove()}">`:`<span class="ph">${esc(g.cat.icon||'📦')}</span>`}</div>
-      <div class="cattiletx"><div class="cattilename">${esc(g.cat.icon||'')} ${esc(g.cat.name)}</div><div class="cattilecount">${g.items.length} products</div></div>
-    </div>`;}).join('');
-  const host=document.getElementById('catalogSections'); if(!host) return;
-  host.innerHTML=`<div class="cattiles">${tiles}</div>`;
-  const sec=document.getElementById('catalog'); if(sec) sec.style.display='';
-  host.querySelectorAll('[data-catslug]').forEach(el=>{ el.onclick=()=>openCatListSheet(el.dataset.catslug); });
-}
-
-/* ---- view 2: one category's products ---- */
-function openCatListSheet(slug){
-  const g=(window._catGroups||{})[slug]; if(!g) return;
-  const sheet=$('catListSheet'); if(!sheet) return;
-  $('catListTitle').textContent=(g.cat.icon?g.cat.icon+' ':'')+g.cat.name;
-  $('catListBody').innerHTML=
-    (CAT_BLURBS[slug]?`<p class="catblurb">${esc(CAT_BLURBS[slug])}</p>`:'')+
-    `<div class="catgrid">${g.items.map(catStoreCard).join('')}</div>`;
-  $('catListBody').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
-  showSheet(sheet);
+  if(typeof isCatalogDept==='function' && isCatalogDept()) renderGrid();
 }
 
 /* ---- view 3: single product (wholesale details) ---- */
