@@ -624,6 +624,14 @@
   .reqcta{background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:12px 20px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;}
   .reqbtn{margin-top:12px;background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:800;cursor:pointer;}
 
+  /* ---- samsung ---- */
+  .samglyph{width:44%;height:44%;color:var(--muted);opacity:.85;display:flex;align-items:center;justify-content:center;}
+  .samglyph svg{width:100%;height:100%;}
+  .samglyph.big{width:120px;height:120px;}
+  .sambadge{position:absolute;top:10px;left:10px;background:var(--tx);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;}
+  .samph{flex-direction:column;gap:8px;}
+  .samsoon{font-size:11.5px;color:var(--faint);font-weight:700;}
+
   /* ---- product sheet controls ---- */
   .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
   .optchip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 13px;font-size:12.5px;font-weight:700;color:var(--tx);cursor:pointer;}
@@ -888,6 +896,12 @@
   <div class="sbody" id="catSheetBody"></div>
 </div>
 
+<div class="sheet" id="samSheet">
+  <div class="grab"></div>
+  <div class="shead"><h2>Samsung</h2><button class="xbtn" id="samClose">✕</button></div>
+  <div class="sbody" id="samSheetBody"></div>
+</div>
+
 <div class="sheet" id="wishSheet">
   <div class="grab"></div>
   <div class="shead"><h2>Wishlist</h2><button class="xbtn" id="wSheetClose">✕</button></div>
@@ -1086,7 +1100,7 @@ const DEPARTMENTS = [
 const BRANDS = {
   phones:[
     { key:'iphones', name:'iPhone',  ready:true,  sub:'Pick a condition, then tap any phone to see it from every angle.' },
-    { key:'samsung', name:'Samsung', ready:false, sub:'Premium Samsung Galaxy phones — landing soon at MiStore.' },
+    { key:'samsung', name:'Samsung', ready:true,  sub:'Samsung Galaxy — S, Z Fold/Flip, Note, A & W series. Photos coming soon; message us to order.' },
     { key:'google',  name:'Google',  ready:false, sub:'Google Pixel devices — landing soon at MiStore.' },
     { key:'xiaomi',  name:'Xiaomi',  ready:false, sub:'Xiaomi & Redmi devices — landing soon at MiStore.' },
     { key:'oneplus', name:'OnePlus', ready:false, sub:'OnePlus flagships — landing soon at MiStore.' },
@@ -1579,8 +1593,10 @@ function renderMore(){
 /* legacy alias — the old category tab strip is hidden; nav is driven by depts+brands */
 function renderCategories(){ renderDepts(); renderBrands(); }
 function isCatalogDept(){ return dept==='kitchen'||dept==='accessories'; }
+function isSamsung(){ return dept==='phones' && category==='samsung'; }
 function renderTabs(){
-  if(isCatalogDept()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none'; return; }
+  if(isCatalogDept()||isSamsung()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
+    if(isSamsung()){ $('catHead').textContent='Samsung Galaxy'; $('catSub').textContent=brandDef('samsung').sub; } return; }
   $('condTabs').style.display=''; $('condBlurb').style.display='';
   const ready=brandDef(category).ready;
   $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
@@ -1599,6 +1615,7 @@ function renderTabs(){
 }
 function renderGrid(){
   if(isCatalogDept()){ renderCatalogDeptGrid(); return; }
+  if(isSamsung()){ renderSamsungGrid(); return; }
   /* coming-soon brands show an elegant panel instead of products */
   if(!brandDef(category).ready){
     const c=brandDef(category); const nm=deptDef(dept).name+' · '+c.name;
@@ -1674,6 +1691,76 @@ function ensureCatalogLoaded(){
   if(window._catGroups) return Promise.resolve();
   if(!_catLoadPromise) _catLoadPromise=loadStorefrontCatalog().catch(()=>{});
   return _catLoadPromise;
+}
+
+/* ============ SAMSUNG (¥ master → live NGN via editable MiStore rate) ============
+   Master data stores ONLY the ¥ buy price. Selling price is computed live:
+   roundUp5000( buy¥ × MiStore-rate × markup + per-unit shipping ). Change the
+   rate in admin → Store settings and every Samsung price updates automatically.
+   No iPhone code is touched. */
+let _miRate=208;                 /* ¥→₦, from store_settings.exchange_rate */
+const SAM_MARKUP=1.2, SAM_SHIP_NGN=25000;   /* editable knobs; tuned to the verified 靓机汇 samples */
+let SAMSUNG=[]; let _samLoaded=false;
+async function ensureRate(){
+  try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=exchange_rate`,
+    {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
+    if(r.ok){ const j=await r.json(); if(j[0]&&j[0].exchange_rate) _miRate=+j[0].exchange_rate; } }catch(e){}
+}
+async function ensureSamsung(){
+  if(_samLoaded) return;
+  await ensureRate();
+  try{ const d=await (await fetch('assets/phones/samsung.json',{cache:'no-store'})).json(); SAMSUNG=d.models||[]; }
+  catch(e){ SAMSUNG=[]; }
+  _samLoaded=true;
+}
+function samPrice(rmb){ return rmb? roundPrice(rmb*_miRate*SAM_MARKUP + SAM_SHIP_NGN) : null; }
+function samModelMin(m){ const ps=(m.storages||[]).map(s=>samPrice(s.buy_rmb)).filter(x=>x); return ps.length?Math.min.apply(null,ps):null; }
+function samGlyph(){ return devIcon('phone')||'📱'; }
+function renderSamsungGrid(){
+  if(!_samLoaded){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading Samsung…</div>'; ensureSamsung().then(()=>{ if(isSamsung()) renderGrid(); }); return; }
+  const models=SAMSUNG.filter(m=>samModelMin(m)!=null);
+  if(!models.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">📱</div>Samsung stock is being priced — message us for a quote.</div>'; return; }
+  window._samById={}; models.forEach((m,i)=>window._samById[i]=m);
+  $('grid').innerHTML=models.map((m,i)=>{
+    const min=samModelMin(m); const stg=(m.storages||[]).filter(s=>s.buy_rmb).map(s=>s.storage).join(' · ');
+    return `<article class="pcard" data-sam="${i}">
+      <div class="phero"><div class="samglyph">${samGlyph()}</div><span class="sambadge">Samsung</span></div>
+      <div class="pinfo">
+        <div class="pname">${esc(m.model)}</div>
+        <div class="pmem">${esc(stg||'')}</div>
+        <div class="prow"><span class="pfrom">from <b>${fmtK(min)}</b></span><span class="stock in">In stock</span></div>
+        <button class="viewbtn">View &amp; order</button>
+      </div>
+    </article>`;}).join('');
+  $('grid').querySelectorAll('[data-sam]').forEach(el=>el.onclick=()=>openSamsungSheet(el.dataset.sam));
+}
+function openSamsungSheet(i){
+  const m=(window._samById||{})[i]; if(!m) return;
+  const sheet=$('samSheet'); if(!sheet) return;
+  const sts=(m.storages||[]).filter(s=>s.buy_rmb);
+  if(!sts.length) return;
+  let si=0;
+  function paint(){
+    const s=sts[si]; const price=samPrice(s.buy_rmb);
+    $('samSheetBody').innerHTML=`
+      <div class="csmedia samph"><div class="samglyph big">${samGlyph()}</div><span class="samsoon">Photos coming soon</span></div>
+      <div class="cskicker">📱 Samsung Galaxy · ${esc(m.series)} Series</div>
+      <h3 class="csname">${esc(m.model)}</h3>
+      <div class="csprice">${fmtK(price)} <span class="perpc">${esc(s.storage)}</span></div>
+      ${sts.length>1?`<div class="csspecshead">Storage</div><div class="chiprow">${sts.map((x,idx)=>`<button class="optchip ${idx===si?'on':''}" data-si="${idx}">${esc(x.storage)} · ${fmtK(samPrice(x.buy_rmb))}</button>`).join('')}</div>`:''}
+      ${s.note?`<p class="csdesc">${esc(s.note)}</p>`:''}
+      <div class="csmoqbox">
+        <div class="csrow"><span>Condition</span><b>Clean · fully tested</b></div>
+        <div class="csrow"><span>Warranty</span><b>MiStore check + support</b></div>
+        <div class="csrow"><span>Photos</span><b>Real photos on request</b></div>
+      </div>
+      <button class="addbtn" id="samOrderBtn">Order on WhatsApp</button>
+      <p class="csnote">Prices update live with the MiStore exchange rate. We confirm exact condition and send real photos on WhatsApp before you pay.</p>`;
+    sheet.querySelectorAll('[data-si]').forEach(el=>el.onclick=()=>{ si=+el.dataset.si; paint(); });
+    $('samOrderBtn').onclick=()=>{ const s2=sts[si];
+      window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to buy the Samsung '+m.model+' '+s2.storage+' ('+fmtK(samPrice(s2.buy_rmb))+'). Please send real photos and confirm availability.'),'_blank','noopener'); };
+  }
+  paint(); showSheet(sheet);
 }
 
 /* ---------- product sheet + swipeable gallery ---------- */
@@ -1955,8 +2042,8 @@ function setBackgroundActive(active){
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
 function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
-scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets;
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet'),$('samSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets; if($('samClose')) $('samClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
 $('cartbar').onclick=openCart;
