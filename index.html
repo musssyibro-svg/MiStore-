@@ -587,6 +587,8 @@
   .catcard .cattl{font-size:13px;font-weight:700;letter-spacing:-.01em;line-height:1.25;}
   .catcard .catpr{font-size:12.5px;color:var(--red,#e0245e);font-weight:800;}
   .catcard .catmedia{position:relative;}
+  .catsubhead{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:20px 0 2px;display:flex;align-items:center;gap:8px;}
+  .catsubhead .count{font-size:11px;font-weight:700;color:var(--faint);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:1px 8px;}
   .catopts{position:absolute;top:7px;right:7px;background:var(--tx);color:var(--bg);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.02em;}
   @media (max-width:560px){ .catgrid{grid-template-columns:repeat(3,1fr);gap:8px;} .catcard .cattl{font-size:11.5px;} .catcard .catpr{font-size:11px;} .catcard .cattx{padding:8px 8px 10px;} }
 
@@ -1658,9 +1660,19 @@ function renderCatalogDeptGrid(){
   const display=g.display||(g.display=buildGroups(g.items));
   const page=window._catPage||24;
   const shown=display.slice(0,page);
+  const isKitchen = slug.indexOf('kitchen')===0;
+  let body='';
+  if(isKitchen){
+    /* organise into type sub-sections (Air Fryers, Blenders, …) */
+    const secs={}, order=[];
+    shown.forEach(grp=>{ const t=catType(grp.base); if(!secs[t]){secs[t]=[];order.push(t);} secs[t].push(grp); });
+    order.sort((a,b)=> (a==='More Kitchen'?1:0)-(b==='More Kitchen'?1:0) || secs[b].length-secs[a].length );
+    body=order.map(t=>`<div class="catsubhead" style="grid-column:1/-1">${esc(t)} <span class="count">${secs[t].length}</span></div><div class="catgrid" style="grid-column:1/-1;margin-top:0">${secs[t].map(catGroupCard).join('')}</div>`).join('');
+  } else {
+    body=`<div class="catgrid" style="grid-column:1/-1;margin-top:0">${shown.map(catGroupCard).join('')}</div>`;
+  }
   $('grid').innerHTML=
-    catDeptHeroHTML()+
-    `<div class="catgrid" style="grid-column:1/-1;margin-top:0">${shown.map(catGroupCard).join('')}</div>`+
+    catDeptHeroHTML()+ body +
     (display.length>page?`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${display.length-page} left)</button>`:'')+
     `<button class="reqband" id="catReqBtn" style="grid-column:1/-1">🛎️ Can’t find it? Request a product or a new section</button>`;
   $('grid').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
@@ -2455,14 +2467,27 @@ function buildGroups(items){
     const key=bv.base.toLowerCase();
     if(!map[key]){ map[key]={base:bv.base, members:[]}; order.push(key); }
     map[key].members.push(p); });
-  return order.map(k=>{ const g=map[k];
-    g.members.sort((a,b)=>(a.price_from_ngn||1e15)-(b.price_from_ngn||1e15));
-    g.members.forEach(m=>{ m._groupMembers=g.members; });
-    g.repId=g.members[0].id;
-    g.img=g.members.find(m=>catProductImg(m))||g.members[0];
-    const pr=g.members.map(m=>m.price_from_ngn).filter(x=>x); g.min=pr.length?Math.min.apply(null,pr):null;
-    return g; });
+  const out=[];
+  order.forEach(k=>{ const grp=map[k]; const mem=grp.members;
+    const labels=mem.map(m=>m._variantLabel).filter(Boolean);
+    const distinct=new Set(labels);
+    // Only merge a CLEAN small set: every member has a distinct size/capacity label, 2–5 of them.
+    const clean = mem.length>=2 && mem.length<=5 && labels.length===mem.length && distinct.size===mem.length;
+    if(clean){
+      mem.sort((a,b)=>(a.price_from_ngn||1e15)-(b.price_from_ngn||1e15));
+      mem.forEach(m=>{ m._groupMembers=mem; });
+      const pr=mem.map(m=>m.price_from_ngn).filter(x=>x);
+      out.push({ base:grp.base, members:mem, repId:mem[0].id, img:mem.find(m=>catProductImg(m))||mem[0], min:pr.length?Math.min.apply(null,pr):null });
+    } else {
+      // keep as individual cards, each its own single-member "group"
+      mem.forEach(m=>{ m._groupMembers=[m]; out.push({ base:m.name, members:[m], repId:m.id, img:m, min:m.price_from_ngn||null }); });
+    }
+  });
+  return out;
 }
+/* product type for kitchen sub-sections */
+const KITCHEN_TYPES=[['Air Fryers',/air ?fryer/i],['Blenders',/blender/i],['Juicers',/juicer/i],['Meat Grinders',/meat ?grinder|grinder/i],['Kettles & Flasks',/kettle|flask|thermal/i],['Hot Plates & Stoves',/hot ?plate|stove|induction|burner/i],['Rice Cookers',/rice ?cooker|cooker/i],['Ovens & Toasters',/oven|toaster/i],['Mixers',/mixer|whisk/i],['Sandwich Makers',/sandwich|waffle/i],['Steamers',/steamer/i],['Pressure Cookers',/pressure/i],['Pots & Pans',/\bpot\b|\bwok\b|\bpan\b|saucepan/i],['Irons',/iron/i],['Fans',/\bfan\b/i]];
+function catType(name){ const n=String(name||''); for(const t of KITCHEN_TYPES){ if(t[1].test(n)) return t[0]; } return 'More Kitchen'; }
 function catGroupCard(g){
   const p=g.img, img=catProductImg(p), alt=catFallbackImg(p);
   const price=g.min?(fmtCatalog(g.min)+'<span class="perpc">/pc</span>'):'Ask price';
@@ -2638,23 +2663,31 @@ async function fetchBundledRows(){
     try{ arr = await (await fetch('catalog-import/data/'+key+'_products.json',{cache:'no-store'})).json(); }
     catch(e){ continue; }
     const cat=BUNDLED_CATS[key];
+    const isKitchen = key.indexOf('kitchen')===0;
+    /* sell price so PROFIT is `margin`% of the customer total (hidden): sell = cost / (1 - margin%) */
+    const sell = cost => Math.round(cost / (1 - (margin/100)));
     (arr.products||arr||[]).forEach(p=>{
       const vs=(p.variants||[]).filter(v=>v.rmb_price>0);
       const min=vs.length? Math.min.apply(null,vs.map(v=>v.rmb_price)) : 0;
-      const priceFrom = min? Math.round(min*rate*(1+margin/100)) : null;
+      const priceFrom = min? sell(min*rate) : null;
+      const v0=(p.variants||[])[0]||{};
+      const cbm=+v0.cbm||0;
+      /* Kitchen must be complete: drop anything missing a price OR shipping (cbm) — no half-finished listings */
+      if(isKitchen && (!priceFrom || !cbm)) return;
       const imgs=[...new Set((p.variants||[]).map(v=>v.image).filter(Boolean))].map(u=>'catalog-import/'+u);
       const moqs=(p.variants||[]).map(v=>v.moq).filter(x=>x!=null);
       const moq = moqs.length? Math.min.apply(null,moqs) : null;
       const variants=(p.variants||[]).map(v=>({
         label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
         img: v.image? 'catalog-import/'+v.image : null,
-        unit: v.rmb_price? Math.round(v.rmb_price*rate*(1+margin/100)) : null }));
-      const v0=(p.variants||[])[0]||{};
-      const cbm=+v0.cbm||0;
+        unit: v.rmb_price? sell(v.rmb_price*rate) : null }));
       const weight=+v0.weight_kg|| (cbm? +(cbm*150).toFixed(1) : 0);   /* volumetric estimate when GW unknown */
       const pcsCarton=+v0.qty_per_carton|| moq || null;
       let nm;
-      if(p.name_en){ nm=p.name_en; }
+      if(p.name_en){ nm=p.name_en;
+        /* differentiate generic names: prepend capacity from the description when the name lacks one */
+        if(!/\b\d+(?:\.\d+)?\s*[lL]\b/.test(nm) && p.description_en){ const cm=String(p.description_en).match(/Capacity:\s*([\d.]+)\s*L/i); if(cm) nm=cm[1]+'L '+nm; }
+      }
       else{
         nm=cat.label;
         const cap=(p.variants||[]).map(v=>String(v.spec2||'')).join(' ').match(/(\d{4,6})\s*毫安/);
