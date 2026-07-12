@@ -1,0 +1,914 @@
+{
+ "brand": "Samsung",
+ "currency": "RMB",
+ "basis": "Xianyu (靓机汇 anchored)",
+ "updated": "2026-07-12",
+ "models": [
+  {
+   "series": "S",
+   "model": "S20",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": 450,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S20+",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": 480,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S20 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 950,
+     "status": "verified",
+     "note": "DeepSeek runs high"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S21",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 800,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S21+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 850,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S21 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1350,
+     "status": "verified",
+     "note": "S Pen support; DeepSeek high"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S21 FE",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "靓机汇 not listed - check Xianyu"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S22",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 900,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S22+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1000,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S22 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1750,
+     "status": "verified",
+     "note": "S Pen; DeepSeek high"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S23",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1300,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S23+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1600,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S23 FE",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1100,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S23 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 2450,
+     "status": "verified",
+     "note": "S Pen; DeepSeek high. 8+256 = ¥2,350"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S24",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1950,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S24+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 2100,
+     "status": "verified",
+     "note": "No charger in box"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S24 FE",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "靓机汇 not listed - check Xianyu"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S24 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 3300,
+     "status": "verified",
+     "note": "S Pen; new discounted to ¥5,899"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 3650,
+     "status": "verified",
+     "note": "S Pen"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 4100,
+     "status": "verified",
+     "note": "S Pen"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S25",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 3050,
+     "status": "verified",
+     "note": "No charger; new RRP ¥5,999"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S25 Edge",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 2600,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S25+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 3150,
+     "status": "verified",
+     "note": "new RRP ¥6,999"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S25 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 4450,
+     "status": "verified",
+     "note": "S Pen"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 5000,
+     "status": "verified",
+     "note": "S Pen"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 5900,
+     "status": "verified",
+     "note": "S Pen (16+1TB)"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S26",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 3300,
+     "status": "verified",
+     "note": "current gen"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S26+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 4350,
+     "status": "verified",
+     "note": "current gen"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 4650,
+     "status": "verified",
+     "note": "current gen"
+    }
+   ]
+  },
+  {
+   "series": "S",
+   "model": "S26 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 5400,
+     "status": "verified",
+     "note": "S Pen, current gen"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 5800,
+     "status": "verified",
+     "note": "S Pen, current gen"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 7100,
+     "status": "verified",
+     "note": "S Pen (16+1TB)"
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold2",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1250,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold3",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1600,
+     "status": "verified",
+     "note": "DeepSeek matches"
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold4",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1850,
+     "status": "verified",
+     "note": "DeepSeek high"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 1950,
+     "status": "verified",
+     "note": ""
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 2050,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold5",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 2600,
+     "status": "verified",
+     "note": "DeepSeek ¥4,800 = ERROR"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 2750,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold6",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 4500,
+     "status": "verified",
+     "note": "test hinge+crease before buying"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 4850,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z Fold7",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 6400,
+     "status": "verified",
+     "note": "new RRP ¥13,999"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 7000,
+     "status": "verified",
+     "note": "new RRP ¥14,999"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 7800,
+     "status": "verified",
+     "note": "16+1TB; new RRP ¥17,499"
+    }
+   ]
+  },
+  {
+   "series": "Z Fold",
+   "model": "Z TriFold",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 12800,
+     "status": "verified",
+     "note": "16+512, ultra-rare"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 13800,
+     "status": "verified",
+     "note": "16+1TB, ultra-rare"
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip3",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": 600,
+     "status": "verified",
+     "note": "DeepSeek ¥1,300 way high"
+    },
+    {
+     "storage": "256GB",
+     "buy_rmb": 700,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip4",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 800,
+     "status": "verified",
+     "note": "DeepSeek way high. 8+512 = ¥900"
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip5",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1300,
+     "status": "verified",
+     "note": "DeepSeek high. 8+512 = ¥1,400"
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip6",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1850,
+     "status": "verified",
+     "note": "DeepSeek high"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 2100,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip7 FE",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1550,
+     "status": "verified",
+     "note": "new RRP ¥6,499"
+    }
+   ]
+  },
+  {
+   "series": "Z Flip",
+   "model": "Z Flip7",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 3000,
+     "status": "verified",
+     "note": "new RRP ¥7,999; DeepSeek high"
+    },
+    {
+     "storage": "512GB",
+     "buy_rmb": 3300,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Note",
+   "model": "Note20",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 650,
+     "status": "verified",
+     "note": ""
+    }
+   ]
+  },
+  {
+   "series": "Note",
+   "model": "Note20 Ultra",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1300,
+     "status": "verified",
+     "note": "S Pen; DeepSeek slightly high"
+    }
+   ]
+  },
+  {
+   "series": "Note",
+   "model": "Note10+",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "靓机汇 not listed - verify"
+    }
+   ]
+  },
+  {
+   "series": "Note",
+   "model": "Note9",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "靓机汇 not listed - verify"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W20",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1000,
+     "status": "verified",
+     "note": "12+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W21",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1200,
+     "status": "verified",
+     "note": "12+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W22",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1700,
+     "status": "verified",
+     "note": "16+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W23 Flip",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1050,
+     "status": "verified",
+     "note": "12+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W23",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 2300,
+     "status": "verified",
+     "note": "16+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W24 Flip",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 1600,
+     "status": "verified",
+     "note": "12+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W24",
+   "storages": [
+    {
+     "storage": "1TB",
+     "buy_rmb": 3600,
+     "status": "verified",
+     "note": "16+1TB"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W25 Flip",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 2800,
+     "status": "verified",
+     "note": "12+512"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W25",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 6400,
+     "status": "verified",
+     "note": "16+512"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 6900,
+     "status": "verified",
+     "note": "16+1TB"
+    }
+   ]
+  },
+  {
+   "series": "W",
+   "model": "W26",
+   "storages": [
+    {
+     "storage": "512GB",
+     "buy_rmb": 9300,
+     "status": "verified",
+     "note": "16+512, current gen"
+    },
+    {
+     "storage": "1TB",
+     "buy_rmb": 10300,
+     "status": "verified",
+     "note": "16+1TB, current gen"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A52",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 430,
+     "status": "verified",
+     "note": "A52 5G"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A53",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 550,
+     "status": "verified",
+     "note": "A53 5G"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A54",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 600,
+     "status": "verified",
+     "note": "A54 5G"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A55",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1300,
+     "status": "verified",
+     "note": "A55 5G"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A56",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1400,
+     "status": "verified",
+     "note": "A56 5G"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A57",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": 1600,
+     "status": "verified",
+     "note": "A57 5G, current"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A15",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A16",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A24",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A25",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A34",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A35",
+   "storages": [
+    {
+     "storage": "256GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A72",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  },
+  {
+   "series": "A",
+   "model": "A73",
+   "storages": [
+    {
+     "storage": "128GB",
+     "buy_rmb": null,
+     "status": "needs-check",
+     "note": "budget - thin Xianyu data, check live"
+    }
+   ]
+  }
+ ]
+}
