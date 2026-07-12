@@ -589,6 +589,12 @@
   .catcard .catmedia{position:relative;}
   .catsubhead{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:20px 0 2px;display:flex;align-items:center;gap:8px;}
   .catsubhead .count{font-size:11px;font-weight:700;color:var(--faint);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:1px 8px;}
+  .catsubhead .seeall{margin-left:auto;font-size:12px;font-weight:700;color:var(--red,#e0245e);background:none;border:none;cursor:pointer;}
+  .subtypebar{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .subtypebar::-webkit-scrollbar{display:none;}
+  .subtype{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;white-space:nowrap;}
+  .subtype.on{background:var(--tx);color:var(--bg);border-color:var(--tx);}
+  .subtype span{opacity:.6;font-size:11px;}
   .catopts{position:absolute;top:7px;right:7px;background:var(--tx);color:var(--bg);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.02em;}
   @media (max-width:560px){ .catgrid{grid-template-columns:repeat(3,1fr);gap:8px;} .catcard .cattl{font-size:11.5px;} .catcard .catpr{font-size:11px;} .catcard .cattx{padding:8px 8px 10px;} }
 
@@ -655,6 +661,7 @@
   .cstotbox{border:1px solid var(--line);border-radius:14px;padding:4px 13px;margin:0 0 14px;background:var(--card);}
   .cstotbox .cstot{border-top:1px solid var(--line);margin-top:2px;}
   .cstotbox .cstot b{font-size:16px;color:var(--red,#e0245e);}
+  .csexpress{font-size:11.5px;color:var(--muted);line-height:1.5;background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:9px 12px;margin:0 0 14px;}
 
   /* ---- catalog product sheet ---- */
   #catSheet{z-index:72;}
@@ -1512,9 +1519,9 @@ function renderWish(){
 function openWish(){ renderWish(); showSheet($('wishSheet')); }
 
 /* ---------- instant search ---------- */
-function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); document.body.style.overflow='hidden'; setTimeout(()=>$('searchInput').focus(),60);
+function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); lockScroll(); setTimeout(()=>$('searchInput').focus(),60);
   ensureCatalogLoaded().then(()=>{ if($('searchOverlay').classList.contains('show')) runSearch($('searchInput').value); }); }
-function closeSearch(){ $('searchOverlay').classList.remove('show'); document.body.style.overflow=''; }
+function closeSearch(){ $('searchOverlay').classList.remove('show'); unlockScroll(); }
 function runSearch(q){
   q=(q||'').trim().toLowerCase(); const res=$('searchResults');
   if(!q){ res.innerHTML='<div class="shint">Search everything — phones, kitchen, power banks, watches, speakers…</div>'; return; }
@@ -1648,7 +1655,7 @@ function renderGrid(){
 function renderCatalogDeptGrid(){
   $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
   const slug=category;
-  if(window._catSlug!==slug){ window._catSlug=slug; window._catPage=24; }
+  if(window._catSlug!==slug){ window._catSlug=slug; window._catPage=24; window._catTypeFilter='all'; }
   $('catHead').textContent=(brandDef(category).name||deptDef(dept).name);
   $('catSub').textContent=CAT_BLURBS[slug]||brandDef(category).sub||'Wholesale stock — tap a product for details and bulk pricing.';
   const g=(window._catGroups||{})[slug];
@@ -1661,20 +1668,33 @@ function renderCatalogDeptGrid(){
   const page=window._catPage||24;
   const shown=display.slice(0,page);
   const isKitchen = slug.indexOf('kitchen')===0;
-  let body='';
+  let body='', typeBar='', more='';
   if(isKitchen){
-    /* organise into type sub-sections (Air Fryers, Blenders, …) */
-    const secs={}, order=[];
-    shown.forEach(grp=>{ const t=catType(grp.base); if(!secs[t]){secs[t]=[];order.push(t);} secs[t].push(grp); });
-    order.sort((a,b)=> (a==='More Kitchen'?1:0)-(b==='More Kitchen'?1:0) || secs[b].length-secs[a].length );
-    body=order.map(t=>`<div class="catsubhead" style="grid-column:1/-1">${esc(t)} <span class="count">${secs[t].length}</span></div><div class="catgrid" style="grid-column:1/-1;margin-top:0">${secs[t].map(catGroupCard).join('')}</div>`).join('');
+    /* full type list (from the WHOLE category, so the top selector is complete) */
+    const allTypes={}; display.forEach(grp=>{ const t=catType(grp.base); allTypes[t]=(allTypes[t]||0)+1; });
+    const typeOrder=Object.keys(allTypes).sort((a,b)=> (a==='More Kitchen'?1:0)-(b==='More Kitchen'?1:0) || allTypes[b]-allTypes[a]);
+    const sel=window._catTypeFilter||'all';
+    typeBar=`<div class="subtypebar" style="grid-column:1/-1"><button class="subtype ${sel==='all'?'on':''}" data-subtype="all">All</button>${typeOrder.map(t=>`<button class="subtype ${sel===t?'on':''}" data-subtype="${esc(t)}">${esc(t)} <span>${allTypes[t]}</span></button>`).join('')}</div>`;
+    if(sel!=='all'){
+      const list=display.filter(grp=>catType(grp.base)===sel);
+      const shownT=list.slice(0,page);
+      body=`<div class="catsubhead" style="grid-column:1/-1">${esc(sel)} <span class="count">${list.length}</span></div><div class="catgrid" style="grid-column:1/-1;margin-top:0">${shownT.map(catGroupCard).join('')}</div>`;
+      if(list.length>page) more=`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${list.length-page} left)</button>`;
+    } else {
+      const secs={}, order=[];
+      shown.forEach(grp=>{ const t=catType(grp.base); if(!secs[t]){secs[t]=[];order.push(t);} secs[t].push(grp); });
+      order.sort((a,b)=> (a==='More Kitchen'?1:0)-(b==='More Kitchen'?1:0) || secs[b].length-secs[a].length );
+      body=order.map(t=>`<div class="catsubhead" style="grid-column:1/-1">${esc(t)} <span class="count">${secs[t].length}</span> <button class="seeall" data-subtype="${esc(t)}">See all →</button></div><div class="catgrid" style="grid-column:1/-1;margin-top:0">${secs[t].map(catGroupCard).join('')}</div>`).join('');
+      if(display.length>page) more=`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${display.length-page} left)</button>`;
+    }
   } else {
     body=`<div class="catgrid" style="grid-column:1/-1;margin-top:0">${shown.map(catGroupCard).join('')}</div>`;
+    if(display.length>page) more=`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${display.length-page} left)</button>`;
   }
   $('grid').innerHTML=
-    catDeptHeroHTML()+ body +
-    (display.length>page?`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${display.length-page} left)</button>`:'')+
+    catDeptHeroHTML()+ typeBar + body + more +
     `<button class="reqband" id="catReqBtn" style="grid-column:1/-1">🛎️ Can’t find it? Request a product or a new section</button>`;
+  $('grid').querySelectorAll('[data-subtype]').forEach(el=>{ el.onclick=()=>{ window._catTypeFilter=el.dataset.subtype; window._catPage=24; renderGrid(); document.getElementById('phones').scrollIntoView({behavior:'smooth',block:'start'}); }; });
   $('grid').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
   const mb=$('catMoreBtn'); if(mb) mb.onclick=()=>{ window._catPage=(window._catPage||24)+48; renderGrid(); };
   const rb=$('catReqBtn'); if(rb) rb.onclick=()=>requestProduct(brandDef(category).name+' ');
@@ -2055,8 +2075,11 @@ function setBackgroundActive(active){
   const mv=window._heroMV;
   if(mv){ try{ if(active){ mv.setAttribute('auto-rotate',''); if(mv.play) mv.play(); } else { mv.removeAttribute('auto-rotate'); if(mv.pause) mv.pause(); } }catch(e){} }
 }
-function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); document.body.style.overflow='hidden'; setBackgroundActive(false); updateBars(); }
-function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet'),$('samSheet')].forEach(s=>s&&s.classList.remove('show')); document.body.style.overflow=''; setBackgroundActive(true); updateBars(); }
+let _lockY=0;
+function lockScroll(){ if(document.body.style.position==='fixed') return; _lockY=window.scrollY||window.pageYOffset||0; const b=document.body; b.style.position='fixed'; b.style.top=(-_lockY)+'px'; b.style.left='0'; b.style.right='0'; b.style.width='100%'; }
+function unlockScroll(){ const b=document.body; if(b.style.position!=='fixed') return; b.style.position=''; b.style.top=''; b.style.left=''; b.style.right=''; b.style.width=''; window.scrollTo(0,_lockY); }
+function showSheet(s){ scrim.classList.add('show'); s.classList.add('show'); lockScroll(); setBackgroundActive(false); updateBars(); }
+function hideSheets(){ scrim.classList.remove('show'); [prodSheet,cartSheet,checkoutSheet,$('wishSheet'),$('catSheet'),$('samSheet')].forEach(s=>s&&s.classList.remove('show')); unlockScroll(); setBackgroundActive(true); updateBars(); }
 scrim.onclick=hideSheets; $('pClose').onclick=hideSheets; $('cClose').onclick=hideSheets; $('kClose').onclick=hideSheets; if($('csClose')) $('csClose').onclick=hideSheets; if($('samClose')) $('samClose').onclick=hideSheets;
 function openCart(){ renderCart(); showSheet(cartSheet); }
 $('openCart').onclick=openCart;
@@ -2529,7 +2552,7 @@ function openCatSheet(id){
   const sheet = $('catSheet'); if(!sheet) return;
   const members=(p0._groupMembers&&p0._groupMembers.length)?p0._groupMembers:[p0];
   let mi=Math.max(0,members.indexOf(p0));
-  let vi=0, qty=null, ship=null;   /* ship default = none (not sea) */
+  let vi=0, qty=null;   /* sea shipping is always included by default */
 
   function paint(){
     const p=members[mi];
@@ -2556,18 +2579,13 @@ function openCatSheet(id){
     const cartons=Math.max(1,Math.ceil(qty/(pcs||1)));
     const sea=cbm? Math.round(cartons*cbm*rates.sea) : null;
     const air=weight? Math.round(cartons*weight*rates.air) : null;
-    const shipCost = ship==='sea'?(sea||0) : ship==='air'?(air||0) : 0;
+    const shipCost = (sea!=null)? sea : 0;   /* sea always included */
     const goods=unit*qty, total=goods+shipCost;
     const vimg=variants[vi].img, heroImg=vimg||imgs[0]||'';
     const thumbs=imgs.length>1?`<div class="csthumbs">${imgs.map((u,i)=>`<img src="${u}" data-csidx="${i}" class="${(!vimg&&i===0)?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>`:'';
     const memberChips = members.length>1?`<div class="csspecshead">Choose option</div><div class="chiprow">${members.map((m,i)=>`<button class="optchip ${i===mi?'on':''}" data-mi="${i}">${esc(memberLabel(m))}${m.price_from_ngn?' · '+fmtCatalog(m.price_from_ngn):''}</button>`).join('')}</div>`:'';
     const colorChips = hasColors?`<div class="csspecshead">Choose colour</div><div class="chiprow">${variants.map((v,i)=>`<button class="optchip ${i===vi?'on':''}" data-vi="${i}">${esc(v.label||('Option '+(i+1)))}${v.unit?` · ${fmtCatalog(v.unit)}`:''}</button>`).join('')}</div>`:'';
-    const shipRow = (sea!=null||air!=null)?`
-      <div class="csspecshead">Choose shipping</div>
-      <div class="shiprow">
-        ${sea!=null?`<button class="shipopt ${ship==='sea'?'on':''}" data-ship="sea"><b>Sea</b><span>${fmtCatalog(sea)}</span></button>`:''}
-        ${air!=null?`<button class="shipopt ${ship==='air'?'on':''}" data-ship="air"><b>Fast express by air</b><span>${ship==='air'?fmtCatalog(air):'Tap to see'}</span></button>`:''}
-      </div>`:'';
+    const airNote = (air!=null)?`<p class="csexpress">⚡ Need it fast? <b>Express air freight</b> available — much quicker but a lot pricier (about ${fmtCatalog(air)} for this order). Ask us on WhatsApp.</p>`:'';
 
     $('catSheetBody').innerHTML = `
       <div class="csmedia"><img id="csMainImg" src="${heroImg}" alt="${esc(p.name||'')}" onerror="this.style.display='none'" onload="if(this.naturalWidth&&this.naturalWidth<300){this.parentNode.style.maxHeight='230px';this.style.padding='28px';}"></div>
@@ -2584,25 +2602,24 @@ function openCatSheet(id){
         <div class="qval"><b id="qVal">${qty}</b><small>${cartons} carton${cartons>1?'s':''}</small></div>
         <button class="qbtn" id="qPlus">+</button>
       </div>
-      ${shipRow}
       <div class="cstotbox">
         <div class="csrow"><span>${qty} pcs × ${fmtCatalog(unit)}</span><b>${fmtCatalog(goods)}</b></div>
-        ${shipCost?`<div class="csrow"><span>Shipping (${ship==='air'?'air':'sea'})</span><b>${fmtCatalog(shipCost)}</b></div>`:''}
-        <div class="csrow cstot"><span>Estimated total${shipCost?'':' (before shipping)'}</span><b>${fmtCatalog(total)}</b></div>
+        ${sea!=null?`<div class="csrow"><span>Sea shipping (${cartons} carton${cartons>1?'s':''})</span><b>${fmtCatalog(sea)}</b></div>`:`<div class="csrow"><span>Shipping</span><b>Quoted on WhatsApp</b></div>`}
+        <div class="csrow cstot"><span>Estimated total${sea!=null?'':' (before shipping)'}</span><b>${fmtCatalog(total)}</b></div>
       </div>
+      ${airNote}
       ${aRows?`<div class="csspecshead">Details</div><div class="csspecs">${aRows}</div>`:''}
       <button class="addbtn" id="csOrderBtn">Order ${qty} pcs on WhatsApp</button>
-      <p class="csnote">Wholesale item — final shipping is confirmed on WhatsApp before you pay.${wEst&&(ship==='air')?' Air cost is a volume estimate.':''}</p>`;
+      <p class="csnote">Wholesale item — sea freight included in the estimate; we confirm final shipping on WhatsApp before you pay.</p>`;
 
     sheet.querySelectorAll('[data-csidx]').forEach(t=>{ t.onclick=()=>{ $('csMainImg').src=t.src; sheet.querySelectorAll('[data-csidx]').forEach(x=>x.classList.remove('on')); t.classList.add('on'); }; });
     sheet.querySelectorAll('[data-mi]').forEach(el=>{ el.onclick=()=>{ mi=+el.dataset.mi; vi=0; qty=null; paint(); }; });
     sheet.querySelectorAll('[data-vi]').forEach(el=>{ el.onclick=()=>{ vi=+el.dataset.vi; paint(); }; });
-    sheet.querySelectorAll('[data-ship]').forEach(el=>{ el.onclick=()=>{ ship=(ship===el.dataset.ship?null:el.dataset.ship); paint(); }; });
     $('qMinus').onclick=()=>{ qty=Math.max(moq, qty-step); paint(); };
     $('qPlus').onclick=()=>{ qty=qty+step; paint(); };
     $('csOrderBtn').onclick=()=>{
       const col=hasColors?(' · '+variants[vi].label):'';
-      const shipTxt = ship==='sea'?(' · sea shipping ~'+fmtCatalog(sea)) : ship==='air'?(' · air shipping ~'+fmtCatalog(air)) : ' · shipping to be advised';
+      const shipTxt = (sea!=null)?(' · sea shipping ~'+fmtCatalog(sea)):' · shipping to be advised';
       const msg='Hi MiStore, I want to order (wholesale): '+(p.name||'Item')+col+' — '+qty+' pcs at '+fmtCatalog(unit)+'/pc'+shipTxt+'. Estimated total '+fmtCatalog(total)+'. Please confirm.';
       window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
     };
