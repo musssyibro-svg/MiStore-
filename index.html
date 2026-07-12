@@ -1748,7 +1748,6 @@ function openSamsungSheet(i){
       <h3 class="csname">${esc(m.model)}</h3>
       <div class="csprice">${fmtK(price)} <span class="perpc">${esc(s.storage)}</span></div>
       ${sts.length>1?`<div class="csspecshead">Storage</div><div class="chiprow">${sts.map((x,idx)=>`<button class="optchip ${idx===si?'on':''}" data-si="${idx}">${esc(x.storage)} · ${fmtK(samPrice(x.buy_rmb))}</button>`).join('')}</div>`:''}
-      ${s.note?`<p class="csdesc">${esc(s.note)}</p>`:''}
       <div class="csmoqbox">
         <div class="csrow"><span>Condition</span><b>Clean · fully tested</b></div>
         <div class="csrow"><span>Warranty</span><b>MiStore check + support</b></div>
