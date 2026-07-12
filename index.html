@@ -606,6 +606,24 @@
   .csmoqbox{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:0 0 12px;background:var(--card);}
   .csspecshead{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 6px;}
 
+  /* ---- department featured hero + request band ---- */
+  .depthero{display:flex;align-items:center;gap:14px;background:linear-gradient(120deg,var(--card),var(--bg));border:1px solid var(--line);border-radius:22px;padding:14px 16px;margin:0 0 14px;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .16s;}
+  .depthero:active{transform:scale(.99);}
+  .depthero .dhimg{flex:0 0 40%;max-width:150px;aspect-ratio:1/1;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .depthero .dhimg img{width:100%;height:100%;object-fit:contain;padding:10px;mix-blend-mode:multiply;}
+  .depthero .dhbadge{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);}
+  .depthero .dhname{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:3px 0 4px;line-height:1.2;}
+  .depthero .dhprice{font-size:14px;font-weight:800;color:var(--red,#e0245e);}
+  .depthero .dhcta{display:inline-block;margin-top:8px;font-size:12.5px;font-weight:700;color:var(--tx);}
+  .reqband{background:var(--card);border:1.5px dashed var(--line-strong,var(--line));border-radius:16px;padding:13px;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;width:100%;margin-top:6px;}
+  .reqband:active{transform:scale(.99);}
+  #requestband{padding-top:6px;}
+  .reqcard{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--card),var(--bg));border:1px solid var(--line);border-radius:22px;padding:18px 18px;box-shadow:var(--shadow);}
+  .reqcard h3{font-size:16.5px;letter-spacing:-.02em;margin:0 0 3px;}
+  .reqcard p{font-size:12.5px;color:var(--muted);margin:0;max-width:420px;line-height:1.5;}
+  .reqcta{background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:12px 20px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;}
+  .reqbtn{margin-top:12px;background:var(--tx);color:var(--bg);border:none;border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:800;cursor:pointer;}
+
   /* ---- catalog product sheet ---- */
   #catSheet{z-index:72;}
   .csmedia{aspect-ratio:1/1;max-height:340px;background:#fff;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;}
@@ -764,6 +782,13 @@
     <div class="moregrid" id="moreGrid"></div>
   </section>
 
+  <section id="requestband">
+    <div class="reqcard">
+      <div class="reqtx"><h3>Looking for something we don’t have yet?</h3><p>Tell us the product or a whole new section — we source new lines every week and can add it for you.</p></div>
+      <button class="reqcta" id="homeReqBtn">🛎️ Request a product or section</button>
+    </div>
+  </section>
+
   <section id="how">
     <div class="sechead"><div><h2>How it works</h2><p>Simple, transparent, and on WhatsApp the whole way.</p></div></div>
     <div class="steps">
@@ -853,7 +878,7 @@
 <div class="searchoverlay" id="searchOverlay">
   <div class="searchbar">
     <svg viewBox="0 0 24 24" class="sicon"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input id="searchInput" type="search" autocomplete="off" placeholder="Search iPhone — try “17”, “Pro Max”…">
+    <input id="searchInput" type="search" autocomplete="off" placeholder="Search all products — phones, blenders, watches…">
     <button id="searchCancel">Cancel</button>
   </div>
   <div class="searchresults" id="searchResults"></div>
@@ -1449,17 +1474,32 @@ function renderWish(){
 function openWish(){ renderWish(); showSheet($('wishSheet')); }
 
 /* ---------- instant search ---------- */
-function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); document.body.style.overflow='hidden'; setTimeout(()=>$('searchInput').focus(),60); }
+function openSearch(){ const o=$('searchOverlay'); o.classList.add('show'); $('searchInput').value=''; runSearch(''); document.body.style.overflow='hidden'; setTimeout(()=>$('searchInput').focus(),60);
+  ensureCatalogLoaded().then(()=>{ if($('searchOverlay').classList.contains('show')) runSearch($('searchInput').value); }); }
 function closeSearch(){ $('searchOverlay').classList.remove('show'); document.body.style.overflow=''; }
 function runSearch(q){
   q=(q||'').trim().toLowerCase(); const res=$('searchResults');
-  if(!q){ res.innerHTML='<div class="shint">Search any model — try “17”, “Pro Max”, “13”…</div>'; return; }
-  const matches=CATALOG_MODELS.filter(m=>m.toLowerCase().includes(q)).slice(0,14);
-  if(!matches.length){ res.innerHTML='<div class="shint">No matches for “'+esc(q)+'”.</div>'; return; }
-  res.innerHTML=matches.map(m=>{ const th=modelThumb(m); const p=anyFromPrice(m);
-    return `<div class="sres" data-sopen="${esc(m)}"><div class="sth">${th?`<img loading="lazy" src="${esc(th)}" alt="" onerror="this.style.display='none'">`:'📱'}</div><div class="sm"><div class="smn">${esc(m)}</div><div class="smp">${p?'from '+fmtFull(p):'View details'}</div></div><span class="sgo">›</span></div>`;
-  }).join('');
+  if(!q){ res.innerHTML='<div class="shint">Search everything — phones, kitchen, power banks, watches, speakers…</div>'; return; }
+  let html='';
+  CATALOG_MODELS.filter(m=>m.toLowerCase().includes(q)).slice(0,8).forEach(m=>{ const th=modelThumb(m); const p=anyFromPrice(m);
+    html+=`<div class="sres" data-sopen="${esc(m)}"><div class="sth">${th?`<img loading="lazy" src="${esc(th)}" alt="" onerror="this.style.display='none'">`:'📱'}</div><div class="sm"><div class="smn">${esc(m)}</div><div class="smp">${p?'from '+fmtFull(p):'Phone'}</div></div><span class="sgo">›</span></div>`;
+  });
+  const prods=Object.values(CAT_STORE).filter(p=>((p.name||'').toLowerCase().includes(q)) || (((p.catalog_categories&&p.catalog_categories.name)||'').toLowerCase().includes(q))).slice(0,24);
+  prods.forEach(p=>{ const th=catProductImg(p); const cn=(p.catalog_categories&&p.catalog_categories.name)||'';
+    html+=`<div class="sres" data-scat="${esc(p.id)}"><div class="sth">${th?`<img loading="lazy" src="${esc(th)}" alt="" onerror="this.style.display='none'">`:'📦'}</div><div class="sm"><div class="smn">${esc(p.name||'Item')}</div><div class="smp">${p.price_from_ngn?(fmtCatalog(p.price_from_ngn)+'/pc · '):''}${esc(cn)}</div></div><span class="sgo">›</span></div>`;
+  });
+  if(!html){ html='<div class="shint">No matches for “'+esc(q)+'”.<br><button class="reqbtn" id="reqFromSearch">🛎️ Request this product</button></div>'; }
+  res.innerHTML=html;
   res.querySelectorAll('[data-sopen]').forEach(el=>el.onclick=()=>{ closeSearch(); openProductAnyCond(el.dataset.sopen); });
+  res.querySelectorAll('[data-scat]').forEach(el=>el.onclick=()=>{ closeSearch(); openCatSheet(el.getAttribute('data-scat')); });
+  const rq=$('reqFromSearch'); if(rq) rq.onclick=()=>{ closeSearch(); requestProduct(q); };
+}
+
+/* Request a product or a whole new section that isn't in the store yet. */
+function requestProduct(prefill){
+  const what=(prefill||'').trim();
+  const msg='Hi MiStore, I want to REQUEST '+(what?('“'+what+'”'):'a product/section')+' that is not in the store yet. Can you source it / add the section?';
+  window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent(msg),'_blank','noopener');
 }
 
 function variantsOf(model,c){ return (CAT[c]||{})[model]||[]; }
@@ -1578,10 +1618,33 @@ function renderCatalogDeptGrid(){
   }
   const page=window._catPage||24;
   const items=g.items.slice(0,page);
-  $('grid').innerHTML=`<div class="catgrid" style="grid-column:1/-1;margin-top:0">${items.map(catStoreCard).join('')}</div>`+
-    (g.items.length>page?`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto;max-width:320px;">Show more (${g.items.length-page} left)</button>`:'');
+  $('grid').innerHTML=
+    catDeptHeroHTML()+
+    `<div class="catgrid" style="grid-column:1/-1;margin-top:0">${items.map(catStoreCard).join('')}</div>`+
+    (g.items.length>page?`<button class="viewbtn" id="catMoreBtn" style="grid-column:1/-1;margin:8px auto 4px;max-width:320px;">Show more (${g.items.length-page} left)</button>`:'')+
+    `<button class="reqband" id="catReqBtn" style="grid-column:1/-1">🛎️ Can’t find it? Request a product or a new section</button>`;
   $('grid').querySelectorAll('[data-catid]').forEach(el=>{ el.onclick=()=>openCatSheet(el.dataset.catid); });
   const mb=$('catMoreBtn'); if(mb) mb.onclick=()=>{ window._catPage=(window._catPage||24)+48; renderGrid(); };
+  const rb=$('catReqBtn'); if(rb) rb.onclick=()=>requestProduct(brandDef(category).name+' ');
+}
+
+/* Featured product banner for a catalog department (Kitchen → a blender). */
+function catDeptHeroHTML(){
+  const groups=window._catGroups||{}; let feat=null;
+  if(dept==='kitchen'){
+    const ka=(groups['kitchen-appliances']||{items:[]}).items;
+    feat=ka.find(p=>/blender/i.test(p.name||'')&&catProductImg(p)) || ka.find(p=>/juicer|air fryer/i.test(p.name||'')&&catProductImg(p)) || ka.find(p=>catProductImg(p));
+  } else if(dept==='accessories'){
+    const sw=(groups['smartwatch']||{items:[]}).items, pb=(groups['powerbank']||{items:[]}).items;
+    feat=sw.find(p=>catProductImg(p)) || pb.find(p=>catProductImg(p));
+  }
+  if(!feat) return '';
+  const img=catProductImg(feat);
+  const price=feat.price_from_ngn?('from '+fmtCatalog(feat.price_from_ngn)+'/pc'):'';
+  return `<div class="depthero" data-catid="${esc(feat.id)}" style="grid-column:1/-1">
+    <div class="dhimg">${img?`<img src="${img}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>
+    <div class="dhtx"><div class="dhbadge">${esc(deptDef(dept).name)} · Featured</div><div class="dhname">${esc(feat.name||'')}</div><div class="dhprice">${price}</div><span class="dhcta">View product →</span></div>
+  </div>`;
 }
 let _catLoadPromise=null;
 function ensureCatalogLoaded(){
@@ -1968,6 +2031,7 @@ async function loadShowcase(){
     else if(k==='wish') openWish();
     else if(k==='account') toast('Accounts are coming soon.');
   });
+  const hrb=$('homeReqBtn'); if(hrb) hrb.onclick=()=>requestProduct('');
   updateWishUI();
 })();
 
