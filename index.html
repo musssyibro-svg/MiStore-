@@ -1720,8 +1720,12 @@ function samModelMin(m){ const ps=(m.storages||[]).map(stPrice).filter(x=>x); re
 function samGlyph(){ return devIcon('phone')||'📱'; }
 /* cover tile: real photo when the brand has one, else a branded glyph tile */
 function brandCoverHTML(cfg,m,big){
-  if(cfg.photos && m.cover){
-    return `<img class="samcover${big?' big':''}" src="${esc(m.cover)}" alt="${esc(m.model)}" loading="lazy" onerror="this.style.display='none'">`;
+  /* admin-uploaded photo (product_images, condition 'brand') overrides the
+     bundled cover — lets Samsung/Xiaomi photos be managed from the admin. */
+  const ov=(CATALOG_IMAGES||{})[m.model+'|brand'];
+  const cover = ov || (cfg.photos && m.cover ? m.cover : null);
+  if(cover){
+    return `<img class="samcover${big?' big':''}" src="${esc(cover)}" alt="${esc(m.model)}" loading="lazy" onerror="this.style.display='none'">`;
   }
   return `<div class="samglyph${big?' big':''}">${samGlyph()}</div>${big?'<span class="samsoon">Photos coming soon</span>':''}`;
 }

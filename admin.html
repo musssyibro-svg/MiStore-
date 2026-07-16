@@ -1121,6 +1121,40 @@ function renderCatalogPhotos(){
     </div>`;
   }).join('') + `</div>`;
 }
+/* ---- Samsung / Xiaomi phone photos ----
+   Same product_images table, condition 'brand'. Model list is read from the
+   storefront's phone files so it always matches what customers see. The
+   storefront shows these photos in place of the built-in Xiaomi covers /
+   Samsung glyph the moment they're uploaded. */
+let BRAND_PHONE_MODELS = null;
+async function loadBrandPhoneModels(){
+  if(BRAND_PHONE_MODELS) return;
+  const out=[];
+  for(const b of [['Samsung','assets/phones/samsung.json'],['Xiaomi','assets/phones/xiaomi.json']]){
+    try{ const d=await (await fetch(b[1],{cache:'no-store'})).json();
+      (d.models||[]).forEach(m=>{ if(m.model) out.push({brand:b[0], model:m.model}); });
+    }catch(e){}
+  }
+  BRAND_PHONE_MODELS = out;
+}
+function renderBrandPhotos(){
+  if(!BRAND_PHONE_MODELS) return '<p class="sub">Loading Samsung &amp; Xiaomi models…</p>';
+  const byBrand={};
+  BRAND_PHONE_MODELS.forEach(x=>{ (byBrand[x.brand]=byBrand[x.brand]||[]).push(x.model); });
+  return Object.keys(byBrand).map(brand=>
+    `<div class="sechead" style="margin-top:18px">${esc(brand)} <span class="count">${byBrand[brand].length}</span></div>`+
+    `<div class="cpGrid">`+ byBrand[brand].map(model=>{
+      const path=productImages[imgKey(model,'brand')]; const url=catalogPhotoUrl(path);
+      const thumb=url?`<img src="${esc(url)}" alt="${esc(model)}">`:`<span class="ph">📷</span>`;
+      return `<div class="cpModel"><div class="cpModelName">${esc(model)}</div>
+        <div class="cpConds"><div class="cpCond">
+          <div class="cpThumb">${thumb}</div>
+          <div class="cpCondName">Photo</div>
+          <button class="cpBtn" data-editphoto="${esc(model)}" data-cond="brand">${path?'Edit':'Add'}</button>
+        </div></div></div>`;
+    }).join('') + `</div>`
+  ).join('');
+}
 document.getElementById('app').addEventListener('click', e=>{
   const b = e.target.closest('[data-editphoto]');
   if(!b) return;
@@ -1137,7 +1171,7 @@ document.getElementById('app').addEventListener('click', e=>{
       const prevLabel = b.textContent; b.textContent = '…'; b.disabled = true;
       try{
         await uploadCatalogPhoto(model, cond, dataUrl);
-        toast('Photo updated for '+model+' · '+CATALOG_CONDITIONS.find(c=>c.key===cond).name);
+        toast('Photo updated for '+model+' · '+((CATALOG_CONDITIONS.find(c=>c.key===cond)||{name:'Photo'}).name));
         if(tab==='photos') render();
       }catch(err){
         toast('⚠ Upload failed: '+(err.message||err));
@@ -1373,6 +1407,9 @@ async function recomputeAllCatalogPrices(){
     let n=0;
     for(const p of (data||[])){
       const pf = catalogPriceFrom(p, p.catalog_variants||[]);
+      /* NGN-baked bundled imports have no supplier ¥ to recompute from — skip
+         them so a recompute never wipes their already-correct price. */
+      if(pf==null) continue;
       const { error:ue } = await db.from('catalog_products').update({ price_from_ngn: pf }).eq('id', p.id);
       if(ue) throw ue; n++;
     }
@@ -1536,7 +1573,7 @@ function friendlyCatalogName(p){
 }
 
 async function importExistingCatalog(publishNow, skipConfirm){
-  if(!skipConfirm && !confirm('Import accessories (earbuds, power banks, speakers, smart watches) from the supplier catalog'+(publishNow?' and publish them':' as drafts')+'? Safe to run — it skips products already imported.')) return 0;
+  if(!skipConfirm && !confirm('Import all catalog products (earbuds, power banks, speakers, smart watches, kitchen appliances & utensils) from the supplier catalog'+(publishNow?' and publish them':' as drafts')+'? Safe to run — it skips products already imported.')) return 0;
   const btn=document.getElementById('ctlgImportBtn'); if(btn){ btn.disabled=true; btn.textContent='Importing…'; }
   try{
     await loadCatalogCategories();
@@ -1555,7 +1592,9 @@ async function importExistingCatalog(publishNow, skipConfirm){
         try{
           const firstImg = (p.variants||[]).find(v=>v.image)?.image || null;
           const moqs=(p.variants||[]).map(v=>v.moq).filter(x=>x!=null);
-          const pf = catalogPriceFrom({}, p.variants||[]);   // price computed inline — no extra update
+          /* bundled files ship baked NGN (no supplier ¥); use it directly, fall
+             back to the ¥ formula only if an older file still has rmb_price */
+          const pf = (p.from_ngn!=null) ? Number(p.from_ngn) : catalogPriceFrom({}, p.variants||[]);
           const { data:created, error } = await db.from('catalog_products').insert({
             category_id: catBySlug[p.category]||null, supplier_id: String(p.supplier_id),
             name: friendlyCatalogName(p), status: publishNow?'published':'draft',
@@ -1576,10 +1615,10 @@ async function importExistingCatalog(publishNow, skipConfirm){
       }
     }
     toast('✓ Imported '+n+' products'+(publishNow?' — they are LIVE on the store':' as drafts — review and publish them')); ctlgProducts=[]; ctlgLoaded=false; render();
-    if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
+    if(btn){ btn.disabled=false; btn.textContent='⬇ Import / refresh catalog'; }
     return n;
   }catch(e){ toast('⚠ Import failed: '+(e.message||e)); }
-  if(btn){ btn.disabled=false; btn.textContent='⬇ Import accessories catalog'; }
+  if(btn){ btn.disabled=false; btn.textContent='⬇ Import / refresh catalog'; }
   return 0;
 }
 
@@ -1619,7 +1658,7 @@ function ctlgListInnerHTML(){
   return `
     <div class="bkAdmChips">${statusChips}</div>
     <div class="bkAdmBar" style="margin-top:6px;">
-      ${ctlgProducts.length===0 && ctlgLoaded ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import accessories catalog</button>' : ''}
+      ${ctlgLoaded ? '<button class="cpBtn" id="ctlgImportBtn" style="width:auto;">⬇ Import / refresh catalog</button>' : ''}
       <button class="cpBtn" id="ctlgPublishAllBtn" style="width:auto;">✓ Publish all shown</button>
       <button class="cpBtn" id="ctlgExportBtn" style="width:auto;">⬆ Export JSON</button>
     </div>
@@ -1827,6 +1866,9 @@ function catalogPriceFrom(product, variants){
 async function persistCatalogPriceFrom(productId, product, variants){
   try{
     const pf = catalogPriceFrom(product, variants);
+    /* NGN-baked bundled import (no supplier ¥) — keep its existing price rather
+       than overwriting it with a null recompute. */
+    if(pf==null) return (product && product.price_from_ngn!=null) ? product.price_from_ngn : null;
     await db.from('catalog_products').update({ price_from_ngn: pf }).eq('id', productId);
     return pf;
   }catch(e){ return null; }
@@ -2947,9 +2989,13 @@ function render(){
   updateBadge();
 
   if(tab==='photos'){
-    app.innerHTML = `<div class="sechead">Catalog photos <span class="count">${CATALOG_MODELS.length}</span></div>
+    if(!BRAND_PHONE_MODELS){ loadBrandPhoneModels().then(()=>{ if(tab==='photos') render(); }); }
+    app.innerHTML = `<div class="sechead">iPhone photos <span class="count">${CATALOG_MODELS.length}</span></div>
       <p class="sub">These are storefront listing photos shown to every customer — separate from the per-order photos on individual orders.</p>
-      ${renderCatalogPhotos()}`;
+      ${renderCatalogPhotos()}
+      <div class="sechead" style="margin-top:28px">Samsung &amp; Xiaomi photos</div>
+      <p class="sub">Add or replace the photo customers see for each Samsung / Xiaomi model. Uploading here instantly replaces the built-in cover on the store.</p>
+      ${renderBrandPhotos()}`;
     return;
   }
 
