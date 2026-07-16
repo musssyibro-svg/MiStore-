@@ -1,0 +1,429 @@
+{
+ "brand": "Xiaomi",
+ "pricing": "ngn",
+ "models": [
+  {
+   "model": "Xiaomi 9",
+   "series": "Standard",
+   "slug": "xiaomi-9",
+   "cover": "assets/phones/xiaomi/xiaomi-9.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 110000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 120000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 9 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-9-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-9-pro.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 155000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 180000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 10",
+   "series": "Standard",
+   "slug": "xiaomi-10",
+   "cover": "assets/phones/xiaomi/xiaomi-10.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 140000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 170000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 10S",
+   "series": "Standard",
+   "slug": "xiaomi-10s",
+   "cover": "assets/phones/xiaomi/xiaomi-10s.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 170000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 185000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 10 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-10-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-10-pro.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 190000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 11",
+   "series": "Standard",
+   "slug": "xiaomi-11",
+   "cover": "assets/phones/xiaomi/xiaomi-11.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 165000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 195000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 11 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-11-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-11-pro.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 180000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 205000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 11 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-11-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-11-ultra.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 335000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 405000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 12",
+   "series": "Standard",
+   "slug": "xiaomi-12",
+   "cover": "assets/phones/xiaomi/xiaomi-12.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 200000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 225000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 12 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-12-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-12-pro.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 205000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 220000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 12 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-12-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-12-ultra.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 355000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 415000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 13",
+   "series": "Standard",
+   "slug": "xiaomi-13",
+   "cover": "assets/phones/xiaomi/xiaomi-13.jpg",
+   "storages": [
+    {
+     "storage": "128GB",
+     "price_ngn": 255000
+    },
+    {
+     "storage": "256GB",
+     "price_ngn": 305000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 13 Lite",
+   "series": "Lite",
+   "slug": "xiaomi-13-lite",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 280000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 13 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-13-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-13-pro.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 365000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 380000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 13 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-13-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-13-ultra.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 385000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 415000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 14",
+   "series": "Standard",
+   "slug": "xiaomi-14",
+   "cover": "assets/phones/xiaomi/xiaomi-14.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 405000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 425000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 470000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 14 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-14-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-14-pro.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 415000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 445000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 480000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 14 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-14-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-14-ultra.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 620000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 675000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 755000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 15",
+   "series": "Standard",
+   "slug": "xiaomi-15",
+   "cover": "assets/phones/xiaomi/xiaomi-15.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 485000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 515000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 685000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 15 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-15-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-15-pro.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 680000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 705000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 830000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 15 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-15-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-15-ultra.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 905000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 930000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1070000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 17",
+   "series": "Standard",
+   "slug": "xiaomi-17",
+   "cover": "assets/phones/xiaomi/xiaomi-17.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 805000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 855000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1030000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 17 Pro",
+   "series": "Pro",
+   "slug": "xiaomi-17-pro",
+   "cover": "assets/phones/xiaomi/xiaomi-17-pro.jpg",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 930000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 995000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1130000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 17 Pro Max",
+   "series": "Pro",
+   "slug": "xiaomi-17-pro-max",
+   "cover": "assets/phones/xiaomi/xiaomi-17-pro-max.jpg",
+   "storages": [
+    {
+     "storage": "512GB",
+     "price_ngn": 1205000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1280000
+    }
+   ]
+  },
+  {
+   "model": "Xiaomi 17 Ultra",
+   "series": "Ultra",
+   "slug": "xiaomi-17-ultra",
+   "cover": "assets/phones/xiaomi/xiaomi-17-ultra.jpg",
+   "storages": [
+    {
+     "storage": "512GB",
+     "price_ngn": 1280000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1530000
+    }
+   ]
+  }
+ ]
+}
