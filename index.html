@@ -641,6 +641,8 @@
   .sambadge{position:absolute;top:10px;left:10px;background:var(--tx);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;}
   .samph{flex-direction:column;gap:8px;}
   .samsoon{font-size:11.5px;color:var(--faint);font-weight:700;}
+  .samcover{width:100%;height:100%;object-fit:contain;padding:10px;mix-blend-mode:multiply;}
+  .samcover.big{padding:16px;}
 
   /* ---- product sheet controls ---- */
   .chiprow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
@@ -995,90 +997,42 @@ const CATALOG_PHOTO_BUCKET = 'catalog-photos';
    "iPhone 14 Pro": ["https://…/front.jpg","https://…/back.jpg"]  */
 const PHONE_IMAGES = {};
 
-/* ===== Baked price catalog (fallback when Supabase is unreachable) ===== */
-/* Prices = supplier RMB × 208 + ₦17,000 profit per phone (1-2 unit rate) */
+/* ===== Baked price catalog (customer-facing ₦ only — no supplier ¥ here) =====
+   Clean grade = current supplier stock (90% new · battery 81–100% · no pop-up),
+   priced live from the ¥ buy list via the MiStore phone formula:
+     roundUp5000( ¥ × rate(209) × 1.2 + ₦25,000 ).  17-series kept from prior list
+   (supplier did not re-quote it). X / XR / XS / 11 series disabled for now. */
 const RAW_CATALOG = {"apple":{
   "clean":{
-    "iPhone XR":          [["64",170200],["128",180600]],
-    "iPhone 11":          [["64",222200],["128",236760]],
-    "iPhone 11 Pro":      [["64",253400],["256",274200]],
-    "iPhone 11 Pro Max":  [["64",263800],["256",295000]],
-    "iPhone 12":          [["64",232600],["128",263800]],
-    "iPhone 12 Pro":      [["128",326200],["256",357400]],
-    "iPhone 12 Pro Max":  [["128",378200],["256",409400]],
-    "iPhone 13":          [["128",347000],["256",357400]],
-    "iPhone 13 Pro":      [["128",451000],["256",471800]],
-    "iPhone 13 Pro Max":  [["128",513400],["256",586200]],
-    "iPhone 14":          [["128",388600],["256",430200]],
-    "iPhone 14 Pro":      [["128",565400],["256",607000]],
-    "iPhone 14 Pro Max":  [["128",607000],["256",659000]],
-    "iPhone 15":          [["128",537200],["256",589200]],
-    "iPhone 15 Pro":      [["128",682800],["256",724400]],
-    "iPhone 15 Pro Max":  [["256",849200],["512",932400]],
-    "iPhone 16":          [["128",703600],["256",766000]],
-    "iPhone 16 Plus":     [["128",828400],["256",932400]],
-    "iPhone 16 Pro":      [["128",870000],["256",974000]],
-    "iPhone 16 Pro Max":  [["256",1098800],["512",1182000]],
+    "iPhone 12":          [["64",265000],["128",305000]],
+    "iPhone 12 Pro":      [["128",380000],["256",415000]],
+    "iPhone 12 Pro Max":  [["128",455000],["256",505000]],
+    "iPhone 13":          [["128",405000],["256",415000]],
+    "iPhone 13 Pro":      [["128",540000],["256",565000]],
+    "iPhone 13 Pro Max":  [["128",615000],["256",690000]],
+    "iPhone 14":          [["128",465000],["256",515000]],
+    "iPhone 14 Pro":      [["128",680000],["256",730000]],
+    "iPhone 14 Pro Max":  [["128",730000],["256",780000]],
+    "iPhone 15":          [["128",655000],["256",730000]],
+    "iPhone 15 Pro":      [["128",805000],["256",855000]],
+    "iPhone 15 Pro Max":  [["256",1005000],["512",1105000]],
+    "iPhone 16":          [["128",830000],["256",905000]],
+    "iPhone 16 Plus":     [["128",980000],["256",1105000]],
+    "iPhone 16 Pro":      [["128",1005000],["256",1155000]],
+    "iPhone 16 Pro Max":  [["256",1305000],["512",1405000]],
     "iPhone 17":          [["256",1019600],["512",1186000]],
     "iPhone 17 Air":      [["256",998800]],
     "iPhone 17 Pro":      [["256",1550000],["512",1654000]],
     "iPhone 17 Pro Max":  [["256",1810000],["512",1882800]]
   },
-  "battery":{
-    "iPhone XR":          [["64",176440],["128",180600]],
-    "iPhone XS Max":      [["64",155640],["256",166040]],
-    "iPhone 11":          [["64",195160],["128",205560]],
-    "iPhone 11 Pro":      [["64",222200],["256",243000]],
-    "iPhone 11 Pro Max":  [["64",232600],["256",263800]],
-    "iPhone 12":          [["64",222200],["128",243000]],
-    "iPhone 12 Pro":      [["128",274200],["256",295000]],
-    "iPhone 12 Pro Max":  [["128",315800],["256",336600]],
-    "iPhone 13":          [["128",326200],["256",336600]],
-    "iPhone 13 Pro":      [["128",419800],["256",440600]],
-    "iPhone 13 Pro Max":  [["128",461400],["256",482200]],
-    "iPhone 14 Pro":      [["128",513400],["256",534200]],
-    "iPhone 14 Pro Max":  [["128",544600],["256",575800]],
-    "iPhone 15 Pro Max":  [["256",724400],["512",786800]]
-  },
-  "screen":{
-    "iPhone 11":          [["64",195160],["128",205560]],
-    "iPhone 11 Pro":      [["64",201400],["256",222200]],
-    "iPhone 11 Pro Max":  [["64",222200],["256",243000]],
-    "iPhone 12":          [["64",201400],["128",211800]],
-    "iPhone 12 Pro":      [["128",263800],["256",274200]],
-    "iPhone 12 Pro Max":  [["128",284600],["256",305400]],
-    "iPhone 13":          [["128",295000],["256",305400]],
-    "iPhone 13 Pro":      [["128",388600],["256",409400]],
-    "iPhone 13 Pro Max":  [["128",409400],["256",430200]],
-    "iPhone 14":          [["128",315800],["256",336600]],
-    "iPhone 14 Pro":      [["128",430200],["256",451000]],
-    "iPhone 14 Pro Max":  [["128",461400],["256",503000]],
-    "iPhone 15":          [["128",402000],["256",422800]],
-    "iPhone 15 Pro":      [["128",516400],["256",568400]],
-    "iPhone 15 Pro Max":  [["256",641200],["512",682800]]
-  },
-  "double":{
-    "iPhone 11":          [["64",186840],["128",195160]],
-    "iPhone 11 Pro":      [["64",191000],["256",211800]],
-    "iPhone 11 Pro Max":  [["64",207640],["256",228440]],
-    "iPhone 12":          [["64",195160],["128",201400]],
-    "iPhone 12 Pro":      [["128",243000],["256",253400]],
-    "iPhone 12 Pro Max":  [["128",274200],["256",284600]],
-    "iPhone 13":          [["128",274200],["256",284600]],
-    "iPhone 13 Pro":      [["128",367800],["256",388600]],
-    "iPhone 13 Pro Max":  [["128",388600],["256",409400]],
-    "iPhone 14":          [["128",295000],["256",315800]],
-    "iPhone 14 Pro":      [["128",409400],["256",430200]],
-    "iPhone 14 Pro Max":  [["128",440600],["256",471800]],
-    "iPhone 15":          [["128",391600],["256",412400]],
-    "iPhone 15 Pro":      [["128",474800],["256",526800]],
-    "iPhone 15 Pro Max":  [["256",578800],["512",599600]]
-  }
+  "battery":{},
+  "screen":{},
+  "double":{}
 }};
 
-/* iPhone X excluded — not currently stocked */
+/* Current stock is a single supplier grade, so X / XR / XS / 11 series are
+   disabled and only models the supplier still quotes are listed. */
 const CATALOG_MODELS = [
-  'iPhone XR','iPhone XS Max','iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
   'iPhone 12','iPhone 12 Pro','iPhone 12 Pro Max',
   'iPhone 13','iPhone 13 Pro','iPhone 13 Pro Max',
   'iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max',
@@ -1087,7 +1041,7 @@ const CATALOG_MODELS = [
   'iPhone 17','iPhone 17 Air','iPhone 17 Pro','iPhone 17 Pro Max'
 ];
 const CONDITIONS = [
-  { key:'clean',   name:'Clean (London Used)', short:'Original parts',   pick:'Original screen & battery · like new',  long:'<b>Clean (London Used).</b> Original screen and battery, clean body, premium overall condition. Best choice for buyers who want the closest experience to a brand-new iPhone.' },
+  { key:'clean',   name:'Clean · 90% New', short:'90% new · battery 81–100%',   pick:'90% new · battery 81–100% · no pop-up',  long:'<b>Clean · 90% New.</b> Approximately 90% new, battery health 81–100%, no pop-up warning messages. Clean original body — the closest experience to a brand-new iPhone. We confirm exact condition and send real photos on WhatsApp before you pay.' },
   { key:'battery', name:'Battery Display',     short:'Replaced battery', pick:'Battery professionally replaced',       long:'<b>Battery Display.</b> Battery replaced for reliable charge performance and smooth daily use.' },
   { key:'screen',  name:'Screen Display',      short:'Replaced screen',  pick:'Screen professionally replaced',        long:'<b>Screen Display.</b> Screen professionally replaced — bright display and responsive touch at a lower price.' },
   { key:'double',  name:'Double Display',      short:'Screen + battery', pick:'Screen & battery replaced',             long:'<b>Double Display.</b> Screen and battery both replaced. Fully functional — the best-value option.' }
@@ -1113,7 +1067,7 @@ const BRANDS = {
     { key:'iphones', name:'iPhone',  ready:true,  sub:'Pick a condition, then tap any phone to see it from every angle.' },
     { key:'samsung', name:'Samsung', ready:true,  sub:'Samsung Galaxy — S, Z Fold/Flip, Note, A & W series. Photos coming soon; message us to order.' },
     { key:'google',  name:'Google',  ready:false, sub:'Google Pixel devices — landing soon at MiStore.' },
-    { key:'xiaomi',  name:'Xiaomi',  ready:false, sub:'Xiaomi & Redmi devices — landing soon at MiStore.' },
+    { key:'xiaomi',  name:'Xiaomi',  ready:true,  sub:'Xiaomi flagships — 9 to 17 series, Pro & Ultra. Tap any phone to see it and order.' },
     { key:'oneplus', name:'OnePlus', ready:false, sub:'OnePlus flagships — landing soon at MiStore.' },
     { key:'nothing', name:'Nothing', ready:false, sub:'Nothing phones — landing soon at MiStore.' }
   ],
@@ -1604,10 +1558,18 @@ function renderMore(){
 /* legacy alias — the old category tab strip is hidden; nav is driven by depts+brands */
 function renderCategories(){ renderDepts(); renderBrands(); }
 function isCatalogDept(){ return dept==='kitchen'||dept==='accessories'; }
-function isSamsung(){ return dept==='phones' && category==='samsung'; }
+/* ¥-driven phone brands (Samsung, Xiaomi): master data holds only the ¥ buy
+   price; NGN is computed live so they share the iPhone-style card + sheet UI. */
+const PHONE_BRANDS = {
+  samsung:{ name:'Samsung', head:'Samsung Galaxy', json:'assets/phones/samsung.json', badge:'Samsung', kicker:'📱 Samsung Galaxy', photos:false },
+  xiaomi: { name:'Xiaomi',  head:'Xiaomi',         json:'assets/phones/xiaomi.json',  badge:'Xiaomi',  kicker:'📱 Xiaomi',         photos:true  }
+};
+function isBrandPhone(){ return dept==='phones' && !!PHONE_BRANDS[category]; }
+function curBrand(){ return PHONE_BRANDS[category]; }
+function isSamsung(){ return isBrandPhone(); }   /* legacy alias — now any ¥-driven brand */
 function renderTabs(){
-  if(isCatalogDept()||isSamsung()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
-    if(isSamsung()){ $('catHead').textContent='Samsung Galaxy'; $('catSub').textContent=brandDef('samsung').sub; } return; }
+  if(isCatalogDept()||isBrandPhone()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
+    if(isBrandPhone()){ const b=curBrand(); $('catHead').textContent=b.head; $('catSub').textContent=brandDef(category).sub; } return; }
   $('condTabs').style.display=''; $('condBlurb').style.display='';
   const ready=brandDef(category).ready;
   $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
@@ -1626,7 +1588,7 @@ function renderTabs(){
 }
 function renderGrid(){
   if(isCatalogDept()){ renderCatalogDeptGrid(); return; }
-  if(isSamsung()){ renderSamsungGrid(); return; }
+  if(isBrandPhone()){ renderBrandGrid(); return; }
   /* coming-soon brands show an elegant panel instead of products */
   if(!brandDef(category).ready){
     const c=brandDef(category); const nm=deptDef(dept).name+' · '+c.name;
@@ -1728,38 +1690,51 @@ function ensureCatalogLoaded(){
   return _catLoadPromise;
 }
 
-/* ============ SAMSUNG (¥ master → live NGN via editable MiStore rate) ============
+/* ====== ¥-DRIVEN PHONE BRANDS (Samsung, Xiaomi) → live NGN via MiStore rate ======
    Master data stores ONLY the ¥ buy price. Selling price is computed live:
    roundUp5000( buy¥ × MiStore-rate × markup + per-unit shipping ). Change the
-   rate in admin → Store settings and every Samsung price updates automatically.
-   No iPhone code is touched. */
-let _miRate=208;                 /* ¥→₦, from store_settings.exchange_rate */
+   rate in admin → Store settings and every price updates automatically.
+   Xiaomi ships with per-model cover photos; Samsung uses a device glyph until
+   photos are added. No iPhone code is touched. */
+let _miRate=209;                 /* ¥→₦, from store_settings.exchange_rate */
 const SAM_MARKUP=1.2, SAM_SHIP_NGN=25000;   /* editable knobs; tuned to the verified 靓机汇 samples */
-let SAMSUNG=[]; let _samLoaded=false;
+let _brandModels={};             /* key -> models[] (cached per brand) */
 async function ensureRate(){
   try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=exchange_rate`,
     {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
     if(r.ok){ const j=await r.json(); if(j[0]&&j[0].exchange_rate) _miRate=+j[0].exchange_rate; } }catch(e){}
+  window._miRate=_miRate;
 }
-async function ensureSamsung(){
-  if(_samLoaded) return;
+async function ensureBrand(key){
+  if(_brandModels[key]) return;
   await ensureRate();
-  try{ const d=await (await fetch('assets/phones/samsung.json',{cache:'no-store'})).json(); SAMSUNG=d.models||[]; }
-  catch(e){ SAMSUNG=[]; }
-  _samLoaded=true;
+  const cfg=PHONE_BRANDS[key]; if(!cfg){ _brandModels[key]=[]; return; }
+  try{ const d=await (await fetch(cfg.json,{cache:'no-store'})).json(); _brandModels[key]=d.models||[]; }
+  catch(e){ _brandModels[key]=[]; }
 }
 function samPrice(rmb){ return rmb? roundPrice(rmb*_miRate*SAM_MARKUP + SAM_SHIP_NGN) : null; }
-function samModelMin(m){ const ps=(m.storages||[]).map(s=>samPrice(s.buy_rmb)).filter(x=>x); return ps.length?Math.min.apply(null,ps):null; }
+/* storage sell price — public files ship NGN only (no ¥ ever reaches the browser);
+   falls back to the live ¥ formula only if a legacy file still carries buy_rmb. */
+function stPrice(s){ return (s && s.price_ngn!=null) ? +s.price_ngn : samPrice(s&&s.buy_rmb); }
+function samModelMin(m){ const ps=(m.storages||[]).map(stPrice).filter(x=>x); return ps.length?Math.min.apply(null,ps):null; }
 function samGlyph(){ return devIcon('phone')||'📱'; }
-function renderSamsungGrid(){
-  if(!_samLoaded){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading Samsung…</div>'; ensureSamsung().then(()=>{ if(isSamsung()) renderGrid(); }); return; }
-  const models=SAMSUNG.filter(m=>samModelMin(m)!=null);
-  if(!models.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">📱</div>Samsung stock is being priced — message us for a quote.</div>'; return; }
-  window._samById={}; models.forEach((m,i)=>window._samById[i]=m);
+/* cover tile: real photo when the brand has one, else a branded glyph tile */
+function brandCoverHTML(cfg,m,big){
+  if(cfg.photos && m.cover){
+    return `<img class="samcover${big?' big':''}" src="${esc(m.cover)}" alt="${esc(m.model)}" loading="lazy" onerror="this.style.display='none'">`;
+  }
+  return `<div class="samglyph${big?' big':''}">${samGlyph()}</div>${big?'<span class="samsoon">Photos coming soon</span>':''}`;
+}
+function renderBrandGrid(){
+  const key=category, cfg=curBrand();
+  if(!_brandModels[key]){ $('grid').innerHTML=`<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading ${esc(cfg.name)}…</div>`; ensureBrand(key).then(()=>{ if(isBrandPhone()) renderGrid(); }); return; }
+  const models=(_brandModels[key]||[]).filter(m=>samModelMin(m)!=null);
+  if(!models.length){ $('grid').innerHTML=`<div class="comingsoon" style="grid-column:1/-1"><div class="big">📱</div>${esc(cfg.name)} stock is being priced — message us for a quote.</div>`; return; }
+  window._brandBy=window._brandBy||{}; window._brandBy[key]={}; models.forEach((m,i)=>window._brandBy[key][i]=m);
   $('grid').innerHTML=models.map((m,i)=>{
-    const min=samModelMin(m); const stg=(m.storages||[]).filter(s=>s.buy_rmb).map(s=>s.storage).join(' · ');
-    return `<article class="pcard" data-sam="${i}">
-      <div class="phero"><div class="samglyph">${samGlyph()}</div><span class="sambadge">Samsung</span></div>
+    const min=samModelMin(m); const stg=(m.storages||[]).filter(s=>stPrice(s)!=null).map(s=>s.storage).join(' · ');
+    return `<article class="pcard" data-brandi="${i}">
+      <div class="phero">${brandCoverHTML(cfg,m,false)}<span class="sambadge">${esc(cfg.badge)}</span></div>
       <div class="pinfo">
         <div class="pname">${esc(m.model)}</div>
         <div class="pmem">${esc(stg||'')}</div>
@@ -1767,22 +1742,24 @@ function renderSamsungGrid(){
         <button class="viewbtn">View &amp; order</button>
       </div>
     </article>`;}).join('');
-  $('grid').querySelectorAll('[data-sam]').forEach(el=>el.onclick=()=>openSamsungSheet(el.dataset.sam));
+  $('grid').querySelectorAll('[data-brandi]').forEach(el=>el.onclick=()=>openBrandSheet(key,el.dataset.brandi));
 }
-function openSamsungSheet(i){
-  const m=(window._samById||{})[i]; if(!m) return;
+function openBrandSheet(key,i){
+  const cfg=PHONE_BRANDS[key]; if(!cfg) return;
+  const m=((window._brandBy||{})[key]||{})[i]; if(!m) return;
   const sheet=$('samSheet'); if(!sheet) return;
-  const sts=(m.storages||[]).filter(s=>s.buy_rmb);
+  const sts=(m.storages||[]).filter(s=>stPrice(s)!=null);
   if(!sts.length) return;
   let si=0;
+  const seriesTxt=m.series?(' · '+esc(m.series)+(/series/i.test(m.series)?'':' Series')):'';
   function paint(){
-    const s=sts[si]; const price=samPrice(s.buy_rmb);
+    const s=sts[si]; const price=stPrice(s);
     $('samSheetBody').innerHTML=`
-      <div class="csmedia samph"><div class="samglyph big">${samGlyph()}</div><span class="samsoon">Photos coming soon</span></div>
-      <div class="cskicker">📱 Samsung Galaxy · ${esc(m.series)} Series</div>
+      <div class="csmedia samph">${brandCoverHTML(cfg,m,true)}</div>
+      <div class="cskicker">${cfg.kicker}${seriesTxt}</div>
       <h3 class="csname">${esc(m.model)}</h3>
       <div class="csprice">${fmtK(price)} <span class="perpc">${esc(s.storage)}</span></div>
-      ${sts.length>1?`<div class="csspecshead">Storage</div><div class="chiprow">${sts.map((x,idx)=>`<button class="optchip ${idx===si?'on':''}" data-si="${idx}">${esc(x.storage)} · ${fmtK(samPrice(x.buy_rmb))}</button>`).join('')}</div>`:''}
+      ${sts.length>1?`<div class="csspecshead">Storage</div><div class="chiprow">${sts.map((x,idx)=>`<button class="optchip ${idx===si?'on':''}" data-si="${idx}">${esc(x.storage)} · ${fmtK(stPrice(x))}</button>`).join('')}</div>`:''}
       <div class="csmoqbox">
         <div class="csrow"><span>Condition</span><b>Clean · fully tested</b></div>
         <div class="csrow"><span>Warranty</span><b>MiStore check + support</b></div>
@@ -1792,10 +1769,13 @@ function openSamsungSheet(i){
       <p class="csnote">Prices update live with the MiStore exchange rate. We confirm exact condition and send real photos on WhatsApp before you pay.</p>`;
     sheet.querySelectorAll('[data-si]').forEach(el=>el.onclick=()=>{ si=+el.dataset.si; paint(); });
     $('samOrderBtn').onclick=()=>{ const s2=sts[si];
-      window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to buy the Samsung '+m.model+' '+s2.storage+' ('+fmtK(samPrice(s2.buy_rmb))+'). Please send real photos and confirm availability.'),'_blank','noopener'); };
+      window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to buy the '+cfg.name+' '+m.model+' '+s2.storage+' ('+fmtK(stPrice(s2))+'). Please send real photos and confirm availability.'),'_blank','noopener'); };
   }
   paint(); showSheet(sheet);
 }
+/* legacy aliases (older call sites) */
+function ensureSamsung(){ return ensureBrand('samsung'); }
+function renderSamsungGrid(){ return renderBrandGrid(); }
 
 /* ---------- product sheet + swipeable gallery ---------- */
 /* "Choose condition" selector — every condition selectable inside the
@@ -2662,11 +2642,11 @@ const BUNDLED_CATS = {
 let _bundledCache=null;
 async function fetchBundledRows(){
   if(_bundledCache) return _bundledCache;
-  let rate=208, margin=15;
+  let rate=209, margin=15;
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=exchange_rate,default_profit_pct`,
       {headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});
-    if(r.ok){ const j=await r.json(); if(j[0]){ rate=+j[0].exchange_rate||208; margin=(j[0].default_profit_pct==null?15:+j[0].default_profit_pct); } }
+    if(r.ok){ const j=await r.json(); if(j[0]){ rate=+j[0].exchange_rate||209; margin=(j[0].default_profit_pct==null?15:+j[0].default_profit_pct); } }
   }catch(e){}
   try{
     const r2=await fetch(`${SUPABASE_URL}/rest/v1/store_settings?id=eq.default&select=sea_rate_per_cbm,air_rate_per_kg`,
@@ -2681,12 +2661,14 @@ async function fetchBundledRows(){
     catch(e){ continue; }
     const cat=BUNDLED_CATS[key];
     const isKitchen = key.indexOf('kitchen')===0;
-    /* sell price so PROFIT is `margin`% of the customer total (hidden): sell = cost / (1 - margin%) */
+    /* Sell prices are pre-baked as NGN in the bundled files (no supplier ¥ ever
+       reaches the browser). Legacy fallback: if a file still carries rmb_price,
+       compute sell = cost / (1 - margin%) so profit stays `margin`% of total. */
     const sell = cost => Math.round(cost / (1 - (margin/100)));
+    const vNgn = v => (v && v.unit_ngn!=null) ? +v.unit_ngn : (v && v.rmb_price>0 ? sell(v.rmb_price*rate) : null);
     (arr.products||arr||[]).forEach(p=>{
-      const vs=(p.variants||[]).filter(v=>v.rmb_price>0);
-      const min=vs.length? Math.min.apply(null,vs.map(v=>v.rmb_price)) : 0;
-      const priceFrom = min? sell(min*rate) : null;
+      const vprices=(p.variants||[]).map(vNgn).filter(x=>x>0);
+      const priceFrom = (p.from_ngn!=null)? +p.from_ngn : (vprices.length? Math.min.apply(null,vprices) : null);
       const v0=(p.variants||[])[0]||{};
       const cbm=+v0.cbm||0;
       /* Kitchen must be complete: drop anything missing a price OR shipping (cbm) — no half-finished listings */
@@ -2697,7 +2679,7 @@ async function fetchBundledRows(){
       const variants=(p.variants||[]).map(v=>({
         label: zhT([v.spec1,v.spec2].filter(Boolean).join(' / ')) || 'Option',
         img: v.image? 'catalog-import/'+v.image : null,
-        unit: v.rmb_price? sell(v.rmb_price*rate) : null }));
+        unit: vNgn(v) }));
       const weight=+v0.weight_kg|| (cbm? +(cbm*150).toFixed(1) : 0);   /* volumetric estimate when GW unknown */
       const pcsCarton=+v0.qty_per_carton|| moq || null;
       let nm;

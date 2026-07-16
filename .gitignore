@@ -1,0 +1,4 @@
+# Internal ¥ buy-price masters — never ship supplier cost to the repo/store.
+# The storefront reads the sanitized NGN-only assets/phones/*.json instead.
+assets/phones/*.src.json
+catalog-import/data/*_raw.json

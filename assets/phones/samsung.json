@@ -1,844 +1,634 @@
 {
  "brand": "Samsung",
- "currency": "RMB",
- "updated": "2026-07-12",
+ "pricing": "ngn",
  "models": [
   {
-   "series": "S",
    "model": "S20",
+   "series": "S",
    "storages": [
     {
      "storage": "128GB",
-     "buy_rmb": 450,
-     "status": "verified"
+     "price_ngn": 140000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S20+",
+   "series": "S",
    "storages": [
     {
      "storage": "128GB",
-     "buy_rmb": 480,
-     "status": "verified"
+     "price_ngn": 150000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S20 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 950,
-     "status": "verified"
+     "price_ngn": 265000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S21",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 800,
-     "status": "verified"
+     "price_ngn": 230000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S21+",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 850,
-     "status": "verified"
+     "price_ngn": 240000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S21 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1350,
-     "status": "verified"
+     "price_ngn": 365000
     }
    ]
   },
   {
-   "series": "S",
-   "model": "S21 FE",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "S",
    "model": "S22",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 900,
-     "status": "verified"
+     "price_ngn": 255000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S22+",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1000,
-     "status": "verified"
+     "price_ngn": 280000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S22 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1750,
-     "status": "verified"
+     "price_ngn": 465000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S23",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1300,
-     "status": "verified"
+     "price_ngn": 355000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S23+",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1600,
-     "status": "verified"
+     "price_ngn": 430000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S23 FE",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1100,
-     "status": "verified"
+     "price_ngn": 305000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S23 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 2450,
-     "status": "verified"
+     "price_ngn": 640000
     },
     {
      "storage": "256GB · 8GB RAM",
-     "buy_rmb": 2350,
-     "status": "verified"
+     "price_ngn": 615000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S24",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1950,
-     "status": "verified"
+     "price_ngn": 515000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S24+",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 2100,
-     "status": "verified"
+     "price_ngn": 555000
     }
    ]
   },
   {
-   "series": "S",
-   "model": "S24 FE",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "S",
    "model": "S24 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 3300,
-     "status": "verified"
+     "price_ngn": 855000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 3650,
-     "status": "verified"
+     "price_ngn": 945000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 4100,
-     "status": "verified"
+     "price_ngn": 1055000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S25",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 3050,
-     "status": "verified"
+     "price_ngn": 790000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S25 Edge",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 2600,
-     "status": "verified"
+     "price_ngn": 680000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S25+",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 3150,
-     "status": "verified"
+     "price_ngn": 820000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S25 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 4450,
-     "status": "verified"
+     "price_ngn": 1145000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 5000,
-     "status": "verified"
+     "price_ngn": 1280000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 5900,
-     "status": "verified"
+     "price_ngn": 1505000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S26",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 3300,
-     "status": "verified"
+     "price_ngn": 855000
     }
    ]
   },
   {
-   "series": "S",
    "model": "S26+",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": 4350,
-     "status": "verified"
-    },
-    {
-     "storage": "512GB",
-     "buy_rmb": 4650,
-     "status": "verified"
-    }
-   ]
-  },
-  {
    "series": "S",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 1120000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 1195000
+    }
+   ]
+  },
+  {
    "model": "S26 Ultra",
+   "series": "S",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 5400,
-     "status": "verified"
+     "price_ngn": 1380000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 5800,
-     "status": "verified"
+     "price_ngn": 1480000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 7100,
-     "status": "verified"
+     "price_ngn": 1810000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold2",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1250,
-     "status": "verified"
+     "price_ngn": 340000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold3",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1600,
-     "status": "verified"
+     "price_ngn": 430000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold4",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1850,
-     "status": "verified"
+     "price_ngn": 490000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 1950,
-     "status": "verified"
+     "price_ngn": 515000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 2050,
-     "status": "verified"
+     "price_ngn": 540000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold5",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 2600,
-     "status": "verified"
+     "price_ngn": 680000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 2750,
-     "status": "verified"
+     "price_ngn": 715000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold6",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 4500,
-     "status": "verified"
+     "price_ngn": 1155000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 4850,
-     "status": "verified"
+     "price_ngn": 1245000
     }
    ]
   },
   {
-   "series": "Z Fold",
    "model": "Z Fold7",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": 6400,
-     "status": "verified"
-    },
-    {
-     "storage": "512GB",
-     "buy_rmb": 7000,
-     "status": "verified"
-    },
-    {
-     "storage": "1TB",
-     "buy_rmb": 7800,
-     "status": "verified"
-    }
-   ]
-  },
-  {
    "series": "Z Fold",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 1635000
+    },
+    {
+     "storage": "512GB",
+     "price_ngn": 1785000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 1985000
+    }
+   ]
+  },
+  {
    "model": "Z TriFold",
+   "series": "Z Fold",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 12800,
-     "status": "verified"
+     "price_ngn": 3240000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 13800,
-     "status": "verified"
+     "price_ngn": 3490000
     }
    ]
   },
   {
-   "series": "Z Flip",
    "model": "Z Flip3",
+   "series": "Z Flip",
    "storages": [
     {
      "storage": "128GB",
-     "buy_rmb": 600,
-     "status": "verified"
+     "price_ngn": 180000
     },
     {
      "storage": "256GB",
-     "buy_rmb": 700,
-     "status": "verified"
+     "price_ngn": 205000
     }
    ]
   },
   {
-   "series": "Z Flip",
    "model": "Z Flip4",
+   "series": "Z Flip",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 800,
-     "status": "verified"
+     "price_ngn": 230000
     },
     {
      "storage": "512GB · 8GB RAM",
-     "buy_rmb": 900,
-     "status": "verified"
+     "price_ngn": 255000
     }
    ]
   },
   {
-   "series": "Z Flip",
    "model": "Z Flip5",
+   "series": "Z Flip",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1300,
-     "status": "verified"
+     "price_ngn": 355000
     },
     {
      "storage": "512GB · 8GB RAM",
-     "buy_rmb": 1400,
-     "status": "verified"
+     "price_ngn": 380000
     }
    ]
   },
   {
-   "series": "Z Flip",
    "model": "Z Flip6",
+   "series": "Z Flip",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1850,
-     "status": "verified"
+     "price_ngn": 490000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 2100,
-     "status": "verified"
+     "price_ngn": 555000
     }
    ]
   },
   {
-   "series": "Z Flip",
    "model": "Z Flip7 FE",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": 1550,
-     "status": "verified"
-    }
-   ]
-  },
-  {
    "series": "Z Flip",
+   "storages": [
+    {
+     "storage": "256GB",
+     "price_ngn": 415000
+    }
+   ]
+  },
+  {
    "model": "Z Flip7",
+   "series": "Z Flip",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 3000,
-     "status": "verified"
+     "price_ngn": 780000
     },
     {
      "storage": "512GB",
-     "buy_rmb": 3300,
-     "status": "verified"
+     "price_ngn": 855000
     }
    ]
   },
   {
-   "series": "Note",
    "model": "Note20",
+   "series": "Note",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 650,
-     "status": "verified"
+     "price_ngn": 190000
     }
    ]
   },
   {
-   "series": "Note",
    "model": "Note20 Ultra",
+   "series": "Note",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1300,
-     "status": "verified"
+     "price_ngn": 355000
     }
    ]
   },
   {
-   "series": "Note",
-   "model": "Note10+",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "Note",
-   "model": "Note9",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "W",
    "model": "W20",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1000,
-     "status": "verified"
+     "price_ngn": 280000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W21",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1200,
-     "status": "verified"
+     "price_ngn": 330000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W22",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1700,
-     "status": "verified"
+     "price_ngn": 455000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W23 Flip",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1050,
-     "status": "verified"
+     "price_ngn": 290000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W23",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 2300,
-     "status": "verified"
+     "price_ngn": 605000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W24 Flip",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 1600,
-     "status": "verified"
+     "price_ngn": 430000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W24",
+   "series": "W",
    "storages": [
     {
      "storage": "1TB",
-     "buy_rmb": 3600,
-     "status": "verified"
+     "price_ngn": 930000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W25 Flip",
+   "series": "W",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 2800,
-     "status": "verified"
+     "price_ngn": 730000
     }
    ]
   },
   {
-   "series": "W",
    "model": "W25",
-   "storages": [
-    {
-     "storage": "512GB",
-     "buy_rmb": 6400,
-     "status": "verified"
-    },
-    {
-     "storage": "1TB",
-     "buy_rmb": 6900,
-     "status": "verified"
-    }
-   ]
-  },
-  {
    "series": "W",
-   "model": "W26",
    "storages": [
     {
      "storage": "512GB",
-     "buy_rmb": 9300,
-     "status": "verified"
+     "price_ngn": 1635000
     },
     {
      "storage": "1TB",
-     "buy_rmb": 10300,
-     "status": "verified"
+     "price_ngn": 1760000
     }
    ]
   },
   {
-   "series": "A",
+   "model": "W26",
+   "series": "W",
+   "storages": [
+    {
+     "storage": "512GB",
+     "price_ngn": 2360000
+    },
+    {
+     "storage": "1TB",
+     "price_ngn": 2610000
+    }
+   ]
+  },
+  {
    "model": "A52",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 430,
-     "status": "verified"
+     "price_ngn": 135000
     }
    ]
   },
   {
-   "series": "A",
    "model": "A53",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 550,
-     "status": "verified"
+     "price_ngn": 165000
     }
    ]
   },
   {
-   "series": "A",
    "model": "A54",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 600,
-     "status": "verified"
+     "price_ngn": 180000
     }
    ]
   },
   {
-   "series": "A",
    "model": "A55",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1300,
-     "status": "verified"
+     "price_ngn": 355000
     }
    ]
   },
   {
-   "series": "A",
    "model": "A56",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1400,
-     "status": "verified"
+     "price_ngn": 380000
     }
    ]
   },
   {
-   "series": "A",
    "model": "A57",
+   "series": "A",
    "storages": [
     {
      "storage": "256GB",
-     "buy_rmb": 1600,
-     "status": "verified"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A15",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A16",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A24",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A25",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A34",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A35",
-   "storages": [
-    {
-     "storage": "256GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A72",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
-    }
-   ]
-  },
-  {
-   "series": "A",
-   "model": "A73",
-   "storages": [
-    {
-     "storage": "128GB",
-     "buy_rmb": null,
-     "status": "needs-check"
+     "price_ngn": 430000
     }
    ]
   }
- ],
- "_note": "INTERNAL: buy_rmb are wholesale ¥ buy prices — the storefront computes the ₦ selling price and never displays ¥."
+ ]
 }
