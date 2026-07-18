@@ -1,0 +1,131 @@
+{
+ "brand": "Sohigh Solar",
+ "section": "Solar",
+ "pricing": "ngn",
+ "warranty": "Backed by MiStore support, plus manufacturer warranty as provided by Sohigh Solar. (Designed lifespan and cycle life below are product specifications, not a warranty term.)",
+ "note": "Prices include sea shipping. Final delivered price (inland freight, clearance & local delivery) is confirmed on WhatsApp before payment.",
+ "systems": [
+  {
+   "id": "solar-1-28kwh",
+   "name": "1.28 KWh / 1.5 KVA Solar System",
+   "slug": "solar-1-28kwh",
+   "capacity_kwh": 1.28,
+   "inverter_kva": 1.5,
+   "panels_included": false,
+   "cover": "assets/solar/inverter-1-5k.jpg",
+   "gallery": [
+    "assets/solar/inverter-1-5k.jpg",
+    "assets/solar/battery-12-8v-100ah.jpg",
+    "assets/solar/accessories-kit.jpg"
+   ],
+   "summary": "Starter off-grid kit for lights, TV, fans and phone charging. 1.5KVA hybrid inverter + 1.28KWh lithium battery.",
+   "includes": [
+    "Sohigh Off-Grid 1.5K hybrid inverter — 1.5KW, 12V, built-in MPPT (max PV 1000W)",
+    "Sohigh LFP-12.8V 100Ah lithium battery — 1.28KWh",
+    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+   ],
+   "specs": {
+    "Inverter": "1.5KW · 12V · built-in MPPT · max PV 1,000W",
+    "Battery": "LFP-12.8V 100Ah · 1.28KWh",
+    "Battery type": "LiFePO₄ (Grade A)",
+    "Cycles": "6,000+",
+    "Designed lifespan": "Up to 15 years",
+    "Built-in MPPT": "Yes",
+    "Smart BMS": "Yes"
+   },
+   "price_ngn": 1055000
+  },
+  {
+   "id": "solar-2-56kwh",
+   "name": "2.56 KWh / 4 KVA Solar System",
+   "slug": "solar-2-56kwh",
+   "capacity_kwh": 2.56,
+   "inverter_kva": 4,
+   "panels_included": false,
+   "cover": "assets/solar/inverter-4k.jpg",
+   "gallery": [
+    "assets/solar/inverter-4k.jpg",
+    "assets/solar/battery-25-6v-100ah.jpg",
+    "assets/solar/accessories-kit.jpg"
+   ],
+   "summary": "Mid-size off-grid kit for a small home or shop. Powerful 4KVA hybrid inverter + 2.56KWh lithium battery.",
+   "includes": [
+    "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
+    "Sohigh LFP-25.6V 100Ah lithium battery — 2.56KWh",
+    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+   ],
+   "specs": {
+    "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
+    "Battery": "LFP-25.6V 100Ah · 2.56KWh",
+    "Battery type": "LiFePO₄ (Grade A)",
+    "Cycles": "6,000+",
+    "Designed lifespan": "Up to 15 years",
+    "Built-in MPPT": "Yes",
+    "Smart BMS": "Yes"
+   },
+   "price_ngn": 1615000
+  },
+  {
+   "id": "solar-5kwh",
+   "name": "5 KWh / 4 KVA Solar System",
+   "slug": "solar-5kwh",
+   "capacity_kwh": 5,
+   "inverter_kva": 4,
+   "panels_included": false,
+   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "gallery": [
+    "assets/solar/battery-25-6v-200ah.jpg",
+    "assets/solar/inverter-4k.jpg",
+    "assets/solar/accessories-kit.jpg"
+   ],
+   "summary": "Whole-home off-grid kit. 4KVA hybrid inverter + big 5KWh lithium battery for all-day backup.",
+   "includes": [
+    "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
+    "Sohigh LFP-25.6V 200Ah lithium battery — 5KWh",
+    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+   ],
+   "specs": {
+    "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
+    "Battery": "LFP-25.6V 200Ah · 5KWh",
+    "Battery type": "LiFePO₄ (Grade A)",
+    "Cycles": "6,000+",
+    "Designed lifespan": "Up to 15 years",
+    "Built-in MPPT": "Yes",
+    "Smart BMS": "Yes"
+   },
+   "price_ngn": 1975000
+  },
+  {
+   "id": "solar-5kwh-panels",
+   "name": "5 KWh / 4 KVA Solar System + 4×600W Panels",
+   "slug": "solar-5kwh-panels",
+   "capacity_kwh": 5,
+   "inverter_kva": 4,
+   "panels_included": true,
+   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "gallery": [
+    "assets/solar/battery-25-6v-200ah.jpg",
+    "assets/solar/inverter-4k.jpg",
+    "assets/solar/accessories-kit.jpg"
+   ],
+   "summary": "Complete solar power station — everything in the 5KWh kit plus four 600W bifacial panels to charge from the sun.",
+   "includes": [
+    "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
+    "Sohigh LFP-25.6V 200Ah lithium battery — 5KWh",
+    "4 × 600W mono bifacial solar panels",
+    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+   ],
+   "specs": {
+    "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
+    "Battery": "LFP-25.6V 200Ah · 5KWh",
+    "Battery type": "LiFePO₄ (Grade A)",
+    "Cycles": "6,000+",
+    "Designed lifespan": "Up to 15 years",
+    "Built-in MPPT": "Yes",
+    "Smart BMS": "Yes",
+    "Solar panels": "4 × 600W mono bifacial (2,400W)"
+   },
+   "price_ngn": 2660000
+  }
+ ]
+}
