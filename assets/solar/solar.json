@@ -2,130 +2,447 @@
  "brand": "Sohigh Solar",
  "section": "Solar",
  "pricing": "ngn",
- "warranty": "Backed by MiStore support, plus manufacturer warranty as provided by Sohigh Solar. (Designed lifespan and cycle life below are product specifications, not a warranty term.)",
- "note": "Prices include sea shipping. Final delivered price (inland freight, clearance & local delivery) is confirmed on WhatsApp before payment.",
- "systems": [
+ "about": "Sohigh Solar — 20+ years in PV (since 2005), Grade-A LiFePO₄ cells, pure sine-wave hybrid inverters. Certified ISO9001 / ISO14001 / ISO45001, IEC61215 / IEC61730, CE, SGS, TÜV.",
+ "note": "Price includes sea shipping estimate. Final delivered price (freight, clearance & local delivery) is confirmed on WhatsApp before payment.",
+ "products": [
   {
-   "id": "solar-1-28kwh",
+   "id": "sys-1-28",
+   "cat": "solar-systems",
    "name": "1.28 KWh / 1.5 KVA Solar System",
    "slug": "solar-1-28kwh",
-   "capacity_kwh": 1.28,
-   "inverter_kva": 1.5,
-   "panels_included": false,
+   "price_ngn": 1055000,
    "cover": "assets/solar/inverter-1-5k.jpg",
    "gallery": [
     "assets/solar/inverter-1-5k.jpg",
     "assets/solar/battery-12-8v-100ah.jpg",
     "assets/solar/accessories-kit.jpg"
    ],
-   "summary": "Starter off-grid kit for lights, TV, fans and phone charging. 1.5KVA hybrid inverter + 1.28KWh lithium battery.",
+   "tags": "1.28KWh · 1.5KVA",
+   "summary": "Starter off-grid kit for lights, TV, fans & phone charging.",
    "includes": [
-    "Sohigh Off-Grid 1.5K hybrid inverter — 1.5KW, 12V, built-in MPPT (max PV 1000W)",
+    "Sohigh Off-Grid 1.5K hybrid inverter — 1.5KW, 12V, built-in MPPT (max PV 1,000W)",
     "Sohigh LFP-12.8V 100Ah lithium battery — 1.28KWh",
-    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
    ],
    "specs": {
     "Inverter": "1.5KW · 12V · built-in MPPT · max PV 1,000W",
-    "Battery": "LFP-12.8V 100Ah · 1.28KWh",
-    "Battery type": "LiFePO₄ (Grade A)",
+    "Battery": "LiFePO₄ 12.8V 100Ah · 1.28KWh · Grade A",
     "Cycles": "6,000+",
-    "Designed lifespan": "Up to 15 years",
-    "Built-in MPPT": "Yes",
-    "Smart BMS": "Yes"
+    "Designed lifespan": "Up to 15 years"
    },
-   "price_ngn": 1055000
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
   },
   {
-   "id": "solar-2-56kwh",
+   "id": "sys-2-56",
+   "cat": "solar-systems",
    "name": "2.56 KWh / 4 KVA Solar System",
    "slug": "solar-2-56kwh",
-   "capacity_kwh": 2.56,
-   "inverter_kva": 4,
-   "panels_included": false,
+   "price_ngn": 1615000,
    "cover": "assets/solar/inverter-4k.jpg",
    "gallery": [
     "assets/solar/inverter-4k.jpg",
     "assets/solar/battery-25-6v-100ah.jpg",
     "assets/solar/accessories-kit.jpg"
    ],
-   "summary": "Mid-size off-grid kit for a small home or shop. Powerful 4KVA hybrid inverter + 2.56KWh lithium battery.",
+   "tags": "2.56KWh · 4KVA",
+   "summary": "Mid-size off-grid kit for a small home or shop.",
    "includes": [
     "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
     "Sohigh LFP-25.6V 100Ah lithium battery — 2.56KWh",
-    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
    ],
    "specs": {
     "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
-    "Battery": "LFP-25.6V 100Ah · 2.56KWh",
-    "Battery type": "LiFePO₄ (Grade A)",
+    "Battery": "LiFePO₄ 25.6V 100Ah · 2.56KWh · Grade A",
     "Cycles": "6,000+",
-    "Designed lifespan": "Up to 15 years",
-    "Built-in MPPT": "Yes",
-    "Smart BMS": "Yes"
+    "Designed lifespan": "Up to 15 years"
    },
-   "price_ngn": 1615000
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
   },
   {
-   "id": "solar-5kwh",
+   "id": "sys-5",
+   "cat": "solar-systems",
    "name": "5 KWh / 4 KVA Solar System",
    "slug": "solar-5kwh",
-   "capacity_kwh": 5,
-   "inverter_kva": 4,
-   "panels_included": false,
+   "price_ngn": 1975000,
    "cover": "assets/solar/battery-25-6v-200ah.jpg",
    "gallery": [
     "assets/solar/battery-25-6v-200ah.jpg",
     "assets/solar/inverter-4k.jpg",
     "assets/solar/accessories-kit.jpg"
    ],
-   "summary": "Whole-home off-grid kit. 4KVA hybrid inverter + big 5KWh lithium battery for all-day backup.",
+   "tags": "5KWh · 4KVA",
+   "summary": "Whole-home off-grid kit with all-day backup.",
    "includes": [
     "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
     "Sohigh LFP-25.6V 200Ah lithium battery — 5KWh",
-    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
    ],
    "specs": {
     "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
-    "Battery": "LFP-25.6V 200Ah · 5KWh",
-    "Battery type": "LiFePO₄ (Grade A)",
+    "Battery": "LiFePO₄ 25.6V 200Ah · 5KWh · Grade A",
     "Cycles": "6,000+",
-    "Designed lifespan": "Up to 15 years",
-    "Built-in MPPT": "Yes",
-    "Smart BMS": "Yes"
+    "Designed lifespan": "Up to 15 years"
    },
-   "price_ngn": 1975000
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
   },
   {
-   "id": "solar-5kwh-panels",
-   "name": "5 KWh / 4 KVA Solar System + 4×600W Panels",
+   "id": "sys-5p",
+   "cat": "solar-systems",
+   "name": "5 KWh / 4 KVA System + 4×600W Panels",
    "slug": "solar-5kwh-panels",
-   "capacity_kwh": 5,
-   "inverter_kva": 4,
-   "panels_included": true,
-   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "price_ngn": 2660000,
+   "cover": "assets/solar/panel-mono.jpg",
    "gallery": [
+    "assets/solar/panel-mono.jpg",
     "assets/solar/battery-25-6v-200ah.jpg",
     "assets/solar/inverter-4k.jpg",
     "assets/solar/accessories-kit.jpg"
    ],
-   "summary": "Complete solar power station — everything in the 5KWh kit plus four 600W bifacial panels to charge from the sun.",
+   "tags": "5KWh · 4KVA · +Panels",
+   "summary": "Complete solar power station — 5KWh kit plus four 600W bifacial panels.",
    "includes": [
-    "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, built-in MPPT (max PV 5,500W)",
+    "Sohigh Off-Grid 4K hybrid inverter — 4KW, 24V, max PV 5,500W",
     "Sohigh LFP-25.6V 200Ah lithium battery — 5KWh",
     "4 × 600W mono bifacial solar panels",
-    "Accessories kit — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), panel connectors"
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
    ],
    "specs": {
     "Inverter": "4KW · 24V · built-in MPPT · max PV 5,500W",
-    "Battery": "LFP-25.6V 200Ah · 5KWh",
-    "Battery type": "LiFePO₄ (Grade A)",
+    "Battery": "LiFePO₄ 25.6V 200Ah · 5KWh",
+    "Solar panels": "4 × 600W mono bifacial (2,400W)",
+    "Designed lifespan": "Up to 15 years"
+   },
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
+  },
+  {
+   "id": "sys-10",
+   "cat": "solar-systems",
+   "name": "10 KWh / 6.5 KVA Solar System + 6×585W Panels",
+   "slug": "solar-10kwh",
+   "price_ngn": 6450000,
+   "cover": "assets/solar/inverter-hybrid.jpg",
+   "gallery": [
+    "assets/solar/inverter-hybrid.jpg",
+    "assets/solar/battery-stack.jpg",
+    "assets/solar/panel-mono.jpg"
+   ],
+   "tags": "10KWh · 6.5KVA · +Panels",
+   "summary": "Large-home / small-business solar station with six panels.",
+   "includes": [
+    "Sohigh 6.5KVA 48V hybrid inverter (IP54)",
+    "10KWh 51.2V lithium battery",
+    "6 × 585W mono bifacial panels",
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
+   ],
+   "specs": {
+    "Inverter": "6.5KVA · 48V · IP54 · pure sine wave",
+    "Battery": "LiFePO₄ 51.2V · 10KWh",
+    "Solar panels": "6 × 585W bifacial (3,510W)",
+    "Monitoring": "Wi-Fi / app"
+   },
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
+  },
+  {
+   "id": "sys-17",
+   "cat": "solar-systems",
+   "name": "17.5 KWh / 13 KVA Solar System + 10×585W Panels",
+   "slug": "solar-17-5kwh",
+   "price_ngn": 10145000,
+   "cover": "assets/solar/inverter-hybrid.jpg",
+   "gallery": [
+    "assets/solar/inverter-hybrid.jpg",
+    "assets/solar/battery-stack.jpg",
+    "assets/solar/panel-mono.jpg"
+   ],
+   "tags": "17.5KWh · 13KVA · +Panels",
+   "summary": "Big off-grid / three-phase-ready station for large homes and businesses.",
+   "includes": [
+    "Sohigh 13KVA 48V parallel hybrid inverter",
+    "17.5KWh 51.2V lithium battery",
+    "10 × 585W mono bifacial panels",
+    "Accessories — battery & panel cables, DC/AC breakers, DC/AC surge protectors (SPD), connectors"
+   ],
+   "specs": {
+    "Inverter": "13KVA · 48V · 3-phase parallel ready",
+    "Battery": "LiFePO₄ 51.2V · 17.5KWh",
+    "Solar panels": "10 × 585W bifacial (5,850W)",
+    "Monitoring": "Wi-Fi / app"
+   },
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": true
+  },
+  {
+   "id": "inv-4k",
+   "cat": "solar-inverters",
+   "name": "Sohigh 4KVA Hybrid Inverter (24V)",
+   "slug": "sohigh-inverter-4kva",
+   "price_ngn": 555000,
+   "cover": "assets/solar/inverter-4k.jpg",
+   "gallery": [
+    "assets/solar/inverter-4k.jpg",
+    "assets/solar/inverter-hybrid.jpg"
+   ],
+   "tags": "4KVA · 24V",
+   "summary": "Off/on-grid hybrid inverter with built-in MPPT and pure sine-wave output.",
+   "specs": {
+    "Power": "4KW · 24V",
+    "Solar input": "Built-in MPPT · max PV 5,500W",
+    "Output": "Pure sine wave",
+    "Transfer time": "10ms UPS",
+    "Monitoring": "Wi-Fi / BLE",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer: 5-year global warranty with spare-parts support (Sohigh), plus MiStore support.",
+   "from": true
+  },
+  {
+   "id": "inv-6k",
+   "cat": "solar-inverters",
+   "name": "Sohigh 5.5 / 6.5KVA Hybrid Inverter (48V, IP54)",
+   "slug": "sohigh-inverter-6-5kva",
+   "price_ngn": 795000,
+   "cover": "assets/solar/inverter-hybrid.jpg",
+   "gallery": [
+    "assets/solar/inverter-hybrid.jpg",
+    "assets/solar/inverter-4k.jpg"
+   ],
+   "tags": "5.5–6.5KVA · 48V · IP54",
+   "summary": "Weatherproof (IP54) 48V hybrid inverter for larger homes and shops.",
+   "specs": {
+    "Power": "5.5 / 6.5KVA · 48V",
+    "Rating": "IP54 waterproof",
+    "Solar input": "Built-in MPPT",
+    "Output": "Pure sine wave",
+    "Monitoring": "Wi-Fi / BLE",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer: 5-year global warranty with spare-parts support (Sohigh), plus MiStore support.",
+   "from": true
+  },
+  {
+   "id": "inv-13k",
+   "cat": "solar-inverters",
+   "name": "Sohigh 13KVA Parallel Hybrid Inverter (48V)",
+   "slug": "sohigh-inverter-13kva",
+   "price_ngn": 1685000,
+   "cover": "assets/solar/inverter-hybrid.jpg",
+   "gallery": [
+    "assets/solar/inverter-hybrid.jpg"
+   ],
+   "tags": "13KVA · 48V · 3-phase",
+   "summary": "High-power inverter — up to 6 units in parallel for three-phase loads.",
+   "specs": {
+    "Power": "13KVA · 48V",
+    "Parallel": "Up to 6 units (3-phase)",
+    "Solar input": "Built-in MPPT · max PV 16,000W",
+    "Output": "Pure sine wave",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer: 5-year global warranty with spare-parts support (Sohigh), plus MiStore support.",
+   "from": true
+  },
+  {
+   "id": "bat-2-56",
+   "cat": "solar-batteries",
+   "name": "Sohigh LiFePO₄ 2.56KWh Battery (25.6V 100Ah)",
+   "slug": "sohigh-battery-2-56kwh",
+   "price_ngn": 520000,
+   "cover": "assets/solar/battery-25-6v-100ah.jpg",
+   "gallery": [
+    "assets/solar/battery-25-6v-100ah.jpg",
+    "assets/solar/battery-12-8v-100ah.jpg"
+   ],
+   "tags": "2.56KWh · 25.6V",
+   "summary": "Wall-mount lithium battery, Grade A prismatic cells with smart BMS.",
+   "specs": {
+    "Capacity": "25.6V 100Ah · 2.56KWh",
+    "Chemistry": "LiFePO₄ · Grade A",
     "Cycles": "6,000+",
     "Designed lifespan": "Up to 15 years",
-    "Built-in MPPT": "Yes",
-    "Smart BMS": "Yes",
-    "Solar panels": "4 × 600W mono bifacial (2,400W)"
+    "BMS": "Smart BMS · RS485 / CAN",
+    "Min order": "2 units"
    },
-   "price_ngn": 2660000
+   "warranty": "Manufacturer: 10-year design lifespan, 5-year replacement for manufacturing defects (Sohigh). Cycle life & lifespan are specifications; MiStore adds local support.",
+   "from": true
+  },
+  {
+   "id": "bat-5",
+   "cat": "solar-batteries",
+   "name": "Sohigh LiFePO₄ 5KWh Battery (25.6V 200Ah)",
+   "slug": "sohigh-battery-5kwh",
+   "price_ngn": 965000,
+   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "gallery": [
+    "assets/solar/battery-25-6v-200ah.jpg"
+   ],
+   "tags": "5KWh · 25.6V",
+   "summary": "Big wall-mount lithium battery for whole-home backup.",
+   "specs": {
+    "Capacity": "25.6V 200Ah · 5KWh",
+    "Chemistry": "LiFePO₄ · Grade A",
+    "Cycles": "6,000+",
+    "Designed lifespan": "Up to 15 years",
+    "BMS": "Smart BMS · RS485 / CAN",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer: 10-year design lifespan, 5-year replacement for manufacturing defects (Sohigh). Cycle life & lifespan are specifications; MiStore adds local support.",
+   "from": true
+  },
+  {
+   "id": "bat-stack",
+   "cat": "solar-batteries",
+   "name": "Sohigh High-Voltage Stack Battery (10.24KWh)",
+   "slug": "sohigh-battery-stack-10kwh",
+   "price_ngn": 2065000,
+   "cover": "assets/solar/battery-stack.jpg",
+   "gallery": [
+    "assets/solar/battery-stack.jpg"
+   ],
+   "tags": "10.24KWh · HV stack",
+   "summary": "Stackable high-voltage lithium storage — expand for bigger loads.",
+   "specs": {
+    "Capacity": "102.4V 100Ah · 10.24KWh",
+    "Expansion": "Stackable 96V–409.6V (10–40KWh)",
+    "Chemistry": "LiFePO₄ · Grade A",
+    "BMS": "Smart BMS · remote monitoring",
+    "Min order": "1 unit"
+   },
+   "warranty": "Manufacturer: 10-year design lifespan, 5-year replacement for manufacturing defects (Sohigh). Cycle life & lifespan are specifications; MiStore adds local support.",
+   "from": true
+  },
+  {
+   "id": "bat-gel",
+   "cat": "solar-batteries",
+   "name": "Sohigh Gel Battery (12V 200Ah)",
+   "slug": "sohigh-battery-gel-200ah",
+   "price_ngn": 245000,
+   "cover": "assets/solar/battery-gel.jpg",
+   "gallery": [
+    "assets/solar/battery-gel.jpg"
+   ],
+   "tags": "12V · 200Ah · Gel",
+   "summary": "Low-cost maintenance-free deep-cycle gel battery backup option.",
+   "specs": {
+    "Capacity": "12V 200Ah",
+    "Type": "Deep-cycle gel (lead-acid)",
+    "Self-discharge": "<3% / month",
+    "Temp range": "-20°C to 60°C",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer warranty as provided by Sohigh; MiStore support.",
+   "from": true
+  },
+  {
+   "id": "pv-585",
+   "cat": "solar-panels",
+   "name": "Sohigh 585W Mono Bifacial Solar Panel",
+   "slug": "sohigh-panel-585w",
+   "price_ngn": 245000,
+   "cover": "assets/solar/panel-mono.jpg",
+   "gallery": [
+    "assets/solar/panel-mono.jpg"
+   ],
+   "tags": "585W · bifacial",
+   "summary": "High-efficiency mono half-cell bifacial panel; salt-spray & ammonia tested.",
+   "specs": {
+    "Power": "585W",
+    "Cell": "182/210mm mono half-cell bifacial",
+    "Durability": "Salt-spray & ammonia-corrosion tested",
+    "Min order": "100 pcs (container discount)"
+   },
+   "warranty": "Manufacturer: 10-year product warranty + 25-year linear power-output guarantee (Sohigh).",
+   "from": true
+  },
+  {
+   "id": "pv-700",
+   "cat": "solar-panels",
+   "name": "Sohigh 660–730W High-Power Bifacial Panel",
+   "slug": "sohigh-panel-700w",
+   "price_ngn": 265000,
+   "cover": "assets/solar/panel-mono.jpg",
+   "gallery": [
+    "assets/solar/panel-mono.jpg"
+   ],
+   "tags": "660–730W · bifacial",
+   "summary": "Top-tier high-power bifacial module for maximum yield per panel.",
+   "specs": {
+    "Power": "660–730W",
+    "Cell": "210mm mono half-cell bifacial",
+    "Durability": "Salt-spray & ammonia-corrosion tested",
+    "Min order": "100 pcs (container discount)"
+   },
+   "warranty": "Manufacturer: 10-year product warranty + 25-year linear power-output guarantee (Sohigh).",
+   "from": true
+  },
+  {
+   "id": "ctl-mppt",
+   "cat": "solar-controllers",
+   "name": "Sohigh MPPT Charge Controller (50–120A)",
+   "slug": "sohigh-mppt-controller",
+   "price_ngn": 270000,
+   "cover": "assets/solar/controller-mppt.jpg",
+   "gallery": [
+    "assets/solar/controller-mppt.jpg"
+   ],
+   "tags": "MPPT · 50–120A",
+   "summary": "High-efficiency MPPT controller (up to 99.9% tracking) for lithium & gel.",
+   "specs": {
+    "Type": "MPPT",
+    "Current": "50A–120A (12/24/48V auto)",
+    "Efficiency": "Up to 99.9%",
+    "Modes": "Multi-stage charge · load timer · light control",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer: 5-year global warranty with spare-parts support (Sohigh), plus MiStore support.",
+   "from": true
+  },
+  {
+   "id": "ctl-pwm",
+   "cat": "solar-controllers",
+   "name": "Sohigh PWM Charge Controller (30–60A)",
+   "slug": "sohigh-pwm-controller",
+   "price_ngn": 85000,
+   "cover": "assets/solar/controller-mppt.jpg",
+   "gallery": [
+    "assets/solar/controller-mppt.jpg"
+   ],
+   "tags": "PWM · 30–60A",
+   "summary": "Affordable PWM controller for small solar setups.",
+   "specs": {
+    "Type": "PWM",
+    "Current": "30A–60A",
+    "Modes": "Multi-stage charge · load timer",
+    "Min order": "2 units"
+   },
+   "warranty": "Manufacturer warranty as provided by Sohigh; MiStore support.",
+   "from": true
+  },
+  {
+   "id": "ci-cabinet",
+   "cat": "solar-systems",
+   "name": "Commercial & Industrial Storage (50KWh – 1MWh)",
+   "slug": "solar-ci-cabinet",
+   "price_ngn": null,
+   "cover": "assets/solar/battery-stack.jpg",
+   "gallery": [
+    "assets/solar/battery-stack.jpg"
+   ],
+   "tags": "C&I · 50KWh–1MWh",
+   "summary": "All-in-one container energy storage for businesses & projects — PCS inverter, EMS, fire suppression, cooling. Custom-designed; request a quote.",
+   "specs": {
+    "Range": "50KWh / 50KW → 1MWh / 500KW",
+    "Includes": "PCS inverter · EMS · fire suppression · cooling",
+    "Parallel": "Multi-cabinet supported",
+    "Design": "Free custom system design"
+   },
+   "warranty": "Inverter 5-yr, battery 10-yr design life / 5-yr defect, panels 10-yr + 25-yr output (Sohigh manufacturer warranty). MiStore adds local support. Lifespan/cycles are specifications, not a warranty term.",
+   "from": false
   }
  ]
 }
