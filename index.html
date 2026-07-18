@@ -1117,9 +1117,10 @@ const COLORS = ["No preference","Black","White / Silver","Blue","Green","Gold","
    shopped inline; Bikes links to its own page; the rest are coming soon. */
 const DEPARTMENTS = [
   { key:'phones',      name:'Phones',      ready:true,  img:'assets/cutouts/iphone-17-pro-max-back.webp' },
-  { key:'accessories', name:'Accessories', ready:true,  dev:'headphones' },
   { key:'bikes',       name:'Bikes',       ready:true,  img:'assets/bikes/icon-sport.png', href:'bikes.html' },
+  { key:'solar',       name:'Solar',       ready:true,  ph:'☀️' },
   { key:'kitchen',     name:'Kitchen',     ready:true,  img:'catalog-import/covers/kitchen-appliances-SC-Y66.jpg' },
+  { key:'accessories', name:'Accessories', ready:true,  dev:'headphones' },
   { key:'laptops',     name:'Laptops',     ready:false, dev:'laptop' },
   { key:'tablets',     name:'Tablets',     ready:false, dev:'tablet' },
   { key:'gadgets',     name:'Gadgets',     ready:false, dev:'watch' }
@@ -1146,6 +1147,18 @@ const BRANDS = {
   kitchen:[
     { key:'kitchen-appliances', name:'Appliances', ready:true, sub:'Air fryers, blenders, kettles, cookers — factory-direct.' },
     { key:'kitchen-utensils',   name:'Utensils',   ready:true, sub:'Pressure cookers, pots, flasks and kitchen tools.' },
+  ],
+  /* Solar (Sohigh Solar) — full range scaffolded; products & prices land once
+     the supplier catalog is imported. Brand shown publicly, supplier hidden. */
+  solar:[
+    { key:'solar-systems',     name:'Home Solar Systems', ready:false, sub:'Complete solar kits — 1.28KWh/1.5KVA up to 16KWh/13KVA. Launching shortly.' },
+    { key:'solar-batteries',   name:'Solar Batteries',    ready:false, sub:'LiFePO₄ storage batteries — landing shortly at MiStore.' },
+    { key:'solar-inverters',   name:'Hybrid Inverters',   ready:false, sub:'Pure sine-wave hybrid inverters — landing shortly at MiStore.' },
+    { key:'solar-panels',      name:'Solar Panels',       ready:false, sub:'Mono solar panels — landing shortly at MiStore.' },
+    { key:'solar-controllers', name:'Charge Controllers', ready:false, sub:'MPPT charge controllers — landing shortly at MiStore.' },
+    { key:'solar-pumps',       name:'Solar Pumps',        ready:false, sub:'Solar water pumps — landing shortly at MiStore.' },
+    { key:'solar-streetlights',name:'Street Lights',      ready:false, sub:'All-in-one solar street lights — landing shortly at MiStore.' },
+    { key:'solar-accessories', name:'Accessories',        ready:false, sub:'Cables, mounts and solar accessories — landing shortly at MiStore.' },
   ],
   bikes:['City','Sport','Mountain','Fat Tire','Cargo','Folding','Motorcycles','Tricycles'].map(n=>({key:'b-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — see the full collection on our Electric Mobility page.'}))
 };
