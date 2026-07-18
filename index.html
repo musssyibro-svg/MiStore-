@@ -1154,11 +1154,11 @@ const BRANDS = {
   /* Solar (Sohigh Solar) — full range scaffolded; products & prices land once
      the supplier catalog is imported. Brand shown publicly, supplier hidden. */
   solar:[
-    { key:'solar-systems',     name:'Home Solar Systems', ready:true,  sub:'Complete Sohigh Solar kits — inverter, LiFePO₄ battery & accessories. Sea shipping included; confirm delivered price on WhatsApp.' },
-    { key:'solar-batteries',   name:'Solar Batteries',    ready:false, sub:'LiFePO₄ storage batteries — landing shortly at MiStore.' },
-    { key:'solar-inverters',   name:'Hybrid Inverters',   ready:false, sub:'Pure sine-wave hybrid inverters — landing shortly at MiStore.' },
-    { key:'solar-panels',      name:'Solar Panels',       ready:false, sub:'Mono solar panels — landing shortly at MiStore.' },
-    { key:'solar-controllers', name:'Charge Controllers', ready:false, sub:'MPPT charge controllers — landing shortly at MiStore.' },
+    { key:'solar-systems',     name:'Home Solar Systems', ready:true,  sub:'Complete Sohigh Solar kits — inverter, LiFePO₄ battery & panels. Sea shipping included; confirm delivered price on WhatsApp.' },
+    { key:'solar-inverters',   name:'Hybrid Inverters',   ready:true,  sub:'Pure sine-wave hybrid inverters with built-in MPPT — 4KVA to 13KVA.' },
+    { key:'solar-batteries',   name:'Solar Batteries',    ready:true,  sub:'Grade-A LiFePO₄, high-voltage stack & gel batteries.' },
+    { key:'solar-panels',      name:'Solar Panels',       ready:true,  sub:'Mono half-cell bifacial panels — 585W to 730W.' },
+    { key:'solar-controllers', name:'Charge Controllers', ready:true,  sub:'MPPT & PWM solar charge controllers.' },
     { key:'solar-pumps',       name:'Solar Pumps',        ready:false, sub:'Solar water pumps — landing shortly at MiStore.' },
     { key:'solar-streetlights',name:'Street Lights',      ready:false, sub:'All-in-one solar street lights — landing shortly at MiStore.' },
     { key:'solar-accessories', name:'Accessories',        ready:false, sub:'Cables, mounts and solar accessories — landing shortly at MiStore.' },
@@ -1646,11 +1646,11 @@ const PHONE_BRANDS = {
 function isBrandPhone(){ return dept==='phones' && !!PHONE_BRANDS[category]; }
 function curBrand(){ return PHONE_BRANDS[category]; }
 function isSamsung(){ return isBrandPhone(); }   /* legacy alias — now any ¥-driven brand */
-function isSolar(){ return dept==='solar' && category==='solar-systems'; }
+function isSolar(){ return dept==='solar' && brandDef(category).ready; }
 function renderTabs(){
   if(isCatalogDept()||isBrandPhone()||isSolar()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
     if(isBrandPhone()){ const b=curBrand(); $('catHead').textContent=b.head; $('catSub').textContent=brandDef(category).sub; }
-    if(isSolar()){ $('catHead').textContent='Home Solar Systems'; $('catSub').textContent=brandDef('solar-systems').sub; } return; }
+    if(isSolar()){ $('catHead').textContent=brandDef(category).name; $('catSub').textContent=brandDef(category).sub; } return; }
   $('condTabs').style.display=''; $('condBlurb').style.display='';
   const ready=brandDef(category).ready;
   $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
@@ -1874,49 +1874,50 @@ function ensureSolar(){
     .then(r=>r.json()).then(d=>{ SOLAR=d; }).catch(()=>{ SOLAR={systems:[]}; });
   return _solarLoading;
 }
+function solarList(){ return (SOLAR&&SOLAR.products||[]).filter(p=>p.cat===category); }
 function renderSolarGrid(){
   if(!SOLAR){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading Solar…</div>'; ensureSolar().then(()=>{ if(isSolar()) renderGrid(); }); return; }
-  const sys=SOLAR.systems||[];
-  if(!sys.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">☀️</div>Solar kits are being priced — message us for a quote.</div>'; return; }
-  window._solarById={}; sys.forEach((s,i)=>window._solarById[i]=s);
-  $('grid').innerHTML=sys.map((s,i)=>`
-    <article class="pcard" data-solar="${i}">
+  const items=solarList();
+  if(!items.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">☀️</div>These are being priced — message us for a quote.</div>'; return; }
+  window._solarById={}; items.forEach((s)=>window._solarById[s.id]=s);
+  $('grid').innerHTML=items.map(s=>`
+    <article class="pcard" data-solar="${esc(s.id)}">
       <div class="phero"><img class="samcover" src="${esc(s.cover)}" alt="${esc(s.name)}" loading="lazy" onerror="this.style.display='none'"><span class="sambadge">Sohigh Solar</span></div>
       <div class="pinfo">
         <div class="pname">${esc(s.name)}</div>
-        <div class="pmem">${esc(s.capacity_kwh)}KWh · ${esc(s.inverter_kva)}KVA${s.panels_included?' · +Panels':''}</div>
-        <div class="prow"><span class="pfrom">from <b>${fmtK(s.price_ngn)}</b></span><span class="stock in">In stock</span></div>
+        <div class="pmem">${esc(s.tags||'')}</div>
+        <div class="prow"><span class="pfrom">${s.price_ngn?((s.from?'from ':'')+'<b>'+fmtK(s.price_ngn)+'</b>'):'<b>Request quote</b>'}</span><span class="stock in">In stock</span></div>
         <button class="viewbtn">View &amp; order</button>
       </div>
     </article>`).join('');
   $('grid').querySelectorAll('[data-solar]').forEach(el=>el.onclick=()=>openSolarSheet(el.dataset.solar));
 }
-function openSolarSheet(i){
-  const s=(window._solarById||{})[i]; if(!s) return;
+function openSolarSheet(id){
+  const s=(window._solarById||{})[id]; if(!s) return;
   const sheet=$('catSheet'); if(!sheet) return;
   const imgs=(s.gallery&&s.gallery.length?s.gallery:[s.cover]).filter(Boolean);
   let gi=0;
+  const priceTxt = s.price_ngn ? (fmtK(s.price_ngn)+' <span class="perpc">'+(s.from?'starting price':'')+'</span>') : 'Request a quote';
   function paint(){
     const specRows=Object.keys(s.specs||{}).map(k=>`<div class="csrow"><span>${esc(k)}</span><b>${esc(s.specs[k])}</b></div>`).join('');
-    const incl=(s.includes||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    const incl=(s.includes||[]).length?`<div class="csspecshead">What's included</div><ul class="csincl">${s.includes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
     const thumbs=imgs.length>1?`<div class="csthumbs">${imgs.map((u,idx)=>`<img src="${esc(u)}" data-si="${idx}" class="${idx===gi?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>`:'';
     $('catSheetBody').innerHTML=`
       <div class="csmedia"><img id="csSolarImg" src="${esc(imgs[gi]||'')}" alt="${esc(s.name)}" onerror="this.style.display='none'"></div>
       ${thumbs}
-      <div class="cskicker">☀️ Sohigh Solar · Complete kit</div>
+      <div class="cskicker">☀️ Sohigh Solar</div>
       <h3 class="csname">${esc(s.name)}</h3>
-      <div class="csprice">${fmtK(s.price_ngn)} <span class="perpc">sea shipping included</span></div>
+      <div class="csprice">${priceTxt}</div>
       ${s.summary?`<p class="csdesc">${esc(s.summary)}</p>`:''}
-      <div class="csspecshead">What's included</div>
-      <ul class="csincl">${incl}</ul>
+      ${incl}
       <div class="csspecshead">Specifications</div>
       <div class="cstotbox">${specRows}</div>
       <div class="csspecshead">Warranty</div>
-      <p class="csdesc">${esc(SOLAR.warranty||'')}</p>
-      <button class="addbtn" id="solarOrderBtn">Order on WhatsApp</button>
+      <p class="csdesc">${esc(s.warranty||SOLAR.about||'')}</p>
+      <button class="addbtn" id="solarOrderBtn">${s.price_ngn?'Order on WhatsApp':'Request a quote'}</button>
       <p class="csnote">${esc(SOLAR.note||'')}</p>`;
     sheet.querySelectorAll('[data-si]').forEach(t=>t.onclick=()=>{ gi=+t.dataset.si; const m=$('csSolarImg'); if(m) m.src=imgs[gi]; sheet.querySelectorAll('[data-si]').forEach(x=>x.classList.remove('on')); t.classList.add('on'); });
-    $('solarOrderBtn').onclick=()=>{ window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to buy the '+s.name+' ('+fmtK(s.price_ngn)+', sea shipping included). Please confirm the delivered price and availability.'),'_blank','noopener'); };
+    $('solarOrderBtn').onclick=()=>{ const pt=s.price_ngn?(' ('+fmtK(s.price_ngn)+(s.from?' from':'')+')'):''; window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I\'m interested in the '+s.name+pt+'. Please confirm the delivered price and availability.'),'_blank','noopener'); };
   }
   paint(); showSheet(sheet);
 }
