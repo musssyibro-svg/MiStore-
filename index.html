@@ -676,6 +676,8 @@
   .csname{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:2px 0 4px;}
   .csprice{font-size:17px;font-weight:800;color:var(--red,#e0245e);margin-bottom:8px;}
   .csdesc{font-size:13.5px;color:var(--muted);line-height:1.55;margin:0 0 12px;}
+  .csincl{margin:0 0 14px;padding-left:20px;font-size:13.5px;color:var(--muted);line-height:1.6;}
+  .csincl li{margin:0 0 4px;}
   .csspecs{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
   .csrow{display:flex;justify-content:space-between;gap:12px;padding:9px 13px;font-size:13px;border-bottom:1px solid var(--line);}
   .csrow:last-child{border-bottom:none;}
@@ -1152,7 +1154,7 @@ const BRANDS = {
   /* Solar (Sohigh Solar) — full range scaffolded; products & prices land once
      the supplier catalog is imported. Brand shown publicly, supplier hidden. */
   solar:[
-    { key:'solar-systems',     name:'Home Solar Systems', ready:false, sub:'Complete solar kits — 1.28KWh/1.5KVA up to 16KWh/13KVA. Launching shortly.' },
+    { key:'solar-systems',     name:'Home Solar Systems', ready:true,  sub:'Complete Sohigh Solar kits — inverter, LiFePO₄ battery & accessories. Sea shipping included; confirm delivered price on WhatsApp.' },
     { key:'solar-batteries',   name:'Solar Batteries',    ready:false, sub:'LiFePO₄ storage batteries — landing shortly at MiStore.' },
     { key:'solar-inverters',   name:'Hybrid Inverters',   ready:false, sub:'Pure sine-wave hybrid inverters — landing shortly at MiStore.' },
     { key:'solar-panels',      name:'Solar Panels',       ready:false, sub:'Mono solar panels — landing shortly at MiStore.' },
@@ -1644,9 +1646,11 @@ const PHONE_BRANDS = {
 function isBrandPhone(){ return dept==='phones' && !!PHONE_BRANDS[category]; }
 function curBrand(){ return PHONE_BRANDS[category]; }
 function isSamsung(){ return isBrandPhone(); }   /* legacy alias — now any ¥-driven brand */
+function isSolar(){ return dept==='solar' && category==='solar-systems'; }
 function renderTabs(){
-  if(isCatalogDept()||isBrandPhone()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
-    if(isBrandPhone()){ const b=curBrand(); $('catHead').textContent=b.head; $('catSub').textContent=brandDef(category).sub; } return; }
+  if(isCatalogDept()||isBrandPhone()||isSolar()){ $('condTabs').style.display='none'; $('condBlurb').style.display='none'; $('hotdeal').style.display='none';
+    if(isBrandPhone()){ const b=curBrand(); $('catHead').textContent=b.head; $('catSub').textContent=brandDef(category).sub; }
+    if(isSolar()){ $('catHead').textContent='Home Solar Systems'; $('catSub').textContent=brandDef('solar-systems').sub; } return; }
   $('condTabs').style.display=''; $('condBlurb').style.display='';
   const ready=brandDef(category).ready;
   $('catHead').textContent=dept==='phones'&&category==='iphones'?'Current iPhone':brandDef(category).name;
@@ -1666,6 +1670,7 @@ function renderTabs(){
 function renderGrid(){
   if(isCatalogDept()){ renderCatalogDeptGrid(); return; }
   if(isBrandPhone()){ renderBrandGrid(); return; }
+  if(isSolar()){ renderSolarGrid(); return; }
   /* coming-soon brands show an elegant panel instead of products */
   if(!brandDef(category).ready){
     const c=brandDef(category); const nm=deptDef(dept).name+' · '+c.name;
@@ -1858,6 +1863,63 @@ function openBrandSheet(key,i){
 /* legacy aliases (older call sites) */
 function ensureSamsung(){ return ensureBrand('samsung'); }
 function renderSamsungGrid(){ return renderBrandGrid(); }
+
+/* ================= SOLAR (Sohigh Solar) — complete kits =================
+   Public data is NGN-only (assets/solar/solar.json): brand shown, supplier &
+   ¥ never shipped to the browser. Price already includes sea shipping. */
+let SOLAR=null, _solarLoading=null;
+function ensureSolar(){
+  if(SOLAR) return Promise.resolve();
+  if(!_solarLoading) _solarLoading=fetch('assets/solar/solar.json',{cache:'no-store'})
+    .then(r=>r.json()).then(d=>{ SOLAR=d; }).catch(()=>{ SOLAR={systems:[]}; });
+  return _solarLoading;
+}
+function renderSolarGrid(){
+  if(!SOLAR){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">⏳</div>Loading Solar…</div>'; ensureSolar().then(()=>{ if(isSolar()) renderGrid(); }); return; }
+  const sys=SOLAR.systems||[];
+  if(!sys.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">☀️</div>Solar kits are being priced — message us for a quote.</div>'; return; }
+  window._solarById={}; sys.forEach((s,i)=>window._solarById[i]=s);
+  $('grid').innerHTML=sys.map((s,i)=>`
+    <article class="pcard" data-solar="${i}">
+      <div class="phero"><img class="samcover" src="${esc(s.cover)}" alt="${esc(s.name)}" loading="lazy" onerror="this.style.display='none'"><span class="sambadge">Sohigh Solar</span></div>
+      <div class="pinfo">
+        <div class="pname">${esc(s.name)}</div>
+        <div class="pmem">${esc(s.capacity_kwh)}KWh · ${esc(s.inverter_kva)}KVA${s.panels_included?' · +Panels':''}</div>
+        <div class="prow"><span class="pfrom">from <b>${fmtK(s.price_ngn)}</b></span><span class="stock in">In stock</span></div>
+        <button class="viewbtn">View &amp; order</button>
+      </div>
+    </article>`).join('');
+  $('grid').querySelectorAll('[data-solar]').forEach(el=>el.onclick=()=>openSolarSheet(el.dataset.solar));
+}
+function openSolarSheet(i){
+  const s=(window._solarById||{})[i]; if(!s) return;
+  const sheet=$('catSheet'); if(!sheet) return;
+  const imgs=(s.gallery&&s.gallery.length?s.gallery:[s.cover]).filter(Boolean);
+  let gi=0;
+  function paint(){
+    const specRows=Object.keys(s.specs||{}).map(k=>`<div class="csrow"><span>${esc(k)}</span><b>${esc(s.specs[k])}</b></div>`).join('');
+    const incl=(s.includes||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    const thumbs=imgs.length>1?`<div class="csthumbs">${imgs.map((u,idx)=>`<img src="${esc(u)}" data-si="${idx}" class="${idx===gi?'on':''}" alt="" onerror="this.remove()">`).join('')}</div>`:'';
+    $('catSheetBody').innerHTML=`
+      <div class="csmedia"><img id="csSolarImg" src="${esc(imgs[gi]||'')}" alt="${esc(s.name)}" onerror="this.style.display='none'"></div>
+      ${thumbs}
+      <div class="cskicker">☀️ Sohigh Solar · Complete kit</div>
+      <h3 class="csname">${esc(s.name)}</h3>
+      <div class="csprice">${fmtK(s.price_ngn)} <span class="perpc">sea shipping included</span></div>
+      ${s.summary?`<p class="csdesc">${esc(s.summary)}</p>`:''}
+      <div class="csspecshead">What's included</div>
+      <ul class="csincl">${incl}</ul>
+      <div class="csspecshead">Specifications</div>
+      <div class="cstotbox">${specRows}</div>
+      <div class="csspecshead">Warranty</div>
+      <p class="csdesc">${esc(SOLAR.warranty||'')}</p>
+      <button class="addbtn" id="solarOrderBtn">Order on WhatsApp</button>
+      <p class="csnote">${esc(SOLAR.note||'')}</p>`;
+    sheet.querySelectorAll('[data-si]').forEach(t=>t.onclick=()=>{ gi=+t.dataset.si; const m=$('csSolarImg'); if(m) m.src=imgs[gi]; sheet.querySelectorAll('[data-si]').forEach(x=>x.classList.remove('on')); t.classList.add('on'); });
+    $('solarOrderBtn').onclick=()=>{ window.open(`https://wa.me/${WHATSAPP}?text=`+encodeURIComponent('Hi MiStore, I want to buy the '+s.name+' ('+fmtK(s.price_ngn)+', sea shipping included). Please confirm the delivered price and availability.'),'_blank','noopener'); };
+  }
+  paint(); showSheet(sheet);
+}
 
 /* ---------- product sheet + swipeable gallery ---------- */
 /* "Choose condition" selector — every condition selectable inside the
