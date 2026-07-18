@@ -8,7 +8,7 @@
    "storages": [
     {
      "storage": "128GB",
-     "price_ngn": 125000
+     "price_ngn": 135000
     }
    ]
   },
@@ -18,7 +18,7 @@
    "storages": [
     {
      "storage": "128GB",
-     "price_ngn": 130000
+     "price_ngn": 140000
     }
    ]
   },
@@ -28,7 +28,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 230000
+     "price_ngn": 240000
     }
    ]
   },
@@ -38,7 +38,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 195000
+     "price_ngn": 205000
     }
    ]
   },
@@ -48,7 +48,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 205000
+     "price_ngn": 215000
     }
    ]
   },
@@ -58,7 +58,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 310000
+     "price_ngn": 320000
     }
    ]
   },
@@ -68,7 +68,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 220000
+     "price_ngn": 230000
     }
    ]
   },
@@ -78,7 +78,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 240000
+     "price_ngn": 250000
     }
    ]
   },
@@ -88,7 +88,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 395000
+     "price_ngn": 405000
     }
    ]
   },
@@ -98,7 +98,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 300000
+     "price_ngn": 310000
     }
    ]
   },
@@ -108,7 +108,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 365000
+     "price_ngn": 375000
     }
    ]
   },
@@ -118,7 +118,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 260000
+     "price_ngn": 270000
     }
    ]
   },
@@ -128,11 +128,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 540000
+     "price_ngn": 550000
     },
     {
      "storage": "256GB · 8GB RAM",
-     "price_ngn": 520000
+     "price_ngn": 530000
     }
    ]
   },
@@ -142,7 +142,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 435000
+     "price_ngn": 445000
     }
    ]
   },
@@ -152,7 +152,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 470000
+     "price_ngn": 480000
     }
    ]
   },
@@ -162,15 +162,15 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 720000
+     "price_ngn": 730000
     },
     {
      "storage": "512GB",
-     "price_ngn": 790000
+     "price_ngn": 800000
     },
     {
      "storage": "1TB",
-     "price_ngn": 885000
+     "price_ngn": 895000
     }
    ]
   },
@@ -180,7 +180,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 665000
+     "price_ngn": 675000
     }
    ]
   },
@@ -190,7 +190,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 575000
+     "price_ngn": 585000
     }
    ]
   },
@@ -200,7 +200,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 690000
+     "price_ngn": 700000
     }
    ]
   },
@@ -210,15 +210,15 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 960000
+     "price_ngn": 970000
     },
     {
      "storage": "512GB",
-     "price_ngn": 1075000
+     "price_ngn": 1085000
     },
     {
      "storage": "1TB",
-     "price_ngn": 1265000
+     "price_ngn": 1275000
     }
    ]
   },
@@ -228,7 +228,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 720000
+     "price_ngn": 730000
     }
    ]
   },
@@ -238,11 +238,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 940000
+     "price_ngn": 950000
     },
     {
      "storage": "512GB",
-     "price_ngn": 1000000
+     "price_ngn": 1010000
     }
    ]
   },
@@ -252,15 +252,15 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 1160000
+     "price_ngn": 1170000
     },
     {
      "storage": "512GB",
-     "price_ngn": 1240000
+     "price_ngn": 1250000
     },
     {
      "storage": "1TB",
-     "price_ngn": 1515000
+     "price_ngn": 1525000
     }
    ]
   },
@@ -270,7 +270,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 290000
+     "price_ngn": 300000
     }
    ]
   },
@@ -280,7 +280,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 365000
+     "price_ngn": 375000
     }
    ]
   },
@@ -290,15 +290,15 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 415000
+     "price_ngn": 425000
     },
     {
      "storage": "512GB",
-     "price_ngn": 435000
+     "price_ngn": 445000
     },
     {
      "storage": "1TB",
-     "price_ngn": 460000
+     "price_ngn": 470000
     }
    ]
   },
@@ -308,11 +308,11 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 575000
+     "price_ngn": 585000
     },
     {
      "storage": "1TB",
-     "price_ngn": 605000
+     "price_ngn": 615000
     }
    ]
   },
@@ -322,11 +322,11 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 970000
+     "price_ngn": 980000
     },
     {
      "storage": "1TB",
-     "price_ngn": 1045000
+     "price_ngn": 1055000
     }
    ]
   },
@@ -336,15 +336,15 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 1365000
+     "price_ngn": 1375000
     },
     {
      "storage": "512GB",
-     "price_ngn": 1490000
+     "price_ngn": 1500000
     },
     {
      "storage": "1TB",
-     "price_ngn": 1660000
+     "price_ngn": 1670000
     }
    ]
   },
@@ -354,11 +354,11 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 2705000
+     "price_ngn": 2715000
     },
     {
      "storage": "1TB",
-     "price_ngn": 2915000
+     "price_ngn": 2925000
     }
    ]
   },
@@ -368,11 +368,11 @@
    "storages": [
     {
      "storage": "128GB",
-     "price_ngn": 155000
+     "price_ngn": 165000
     },
     {
      "storage": "256GB",
-     "price_ngn": 175000
+     "price_ngn": 185000
     }
    ]
   },
@@ -382,11 +382,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 195000
+     "price_ngn": 205000
     },
     {
      "storage": "512GB · 8GB RAM",
-     "price_ngn": 220000
+     "price_ngn": 230000
     }
    ]
   },
@@ -396,11 +396,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 300000
+     "price_ngn": 310000
     },
     {
      "storage": "512GB · 8GB RAM",
-     "price_ngn": 320000
+     "price_ngn": 330000
     }
    ]
   },
@@ -410,11 +410,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 415000
+     "price_ngn": 425000
     },
     {
      "storage": "512GB",
-     "price_ngn": 470000
+     "price_ngn": 480000
     }
    ]
   },
@@ -424,7 +424,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 355000
+     "price_ngn": 365000
     }
    ]
   },
@@ -434,11 +434,11 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 655000
+     "price_ngn": 665000
     },
     {
      "storage": "512GB",
-     "price_ngn": 720000
+     "price_ngn": 730000
     }
    ]
   },
@@ -448,7 +448,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 165000
+     "price_ngn": 175000
     }
    ]
   },
@@ -458,7 +458,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 300000
+     "price_ngn": 310000
     }
    ]
   },
@@ -468,7 +468,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 240000
+     "price_ngn": 250000
     }
    ]
   },
@@ -478,7 +478,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 280000
+     "price_ngn": 290000
     }
    ]
   },
@@ -488,7 +488,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 385000
+     "price_ngn": 395000
     }
    ]
   },
@@ -498,7 +498,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 250000
+     "price_ngn": 260000
     }
    ]
   },
@@ -508,7 +508,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 510000
+     "price_ngn": 520000
     }
    ]
   },
@@ -518,7 +518,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 365000
+     "price_ngn": 375000
     }
    ]
   },
@@ -528,7 +528,7 @@
    "storages": [
     {
      "storage": "1TB",
-     "price_ngn": 780000
+     "price_ngn": 790000
     }
    ]
   },
@@ -538,7 +538,7 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 615000
+     "price_ngn": 625000
     }
    ]
   },
@@ -548,11 +548,11 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 1365000
+     "price_ngn": 1375000
     },
     {
      "storage": "1TB",
-     "price_ngn": 1470000
+     "price_ngn": 1480000
     }
    ]
   },
@@ -562,11 +562,11 @@
    "storages": [
     {
      "storage": "512GB",
-     "price_ngn": 1975000
+     "price_ngn": 1985000
     },
     {
      "storage": "1TB",
-     "price_ngn": 2180000
+     "price_ngn": 2190000
     }
    ]
   },
@@ -576,7 +576,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 120000
+     "price_ngn": 130000
     }
    ]
   },
@@ -586,7 +586,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 145000
+     "price_ngn": 155000
     }
    ]
   },
@@ -596,7 +596,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 155000
+     "price_ngn": 165000
     }
    ]
   },
@@ -606,7 +606,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 300000
+     "price_ngn": 310000
     }
    ]
   },
@@ -616,7 +616,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 320000
+     "price_ngn": 330000
     }
    ]
   },
@@ -626,7 +626,7 @@
    "storages": [
     {
      "storage": "256GB",
-     "price_ngn": 365000
+     "price_ngn": 375000
     }
    ]
   }
