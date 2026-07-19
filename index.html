@@ -642,6 +642,11 @@
   .samph{flex-direction:column;gap:8px;}
   .samsoon{font-size:11.5px;color:var(--faint);font-weight:700;}
   .samcover{width:100%;height:100%;object-fit:contain;padding:10px;mix-blend-mode:multiply;}
+  .solarabout{background:linear-gradient(120deg,var(--card),var(--bg));border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:4px;}
+  .solarabout .satitle{font-size:15px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;}
+  .solarabout p{font-size:13px;color:var(--muted);line-height:1.55;margin:0 0 10px;}
+  .sabadges{display:flex;flex-wrap:wrap;gap:6px;}
+  .sabadges span{font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 10px;}
   .samcover.big{padding:16px;}
 
   /* ---- product sheet controls ---- */
@@ -1159,8 +1164,8 @@ const BRANDS = {
     { key:'solar-batteries',   name:'Solar Batteries',    ready:true,  sub:'Grade-A LiFePO₄, high-voltage stack & gel batteries.' },
     { key:'solar-panels',      name:'Solar Panels',       ready:true,  sub:'Mono half-cell bifacial panels — 585W to 730W.' },
     { key:'solar-controllers', name:'Charge Controllers', ready:true,  sub:'MPPT & PWM solar charge controllers.' },
-    { key:'solar-pumps',       name:'Solar Pumps',        ready:false, sub:'Solar water pumps — landing shortly at MiStore.' },
-    { key:'solar-streetlights',name:'Street Lights',      ready:false, sub:'All-in-one solar street lights — landing shortly at MiStore.' },
+    { key:'solar-pumps',       name:'Solar Pumps',        ready:false, sub:'Sohigh solar submersible & surface water pumps — landing shortly. Message us for a quote.' },
+    { key:'solar-streetlights',name:'Street Lights',      ready:false, sub:'Sohigh all-in-one solar street lights, 8W–300W (LiFePO₄, IP65, motion sensor) — landing shortly. Message us for a quote.' },
     { key:'solar-accessories', name:'Accessories',        ready:false, sub:'Cables, mounts and solar accessories — landing shortly at MiStore.' },
   ],
   bikes:['City','Sport','Mountain','Fat Tire','Cargo','Folding','Motorcycles','Tricycles'].map(n=>({key:'b-'+n.toLowerCase().replace(/\s/g,''),name:n,ready:false,sub:n+' — see the full collection on our Electric Mobility page.'}))
@@ -1880,7 +1885,8 @@ function renderSolarGrid(){
   const items=solarList();
   if(!items.length){ $('grid').innerHTML='<div class="comingsoon" style="grid-column:1/-1"><div class="big">☀️</div>These are being priced — message us for a quote.</div>'; return; }
   window._solarById={}; items.forEach((s)=>window._solarById[s.id]=s);
-  $('grid').innerHTML=items.map(s=>`
+  const about=(category==='solar-systems'&&SOLAR.about)?`<div class="solarabout" style="grid-column:1/-1"><div class="satitle">☀️ Sohigh Solar</div><p>${esc(SOLAR.about)}</p><div class="sabadges"><span>Since 2005</span><span>Grade-A LiFePO₄</span><span>Pure sine wave</span><span>ISO · IEC · CE · SGS · TÜV</span><span>Panels 25-yr output</span></div></div>`:'';
+  $('grid').innerHTML=about+items.map(s=>`
     <article class="pcard" data-solar="${esc(s.id)}">
       <div class="phero"><img class="samcover" src="${esc(s.cover)}" alt="${esc(s.name)}" loading="lazy" onerror="this.style.display='none'"><span class="sambadge">Sohigh Solar</span></div>
       <div class="pinfo">
