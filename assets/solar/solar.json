@@ -10,11 +10,11 @@
    "cat": "solar-systems",
    "name": "1.28 KWh / 1.5 KVA Solar System",
    "price_ngn": 1075000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/battery-12-8v-100ah.jpg",
-    "assets/solar/accessories-kit.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "1.28KWh · 1.5KVA",
    "summary": "Starter off-grid kit for lights, TV, fans & phone charging.",
@@ -38,11 +38,11 @@
    "cat": "solar-systems",
    "name": "2.56 KWh / 4 KVA Solar System",
    "price_ngn": 1635000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/battery-25-6v-200ah.jpg",
-    "assets/solar/accessories-kit.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "2.56KWh · 4KVA",
    "summary": "Mid-size off-grid kit for a small home or shop.",
@@ -66,11 +66,11 @@
    "cat": "solar-systems",
    "name": "5 KWh / 4 KVA Solar System",
    "price_ngn": 2030000,
-   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
-    "assets/solar/battery-25-6v-200ah.jpg",
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/accessories-kit.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "5KWh · 4KVA",
    "summary": "Whole-home off-grid kit with all-day backup.",
@@ -94,12 +94,12 @@
    "cat": "solar-systems",
    "name": "5 KWh / 4 KVA System + 4×600W Panels",
    "price_ngn": 2815000,
-   "cover": "assets/solar/panel-mono.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
     "assets/solar/panel-mono.jpg",
-    "assets/solar/battery-25-6v-200ah.jpg",
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/accessories-kit.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "5KWh · 4KVA · +Panels",
    "summary": "Complete solar power station — 5KWh kit plus four 600W bifacial panels.",
@@ -124,11 +124,11 @@
    "cat": "solar-systems",
    "name": "10 KWh / 6.5 KVA Solar System + 6×585W Panels",
    "price_ngn": 8140000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/battery-stack.jpg",
-    "assets/solar/panel-mono.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "10KWh · 6.5KVA · +Panels",
    "summary": "Large-home / small-business solar station with six panels.",
@@ -153,11 +153,11 @@
    "cat": "solar-systems",
    "name": "17.5 KWh / 13 KVA Solar System + 10×585W Panels",
    "price_ngn": 12745000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/system-kit.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg",
-    "assets/solar/battery-stack.jpg",
-    "assets/solar/panel-mono.jpg"
+    "assets/solar/system-kit.jpg",
+    "assets/solar/inverter.jpg",
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "17.5KWh · 13KVA · +Panels",
    "summary": "Big off-grid / three-phase-ready station for large homes and businesses.",
@@ -182,9 +182,9 @@
    "cat": "solar-systems",
    "name": "Commercial & Industrial Storage (50KWh – 1MWh)",
    "price_ngn": null,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/ci-cabinet.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/ci-cabinet.jpg"
    ],
    "tags": "C&I · 50KWh–1MWh",
    "summary": "All-in-one container energy storage for businesses & projects — PCS inverter, EMS, fire suppression, cooling. Custom-designed; request a quote.",
@@ -202,9 +202,9 @@
    "cat": "solar-inverters",
    "name": "Sohigh 4KVA Hybrid Inverter (24V)",
    "price_ngn": 610000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/inverter.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg"
+    "assets/solar/inverter.jpg"
    ],
    "tags": "4KVA · 24V",
    "summary": "Off/on-grid hybrid inverter with built-in MPPT and pure sine-wave output.",
@@ -224,9 +224,9 @@
    "cat": "solar-inverters",
    "name": "Sohigh 5.5 / 6.5KVA Hybrid Inverter (48V, IP54)",
    "price_ngn": 875000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/inverter.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg"
+    "assets/solar/inverter.jpg"
    ],
    "tags": "5.5–6.5KVA · 48V · IP54",
    "summary": "Weatherproof (IP54) 48V hybrid inverter for larger homes and shops.",
@@ -246,9 +246,9 @@
    "cat": "solar-inverters",
    "name": "Sohigh 13KVA Parallel Hybrid Inverter (48V)",
    "price_ngn": 1825000,
-   "cover": "assets/solar/inverter-hybrid.jpg",
+   "cover": "assets/solar/inverter.jpg",
    "gallery": [
-    "assets/solar/inverter-hybrid.jpg"
+    "assets/solar/inverter.jpg"
    ],
    "tags": "13KVA · 48V · 3-phase",
    "summary": "High-power inverter — up to 6 units in parallel for three-phase loads.",
@@ -267,9 +267,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh LiFePO₄ 1.28KWh Battery (12.8V 100Ah)",
    "price_ngn": 330000,
-   "cover": "assets/solar/battery-12-8v-100ah.jpg",
+   "cover": "assets/solar/battery-wall.jpg",
    "gallery": [
-    "assets/solar/battery-12-8v-100ah.jpg"
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "1.28KWh · 12.8V",
    "summary": "Compact wall-mount lithium battery for small setups.",
@@ -289,9 +289,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh LiFePO₄ 2.7KWh Battery (12.8V 200Ah)",
    "price_ngn": 645000,
-   "cover": "assets/solar/battery-12-8v-100ah.jpg",
+   "cover": "assets/solar/battery-wall.jpg",
    "gallery": [
-    "assets/solar/battery-12-8v-100ah.jpg"
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "2.7KWh · 12.8V",
    "summary": "12V lithium battery for medium backup.",
@@ -311,9 +311,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh LiFePO₄ 4KWh Battery (12.8V 300Ah)",
    "price_ngn": 935000,
-   "cover": "assets/solar/battery-12-8v-100ah.jpg",
+   "cover": "assets/solar/battery-wall.jpg",
    "gallery": [
-    "assets/solar/battery-12-8v-100ah.jpg"
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "4KWh · 12.8V",
    "summary": "Large 12V lithium battery.",
@@ -333,9 +333,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh LiFePO₄ 2.56KWh Battery (25.6V 100Ah)",
    "price_ngn": 620000,
-   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "cover": "assets/solar/battery-wall.jpg",
    "gallery": [
-    "assets/solar/battery-25-6v-200ah.jpg"
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "2.56KWh · 25.6V",
    "summary": "24V wall-mount lithium battery.",
@@ -355,9 +355,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh LiFePO₄ 5KWh Battery (25.6V 200Ah)",
    "price_ngn": 1170000,
-   "cover": "assets/solar/battery-25-6v-200ah.jpg",
+   "cover": "assets/solar/battery-wall.jpg",
    "gallery": [
-    "assets/solar/battery-25-6v-200ah.jpg"
+    "assets/solar/battery-wall.jpg"
    ],
    "tags": "5KWh · 25.6V",
    "summary": "Big 24V wall-mount battery for whole-home backup.",
@@ -377,9 +377,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh Rack LiFePO₄ 5KWh (51.2V 100Ah)",
    "price_ngn": 1135000,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/battery-rack.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/battery-rack.jpg"
    ],
    "tags": "5KWh · 51.2V rack",
    "summary": "48V rack-mount battery module.",
@@ -399,9 +399,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh Rack LiFePO₄ 10KWh (51.2V 200Ah)",
    "price_ngn": 2210000,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/battery-rack.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/battery-rack.jpg"
    ],
    "tags": "10KWh · 51.2V rack",
    "summary": "48V rack-mount battery for large systems.",
@@ -421,9 +421,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh Rack LiFePO₄ 17.5KWh (51.2V 340Ah)",
    "price_ngn": 3805000,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/battery-rack.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/battery-rack.jpg"
    ],
    "tags": "17.5KWh · 51.2V rack",
    "summary": "High-capacity 48V rack battery.",
@@ -443,9 +443,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh High-Voltage Stack Battery (10.24KWh)",
    "price_ngn": 2360000,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/battery-rack.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/battery-rack.jpg"
    ],
    "tags": "10.24KWh · HV stack",
    "summary": "Stackable high-voltage lithium storage — expand for bigger loads.",
@@ -464,9 +464,9 @@
    "cat": "solar-batteries",
    "name": "Sohigh High-Voltage Stack Battery (40.96KWh)",
    "price_ngn": 7430000,
-   "cover": "assets/solar/battery-stack.jpg",
+   "cover": "assets/solar/battery-rack.jpg",
    "gallery": [
-    "assets/solar/battery-stack.jpg"
+    "assets/solar/battery-rack.jpg"
    ],
    "tags": "40.96KWh · HV stack",
    "summary": "Large high-voltage stack for commercial loads.",
